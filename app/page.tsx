@@ -10,6 +10,43 @@ export default function Home() {
       id="top"
     >
       <ThemeToggle />
+
+      {/* HEADER with Member Login */}
+      <header className="w-full border-b dark:border-zinc-900 light:border-zinc-300 dark:bg-black/95 light:bg-white/95 backdrop-blur-sm sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto px-6 sm:px-10 lg:px-16 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Image
+              src="/logo_white.png"
+              alt="ROBOCEK logo"
+              width={32}
+              height={32}
+              className="hidden dark:block select-none"
+              style={{ width: "auto", height: "auto" }}
+            />
+            <Image
+              src="/logo_black.png"
+              alt="ROBOCEK logo"
+              width={32}
+              height={32}
+              className="block dark:hidden select-none"
+              style={{ width: "auto", height: "auto" }}
+            />
+            <span className="text-sm font-semibold tracking-widest uppercase">
+              ROBOCEK
+            </span>
+          </div>
+          <a
+            href="/login"
+            className="inline-flex items-center justify-center rounded-full border
+              dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-100 dark:hover:text-zinc-50 dark:hover:bg-zinc-900/50
+              light:border-zinc-400 light:text-zinc-700 light:hover:border-zinc-800 light:hover:text-black light:hover:bg-gray-100
+              px-5 py-2 text-xs font-medium uppercase tracking-[0.15em] transition"
+          >
+            Member Login
+          </a>
+        </div>
+      </header>
+
       {/* HERO */}
       <main className="flex-1 w-full flex flex-col items-center">
         <section className="w-full max-w-6xl px-6 sm:px-10 lg:px-16 pt-10 pb-16 sm:pt-16 sm:pb-24">
@@ -64,7 +101,7 @@ export default function Home() {
 
               <div className="flex flex-col sm:flex-row items-center gap-4 mt-2">
                 <a
-                  href="#join"
+                  href="/register"
                   className="group inline-flex items-center justify-center rounded-full border
                     dark:border-zinc-50 dark:bg-zinc-50 dark:text-black dark:hover:bg-black dark:hover:text-zinc-50 dark:hover:border-zinc-500
                     light:border-black light:bg-black light:text-white light:hover:bg-white light:hover:text-black light:hover:border-zinc-700
