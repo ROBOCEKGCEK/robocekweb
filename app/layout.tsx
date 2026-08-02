@@ -16,8 +16,8 @@ export const metadata: Metadata = {
   title: "ROBOCEK GCEK",
   description: "ROBOCEK — The Official Robotics Club of Government College of Engineering Kannur. Explore robotics, innovation, and technology.",
   icons: {
-    icon: "/logo_white.png",
-    apple: "/logo_white.png",
+    icon: "/logo_black.png",
+    apple: "/logo_black.png",
   },
   openGraph: {
     title: "ROBOCEK GCEK",
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     siteName: "ROBOCEK GCEK",
     images: [
       {
-        url: "/logo_white.png",
+        url: "/logo_black.png",
         width: 1200,
         height: 630,
         alt: "ROBOCEK GCEK Logo",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "ROBOCEK GCEK",
     description: "ROBOCEK — The Official Robotics Club of Government College of Engineering Kannur.",
-    images: ["/logo_white.png"],
+    images: ["/logo_black.png"],
   },
 };
 
