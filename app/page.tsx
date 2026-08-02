@@ -35,15 +35,29 @@ export default function Home() {
               ROBOCEK
             </span>
           </div>
-          <a
-            href="/login"
-            className="inline-flex items-center justify-center rounded-full border
-              dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-100 dark:hover:text-zinc-50 dark:hover:bg-zinc-900/50
-              light:border-zinc-400 light:text-zinc-700 light:hover:border-zinc-800 light:hover:text-black light:hover:bg-gray-100
-              px-5 py-2 text-xs font-medium uppercase tracking-[0.15em] transition"
-          >
-            Member Login
-          </a>
+          <div className="flex items-center gap-3">
+            <a
+              href="https://robocek-components.web.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center rounded-full border
+                dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-100 dark:hover:text-zinc-50 dark:hover:bg-zinc-900/50
+                light:border-zinc-400 light:text-zinc-700 light:hover:border-zinc-800 light:hover:text-black light:hover:bg-gray-100
+                px-5 py-2 text-xs font-medium uppercase tracking-[0.15em] transition gap-1.5"
+            >
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              Components
+            </a>
+            <a
+              href="/login"
+              className="inline-flex items-center justify-center rounded-full border
+                dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-100 dark:hover:text-zinc-50 dark:hover:bg-zinc-900/50
+                light:border-zinc-400 light:text-zinc-700 light:hover:border-zinc-800 light:hover:text-black light:hover:bg-gray-100
+                px-5 py-2 text-xs font-medium uppercase tracking-[0.15em] transition"
+            >
+              Member Login
+            </a>
+          </div>
         </div>
       </header>
 
@@ -363,6 +377,90 @@ export default function Home() {
           </div>
         </section>
 
+        {/* COMPONENTS STORE */}
+        <section
+          id="components"
+          className="w-full border-t dark:border-zinc-900 light:border-zinc-300
+            dark:bg-black/60 light:bg-gray-50"
+        >
+          <div className="max-w-6xl mx-auto px-6 sm:px-10 lg:px-16 py-12 sm:py-16">
+            <div className="flex flex-col lg:flex-row items-center gap-10">
+
+              {/* Text */}
+              <div className="flex-1 flex flex-col gap-4">
+                <span className="inline-flex items-center gap-2 text-[0.68rem] uppercase tracking-[0.2em] dark:text-zinc-500 light:text-zinc-600">
+                  <span className="h-px w-6 dark:bg-zinc-700 light:bg-zinc-400" />
+                  ROBOCEK Store
+                </span>
+                <h2 className="text-xl sm:text-2xl font-semibold tracking-tight">
+                  Rent components &amp; tools.
+                </h2>
+                <p className="text-sm dark:text-zinc-400 light:text-zinc-700 max-w-md leading-relaxed">
+                  Need sensors, microcontrollers, motors or lab equipment for
+                  your project? ROBOCEK runs a community components rental
+                  service — browse available parts and book them online.
+                </p>
+                <div className="flex flex-wrap gap-2 text-[0.68rem] uppercase tracking-[0.14em] dark:text-zinc-500 light:text-zinc-600">
+                  {["Sensors", "Microcontrollers", "Motors", "Displays", "Power", "Tools"].map((tag) => (
+                    <span
+                      key={tag}
+                      className="rounded-full border dark:border-zinc-800 light:border-zinc-300 px-3 py-1"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* CTA Card */}
+              <div className="flex-1 w-full max-w-md">
+                <div className="relative rounded-2xl border dark:border-zinc-800 light:border-zinc-300 dark:bg-zinc-950 light:bg-white p-6 sm:p-8 overflow-hidden shadow-[0_0_60px_rgba(255,255,255,0.03)]">
+                  {/* glow accent */}
+                  <div
+                    className="pointer-events-none absolute -top-10 -right-10 h-40 w-40 rounded-full
+                      dark:bg-emerald-500/10 light:bg-emerald-400/20 blur-3xl"
+                    aria-hidden="true"
+                  />
+                  <div className="relative flex flex-col gap-5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[0.65rem] uppercase tracking-[0.22em] dark:text-zinc-500 light:text-zinc-500">
+                        robocek-components.web.app
+                      </span>
+                      <span className="inline-flex items-center gap-1.5 text-[0.65rem] dark:text-emerald-400 light:text-emerald-600">
+                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                        Live
+                      </span>
+                    </div>
+
+                    <div>
+                      <p className="text-lg font-semibold tracking-tight dark:text-zinc-50 light:text-black">
+                        ROBOCEK Component Hub
+                      </p>
+                      <p className="mt-1 text-xs dark:text-zinc-400 light:text-zinc-600">
+                        Browse · Reserve · Pick up from lab
+                      </p>
+                    </div>
+
+                    <a
+                      href="https://robocek-components.web.app/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group inline-flex items-center justify-center rounded-full
+                        dark:bg-zinc-50 dark:text-black dark:hover:bg-zinc-200
+                        light:bg-black light:text-white light:hover:bg-zinc-800
+                        px-6 py-2.5 text-xs font-medium uppercase tracking-[0.18em] transition"
+                    >
+                      Browse Components
+                      <span className="ml-2 h-px w-5 dark:bg-black light:bg-white group-hover:w-8 transition-all" />
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
         {/* JOIN */}
         <section
           id="join"
@@ -473,6 +571,16 @@ export default function Home() {
             College of Engineering Kannur.
           </p>
           <div className="flex items-center gap-4">
+            <a
+              href="https://robocek-components.web.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="dark:hover:text-zinc-200 light:hover:text-zinc-800 transition uppercase tracking-[0.16em] inline-flex items-center gap-1.5"
+            >
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+              Components Store
+            </a>
+            <span className="h-px w-6 dark:bg-zinc-700 light:bg-zinc-300" />
             <span className="uppercase tracking-[0.18em] dark:text-zinc-600 light:text-zinc-500">
               Designed in B/W
             </span>
