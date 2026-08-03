@@ -13,6 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://robocekgcek.in"),
   title: "ROBOCEK GCEK",
   description: "ROBOCEK — The Official Robotics Club of Government College of Engineering Kannur. Explore robotics, innovation, and technology.",
   icons: {
@@ -71,3 +72,4 @@ export default function RootLayout({
     </html>
   );
 }
+

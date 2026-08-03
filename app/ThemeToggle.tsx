@@ -7,18 +7,8 @@ export default function ThemeToggle() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
-    const saved = localStorage.getItem("theme") as "light" | "dark" | null;
-    const initial =
-      saved ||
-      (window.matchMedia("(prefers-color-scheme: light)").matches
-        ? "light"
-        : "dark");
-    setTheme(initial);
-    if (initial === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
+    const isDark = document.documentElement.classList.contains("dark");
+    setTheme(isDark ? "dark" : "light");
   }, []);
 
   const toggleTheme = () => {
@@ -38,7 +28,7 @@ export default function ThemeToggle() {
       onClick={toggleTheme}
       className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-12 h-12 rounded-full border transition-colors
         dark:border-zinc-700 dark:bg-zinc-900/80 dark:hover:bg-zinc-800
-        light:border-zinc-300 light:bg-white/80 light:hover:bg-zinc-100
+        border-zinc-300 bg-white/80 hover:bg-zinc-100
         backdrop-blur-sm"
       aria-label="Toggle theme"
       title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
@@ -67,3 +57,4 @@ export default function ThemeToggle() {
     </button>
   );
 }
+
