@@ -568,7 +568,7 @@ export default function Home() {
               {([
                 { role: "President", name: "Harikesh O P", photo: "/execom/president.jpg" },
                 { role: "Vice President", name: "Vismaya P", photo: "/execom/Vismaya.jpg" },
-                { role: "Secretary", name: "Rahul S", photo: "/execom/Rahul.jpg" },
+                { role: "Secretary", name: "Rahul S", photo: "/execom/rahul.jpg" },
                 { role: "Treasurer", name: "Alex K Joseph", photo: "/execom/Alex.jpg" },
                 { role: "Project Manager", name: "Arjav P", photo: "/execom/Arjav.jpg" },
                 { role: "Chief Technical Lead", name: "Shan Francis", photo: "/execom/shan.jpg" },
