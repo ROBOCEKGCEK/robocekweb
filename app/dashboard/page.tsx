@@ -47,6 +47,12 @@ export default function DashboardPage() {
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
+    if (!auth || !db) {
+      setLoading(false);
+      setErrorMessage("Firebase is not initialized. Check environment variables.");
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (!currentUser) {
         router.replace("/login");

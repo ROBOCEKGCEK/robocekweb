@@ -59,6 +59,11 @@ export default function RegisterPage() {
     setErrorMessage("");
     setStatusMessage("");
 
+    if (!auth || !db) {
+      setErrorMessage("Firebase registration is not configured. Please check environment variables.");
+      return;
+    }
+
     const trimmedFullName = fullName.trim();
     const trimmedEmail = email.trim().toLowerCase();
     const trimmedPhone = phoneNumber.trim();

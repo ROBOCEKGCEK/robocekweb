@@ -33,6 +33,11 @@ export default function LoginPage() {
     setErrorMessage("");
     setStatusMessage("");
 
+    if (!auth || !db) {
+      setErrorMessage("Firebase authentication is not configured. Please check environment variables.");
+      return;
+    }
+
     const trimmedIdentifier = identifier.trim();
     const trimmedPassword = password.trim();
 
