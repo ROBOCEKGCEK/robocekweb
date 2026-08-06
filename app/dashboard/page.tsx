@@ -145,14 +145,6 @@ export default function DashboardPage() {
                 <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                   <div className="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-black/40">
                     <p className="text-[0.68rem] uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-500">
-                      User ID
-                    </p>
-                    <p className="mt-2 break-all text-sm font-medium text-black dark:text-zinc-100">
-                      {user.uid}
-                    </p>
-                  </div>
-                  <div className="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-black/40">
-                    <p className="text-[0.68rem] uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-500">
                       Membership ID
                     </p>
                     <p className="mt-2 break-all text-sm font-medium text-black dark:text-zinc-100">
@@ -242,12 +234,6 @@ export default function DashboardPage() {
                   Member Snapshot
                 </p>
                 <dl className="mt-4 space-y-4 text-sm">
-                  <div>
-                    <dt className="text-zinc-500 dark:text-zinc-400">Firebase UID</dt>
-                    <dd className="mt-1 break-all font-medium text-black dark:text-zinc-100">
-                      {user.uid}
-                    </dd>
-                  </div>
                   <div>
                     <dt className="text-zinc-500 dark:text-zinc-400">Membership ID</dt>
                     <dd className="mt-1 break-all font-medium text-black dark:text-zinc-100">
