@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import ThemeToggle from "./ThemeToggle";
 
 const slideshowImages = [
@@ -77,45 +78,42 @@ export default function Home() {
             </span>
           </div>
           <div className="flex items-center gap-3">
+            <Link
+              href="/events"
+              className="inline-flex items-center justify-center rounded-full border
+                dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-100 dark:hover:text-zinc-50 dark:hover:bg-zinc-900/50
+                border-zinc-400 text-zinc-700 hover:border-zinc-800 hover:text-black hover:bg-gray-100
+                px-4 py-2 text-xs font-medium uppercase tracking-[0.15em] transition"
+            >
+              Events
+            </Link>
+            <Link
+              href="/projects"
+              className="inline-flex items-center justify-center rounded-full border
+                dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-100 dark:hover:text-zinc-50 dark:hover:bg-zinc-900/50
+                border-zinc-400 text-zinc-700 hover:border-zinc-800 hover:text-black hover:bg-gray-100
+                px-4 py-2 text-xs font-medium uppercase tracking-[0.15em] transition"
+            >
+              Project Hub
+            </Link>
             <a
               href="https://robocek-components.web.app/"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center rounded-full border
+              className="hidden md:inline-flex items-center justify-center rounded-full border
                 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-100 dark:hover:text-zinc-50 dark:hover:bg-zinc-900/50
                 border-zinc-400 text-zinc-700 hover:border-zinc-800 hover:text-black hover:bg-gray-100
-                px-5 py-2 text-xs font-medium uppercase tracking-[0.15em] transition gap-1.5"
+                px-4 py-2 text-xs font-medium uppercase tracking-[0.15em] transition gap-1.5"
             >
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
               Components
             </a>
-            <a
-              href="#execom"
-              className="hidden sm:inline-flex items-center justify-center rounded-full border
-                dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-100 dark:hover:text-zinc-50 dark:hover:bg-zinc-900/50
-                border-zinc-400 text-zinc-700 hover:border-zinc-800 hover:text-black hover:bg-gray-100
-                px-5 py-2 text-xs font-medium uppercase tracking-[0.15em] transition"
-            >
-              ExeCom
-            </a>
-            <a
-              href="#contact"
-              className="hidden sm:inline-flex items-center justify-center rounded-full border
-                dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-100 dark:hover:text-zinc-50 dark:hover:bg-zinc-900/50
-                border-zinc-400 text-zinc-700 hover:border-zinc-800 hover:text-black hover:bg-gray-100
-                px-5 py-2 text-xs font-medium uppercase tracking-[0.15em] transition"
-            >
-              Contact
-            </a>
-            <a
+            <Link
               href="/login"
-              className="inline-flex items-center justify-center rounded-full border
-                dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-100 dark:hover:text-zinc-50 dark:hover:bg-zinc-900/50
-                border-zinc-400 text-zinc-700 hover:border-zinc-800 hover:text-black hover:bg-gray-100
-                px-5 py-2 text-xs font-medium uppercase tracking-[0.15em] transition"
+              className="inline-flex items-center justify-center rounded-full dark:bg-zinc-50 bg-black px-5 py-2 text-xs font-semibold uppercase tracking-[0.15em] dark:text-black text-white dark:hover:bg-zinc-200 hover:bg-zinc-900 transition"
             >
               Member Login
-            </a>
+            </Link>
           </div>
         </div>
       </header>
