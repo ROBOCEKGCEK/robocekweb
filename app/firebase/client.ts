@@ -1,4 +1,4 @@
-import { getApps, initializeApp } from "firebase/app";
+import { getApp, getApps, initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
@@ -12,7 +12,11 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
+const app = getApps().length
+  ? getApp()
+  : firebaseConfig.apiKey
+    ? initializeApp(firebaseConfig)
+    : null;
 
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+export const auth = (app ? getAuth(app) : null) as ReturnType<typeof getAuth>;
+export const db = (app ? getFirestore(app) : null) as ReturnType<typeof getFirestore>;
