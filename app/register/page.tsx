@@ -1,8 +1,150 @@
+"use client";
+
 import Image from "next/image";
 import ThemeToggle from "../ThemeToggle";
 import Link from "next/link";
+import { FormEvent, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import {
+  browserLocalPersistence,
+  createUserWithEmailAndPassword,
+  setPersistence,
+  updateProfile,
+} from "firebase/auth";
+import {
+  doc,
+  serverTimestamp,
+  setDoc,
+} from "firebase/firestore";
+import { auth, db } from "../firebase/client";
 
 export default function RegisterPage() {
+  const router = useRouter();
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [branch, setBranch] = useState("");
+  const [yearSemester, setYearSemester] = useState("");
+  const [comments, setComments] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [statusMessage, setStatusMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const interestOptions = useMemo(
+    () => [
+      "Robotics & Autonomous Systems",
+      "Embedded Systems",
+      "Computer Vision",
+      "Mechanical Design & Fabrication",
+      "Coding & Control",
+      "Research & Innovation",
+    ],
+    [],
+  );
+
+  const toggleInterest = (interest: string) => {
+    setSelectedInterests((current) =>
+      current.includes(interest)
+        ? current.filter((value) => value !== interest)
+        : [...current, interest],
+    );
+  };
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setErrorMessage("");
+    setStatusMessage("");
+
+    const trimmedFullName = fullName.trim();
+    const trimmedEmail = email.trim().toLowerCase();
+    const trimmedPhone = phoneNumber.trim();
+    const trimmedBranch = branch.trim();
+    const trimmedYearSemester = yearSemester.trim();
+    const trimmedPassword = password.trim();
+
+    if (!trimmedFullName || !trimmedEmail || !trimmedPhone || !trimmedBranch || !trimmedYearSemester || !trimmedPassword) {
+      setErrorMessage("Fill in all required fields.");
+      return;
+    }
+
+    if (selectedInterests.length === 0) {
+      setErrorMessage("Select at least one area of interest.");
+      return;
+    }
+
+    if (trimmedPassword.length < 6) {
+      setErrorMessage("Password must be at least 6 characters long.");
+      return;
+    }
+
+    if (trimmedPassword !== confirmPassword) {
+      setErrorMessage("Passwords do not match.");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      await setPersistence(auth, browserLocalPersistence);
+
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        trimmedEmail,
+        trimmedPassword,
+      );
+
+      await updateProfile(userCredential.user, {
+        displayName: trimmedFullName,
+      });
+
+      await setDoc(doc(db, "users", userCredential.user.uid), {
+        uid: userCredential.user.uid,
+        fullName: trimmedFullName,
+        email: trimmedEmail,
+        phoneNumber: trimmedPhone,
+        phone: trimmedPhone,
+        branch: trimmedBranch,
+        yearSemester: trimmedYearSemester,
+        year: trimmedYearSemester,
+        interests: selectedInterests,
+        comments: comments.trim(),
+        status: "Pending Approval",
+        membershipId: null,
+        createdAt: serverTimestamp(),
+      });
+
+      setStatusMessage(
+        "Registration successful! Your account was saved to users and is pending admin confirmation. Redirecting to your dashboard...",
+      );
+      setTimeout(() => {
+        router.replace("/dashboard");
+      }, 1500);
+    } catch (error: unknown) {
+      let msg = "Registration failed.";
+      if (typeof error === "object" && error !== null && "code" in error) {
+        const errCode = (error as { code: string }).code;
+        if (errCode === "auth/email-already-in-use") {
+          msg = "This email is already registered. Please sign in instead.";
+        } else if (errCode === "auth/weak-password") {
+          msg = "Password must be at least 6 characters long.";
+        } else if (errCode === "auth/invalid-email") {
+          msg = "Please enter a valid email address.";
+        } else if (error instanceof Error) {
+          msg = error.message;
+        }
+      } else if (error instanceof Error) {
+        msg = error.message;
+      }
+      setErrorMessage(msg);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div
       className="min-h-screen flex flex-col font-sans bg-white text-black dark:bg-black dark:text-zinc-50"
@@ -70,7 +212,17 @@ export default function RegisterPage() {
               </p>
             </div>
 
-            <form className="space-y-6">
+            <form className="space-y-6" onSubmit={handleSubmit}>
+              {errorMessage ? (
+                <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-800 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-200">
+                  {errorMessage}
+                </div>
+              ) : null}
+              {statusMessage ? (
+                <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-xs text-emerald-800 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-200">
+                  {statusMessage}
+                </div>
+              ) : null}
               {/* Full Name */}
               <div className="flex flex-col gap-2">
                 <label className="text-[0.75rem] uppercase tracking-[0.18em] dark:text-zinc-400 text-zinc-700 font-medium">
@@ -80,6 +232,8 @@ export default function RegisterPage() {
                   type="text"
                   placeholder="John Doe"
                   required
+                  value={fullName}
+                  onChange={(event) => setFullName(event.target.value)}
                   className="h-11 rounded-xl border
                     dark:border-zinc-800 dark:bg-black dark:text-zinc-100 dark:placeholder:text-zinc-600
                     border-zinc-300 bg-white text-black placeholder:text-zinc-500
@@ -97,6 +251,8 @@ export default function RegisterPage() {
                   type="email"
                   placeholder="you@email.com"
                   required
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
                   className="h-11 rounded-xl border
                     dark:border-zinc-800 dark:bg-black dark:text-zinc-100 dark:placeholder:text-zinc-600
                     border-zinc-300 bg-white text-black placeholder:text-zinc-500
@@ -109,6 +265,72 @@ export default function RegisterPage() {
                   Use any valid email address
                 </p>
               </div>
+
+              {/* Password & Confirm Password */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="flex flex-col gap-2">
+                  <label className="text-[0.75rem] uppercase tracking-[0.18em] dark:text-zinc-400 text-zinc-700 font-medium">
+                    Password <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative flex items-center">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      required
+                      value={password}
+                      onChange={(event) => setPassword(event.target.value)}
+                      className="h-11 w-full rounded-xl border
+                        dark:border-zinc-800 dark:bg-black dark:text-zinc-100 dark:placeholder:text-zinc-600
+                        border-zinc-300 bg-white text-black placeholder:text-zinc-500
+                        pl-4 pr-10 text-sm focus:outline-none focus:ring-2
+                        dark:focus:ring-zinc-400 dark:focus:border-zinc-400
+                        focus:ring-zinc-600 focus:border-zinc-600
+                        transition"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 text-xs text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 select-none"
+                    >
+                      {showPassword ? "Hide" : "Show"}
+                    </button>
+                  </div>
+                  <p className="text-[0.65rem] dark:text-zinc-500 text-zinc-600">
+                    Minimum 6 characters
+                  </p>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label className="text-[0.75rem] uppercase tracking-[0.18em] dark:text-zinc-400 text-zinc-700 font-medium">
+                    Confirm Password <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative flex items-center">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      required
+                      value={confirmPassword}
+                      onChange={(event) => setConfirmPassword(event.target.value)}
+                      className="h-11 w-full rounded-xl border
+                        dark:border-zinc-800 dark:bg-black dark:text-zinc-100 dark:placeholder:text-zinc-600
+                        border-zinc-300 bg-white text-black placeholder:text-zinc-500
+                        pl-4 pr-10 text-sm focus:outline-none focus:ring-2
+                        dark:focus:ring-zinc-400 dark:focus:border-zinc-400
+                        focus:ring-zinc-600 focus:border-zinc-600
+                        transition"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 text-xs text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 select-none"
+                    >
+                      {showPassword ? "Hide" : "Show"}
+                    </button>
+                  </div>
+                  <p className="text-[0.65rem] dark:text-zinc-500 text-zinc-600">
+                    Re-enter your password
+                  </p>
+                </div>
+              </div>
               {/* Phone Number */}
               <div className="flex flex-col gap-2">
                 <label className="text-[0.75rem] uppercase tracking-[0.18em] dark:text-zinc-400 text-zinc-700 font-medium">
@@ -118,6 +340,8 @@ export default function RegisterPage() {
                   type="tel"
                   placeholder="+91 98765 43210"
                   required
+                  value={phoneNumber}
+                  onChange={(event) => setPhoneNumber(event.target.value)}
                   className="h-11 rounded-xl border
                     dark:border-zinc-800 dark:bg-black dark:text-zinc-100 dark:placeholder:text-zinc-600
                     border-zinc-300 bg-white text-black placeholder:text-zinc-500
@@ -137,6 +361,8 @@ export default function RegisterPage() {
                     type="text"
                     placeholder="e.g. ECE, ME, CS"
                     required
+                    value={branch}
+                    onChange={(event) => setBranch(event.target.value)}
                     className="h-11 rounded-xl border
                       dark:border-zinc-800 dark:bg-black dark:text-zinc-100 dark:placeholder:text-zinc-600
                       border-zinc-300 bg-white text-black placeholder:text-zinc-500
@@ -154,6 +380,8 @@ export default function RegisterPage() {
                     type="text"
                     placeholder="e.g. S3, S5, S7"
                     required
+                    value={yearSemester}
+                    onChange={(event) => setYearSemester(event.target.value)}
                     className="h-11 rounded-xl border
                       dark:border-zinc-800 dark:bg-black dark:text-zinc-100 dark:placeholder:text-zinc-600
                       border-zinc-300 bg-white text-black placeholder:text-zinc-500
@@ -170,20 +398,15 @@ export default function RegisterPage() {
                   Areas of Interest <span className="text-red-500">*</span>
                 </label>
                 <div className="space-y-2">
-                  {[
-                    "Robotics & Autonomous Systems",
-                    "Embedded Systems",
-                    "Computer Vision",
-                    "Mechanical Design & Fabrication",
-                    "Coding & Control",
-                    "Research & Innovation",
-                  ].map((interest) => (
+                  {interestOptions.map((interest) => (
                     <label
                       key={interest}
                       className="flex items-center gap-3 cursor-pointer"
                     >
                       <input
                         type="checkbox"
+                        checked={selectedInterests.includes(interest)}
+                        onChange={() => toggleInterest(interest)}
                         className="w-4 h-4 rounded border
                           dark:border-zinc-800 dark:bg-black dark:checked:bg-zinc-50 dark:checked:border-zinc-50
                           border-zinc-300 bg-white checked:bg-black checked:border-black
@@ -204,6 +427,8 @@ export default function RegisterPage() {
                 <textarea
                   placeholder="Tell us about your robotics experience, project ideas, or anything else you'd like us to know..."
                   rows={4}
+                  value={comments}
+                  onChange={(event) => setComments(event.target.value)}
                   className="rounded-xl border
                     dark:border-zinc-800 dark:bg-black dark:text-zinc-100 dark:placeholder:text-zinc-600
                     border-zinc-300 bg-white text-black placeholder:text-zinc-500
@@ -217,9 +442,10 @@ export default function RegisterPage() {
               <div className="pt-4">
                 <button
                   type="submit"
-                  className="w-full inline-flex items-center justify-center rounded-full dark:bg-zinc-50 bg-black px-6 py-3 text-sm font-medium uppercase tracking-[0.18em] dark:text-black text-white dark:hover:bg-zinc-200 hover:bg-zinc-900 transition"
+                  disabled={isSubmitting}
+                  className="w-full inline-flex items-center justify-center rounded-full dark:bg-zinc-50 bg-black px-6 py-3 text-sm font-medium uppercase tracking-[0.18em] dark:text-black text-white dark:hover:bg-zinc-200 hover:bg-zinc-900 transition disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  Complete Registration
+                  {isSubmitting ? "Saving..." : "Complete Registration"}
                 </button>
               </div>
             </form>

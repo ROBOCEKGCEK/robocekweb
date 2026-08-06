@@ -1,8 +1,83 @@
+"use client";
+
 import Image from "next/image";
 import ThemeToggle from "../ThemeToggle";
 import Link from "next/link";
+import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
+import {
+  browserLocalPersistence,
+  browserSessionPersistence,
+  setPersistence,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { auth, db } from "../firebase/client";
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
 
 export default function LoginPage() {
+  const router = useRouter();
+  const [identifier, setIdentifier] = useState("");
+  const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
+  const [statusMessage, setStatusMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setErrorMessage("");
+    setStatusMessage("");
+
+    const trimmedIdentifier = identifier.trim();
+    const trimmedPassword = password.trim();
+
+    if (!trimmedIdentifier || !trimmedPassword) {
+      setErrorMessage("Enter your email or membership ID and password.");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      await setPersistence(
+        auth,
+        rememberMe ? browserLocalPersistence : browserSessionPersistence,
+      );
+
+      let emailToUse = trimmedIdentifier;
+
+      if (!trimmedIdentifier.includes("@")) {
+        const userQuery = query(
+          collection(db, "users"),
+          where("membershipId", "==", trimmedIdentifier),
+        );
+        const snapshot = await getDocs(userQuery);
+
+        if (snapshot.empty) {
+          setErrorMessage("No membership ID matched that account.");
+          return;
+        }
+
+        emailToUse = snapshot.docs[0].data().email as string;
+      }
+
+      await signInWithEmailAndPassword(auth, emailToUse, trimmedPassword);
+      setStatusMessage("Signed in successfully. Redirecting...");
+      router.replace("/dashboard");
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error ? error.message : "Sign in failed.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div
       className="min-h-screen flex flex-col font-sans bg-white text-black dark:bg-black dark:text-zinc-50"
@@ -67,7 +142,17 @@ export default function LoginPage() {
                 ⓘ Enter either your email or membership ID to login.
               </p>
             </div>
-            <form className="space-y-6">
+            <form className="space-y-6" onSubmit={handleSubmit}>
+              {errorMessage ? (
+                <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-800 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-200">
+                  {errorMessage}
+                </div>
+              ) : null}
+              {statusMessage ? (
+                <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-xs text-emerald-800 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-200">
+                  {statusMessage}
+                </div>
+              ) : null}
               {/* Email or Membership ID */}
               <div className="flex flex-col gap-2">
                 <label className="text-[0.75rem] uppercase tracking-[0.18em] dark:text-zinc-400 text-zinc-700 font-medium">
@@ -77,6 +162,8 @@ export default function LoginPage() {
                   type="text"
                   placeholder="you@email.com or ROBOCEK-2024-001"
                   required
+                  value={identifier}
+                  onChange={(event) => setIdentifier(event.target.value)}
                   className="h-11 rounded-xl border
                     dark:border-zinc-800 dark:bg-black dark:text-zinc-100 dark:placeholder:text-zinc-600
                     border-zinc-300 bg-white text-black placeholder:text-zinc-500
@@ -99,6 +186,8 @@ export default function LoginPage() {
                   type="password"
                   placeholder="••••••••"
                   required
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
                   className="h-11 rounded-xl border
                     dark:border-zinc-800 dark:bg-black dark:text-zinc-100 dark:placeholder:text-zinc-600
                     border-zinc-300 bg-white text-black placeholder:text-zinc-500
@@ -114,6 +203,8 @@ export default function LoginPage() {
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
+                    checked={rememberMe}
+                    onChange={(event) => setRememberMe(event.target.checked)}
                     className="w-4 h-4 rounded border
                       dark:border-zinc-800 dark:bg-black dark:checked:bg-zinc-50 dark:checked:border-zinc-50
                       border-zinc-300 bg-white checked:bg-black checked:border-black
@@ -135,9 +226,10 @@ export default function LoginPage() {
               <div className="pt-4">
                 <button
                   type="submit"
+                  disabled={isSubmitting}
                   className="w-full inline-flex items-center justify-center rounded-full dark:bg-zinc-50 bg-black px-6 py-3 text-sm font-medium uppercase tracking-[0.18em] dark:text-black text-white dark:hover:bg-zinc-200 hover:bg-zinc-900 transition"
                 >
-                  Sign In
+                  {isSubmitting ? "Signing In..." : "Sign In"}
                 </button>
               </div>
             </form>

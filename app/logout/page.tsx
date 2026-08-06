@@ -2,12 +2,19 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { signOut } from "firebase/auth";
+import { auth } from "../firebase/client";
 
 export default function LogoutPage() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace("/");
+    const runLogout = async () => {
+      await signOut(auth);
+      router.replace("/");
+    };
+
+    void runLogout();
   }, [router]);
 
   return (
