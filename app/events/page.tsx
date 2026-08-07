@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import ThemeToggle from "../ThemeToggle";
-import { collection, getDocs, orderBy, query } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase/client";
 
 type ClubEvent = {
@@ -65,6 +65,38 @@ const sampleEvents: ClubEvent[] = [
   },
 ];
 
+function formatFieldToString(val: any, fallback = ""): string {
+  if (val === null || val === undefined) return fallback;
+  if (typeof val === "string") return val;
+  if (typeof val === "number") return String(val);
+  if (typeof val === "object") {
+    if (typeof val.toDate === "function") {
+      try {
+        return val.toDate().toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        });
+      } catch {
+        return fallback;
+      }
+    }
+    if ("seconds" in val && typeof val.seconds === "number") {
+      try {
+        return new Date(val.seconds * 1000).toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        });
+      } catch {
+        return fallback;
+      }
+    }
+    return fallback;
+  }
+  return String(val);
+}
+
 export default function EventsPage() {
   const [events, setEvents] = useState<ClubEvent[]>(sampleEvents);
   const [loading, setLoading] = useState(true);
@@ -77,28 +109,38 @@ export default function EventsPage() {
         return;
       }
       try {
-        const q = query(collection(db, "events"), orderBy("date", "desc"));
-        const snapshot = await getDocs(q);
+        const eventsRef = collection(db, "events");
+        const snapshot = await getDocs(eventsRef);
         if (!snapshot.empty) {
           const fetched: ClubEvent[] = snapshot.docs.map((docSnap) => {
             const data = docSnap.data();
+            const rawStatus = formatFieldToString(data.status, "Upcoming");
+            let finalStatus: "Upcoming" | "Ongoing" | "Completed" = "Upcoming";
+            if (rawStatus.toLowerCase().includes("complete") || rawStatus.toLowerCase().includes("archived")) {
+              finalStatus = "Completed";
+            } else if (rawStatus.toLowerCase().includes("ongoing") || rawStatus.toLowerCase().includes("active")) {
+              finalStatus = "Ongoing";
+            } else if (rawStatus.toLowerCase().includes("upcoming")) {
+              finalStatus = "Upcoming";
+            }
+
             return {
               id: docSnap.id,
-              title: data.title || "Untitled Event",
-              category: data.category || "General",
-              date: data.date || "TBA",
-              time: data.time,
-              venue: data.venue || "GCE Kannur Campus",
-              description: data.description || "",
-              status: data.status || "Upcoming",
-              registrationUrl: data.registrationUrl,
-              image: data.image,
+              title: formatFieldToString(data.title, "Untitled Event"),
+              category: formatFieldToString(data.category, "Workshop"),
+              date: formatFieldToString(data.date, "TBA"),
+              time: formatFieldToString(data.time, ""),
+              venue: formatFieldToString(data.venue || data.location, "GCE Kannur Campus"),
+              description: formatFieldToString(data.description, ""),
+              status: finalStatus,
+              registrationUrl: typeof data.registrationUrl === "string" ? data.registrationUrl : undefined,
+              image: typeof (data.imageUrl || data.image) === "string" ? (data.imageUrl || data.image) : undefined,
             };
           });
           setEvents(fetched);
         }
-      } catch {
-        // Fall back to sample events if fetch fails
+      } catch (err) {
+        console.warn("Could not fetch events from Firestore:", err);
       } finally {
         setLoading(false);
       }
@@ -256,12 +298,14 @@ export default function EventsPage() {
 
                 {ev.status === "Upcoming" && ev.registrationUrl ? (
                   <div className="shrink-0 pt-2 md:pt-0">
-                    <Link
+                    <a
                       href={ev.registrationUrl}
+                      target={ev.registrationUrl.startsWith("http") ? "_blank" : "_self"}
+                      rel="noreferrer"
                       className="inline-flex items-center justify-center rounded-full dark:bg-zinc-50 bg-black px-6 py-3 text-xs font-semibold uppercase tracking-[0.18em] dark:text-black text-white dark:hover:bg-zinc-200 hover:bg-zinc-900 transition"
                     >
                       Register Now →
-                    </Link>
+                    </a>
                   </div>
                 ) : null}
               </article>
