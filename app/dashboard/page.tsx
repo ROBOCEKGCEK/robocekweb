@@ -16,6 +16,7 @@ import {
   where,
 } from "firebase/firestore";
 import { auth, db } from "../firebase/client";
+import MembershipCard from "./MembershipCard";
 
 type UserProfile = {
   membershipId?: string | null;
@@ -332,6 +333,30 @@ export default function DashboardPage() {
                     </p>
                   </div>
                 </div>
+              </div>
+
+              {/* DIGITAL MEMBERSHIP CARD SECTION */}
+              <div className="rounded-3xl border border-emerald-900/40 bg-zinc-950 p-6 sm:p-8 relative overflow-hidden shadow-2xl">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+                  <div>
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[0.68rem] uppercase tracking-[0.2em] font-mono text-emerald-400 font-medium">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                      OFFICIAL ID CARD
+                    </span>
+                    <h3 className="text-xl font-semibold mt-2 text-white">Digital Membership Card</h3>
+                    <p className="text-xs text-zinc-400 mt-1 max-w-xl">
+                      Pitch-black & dark green ROBOCEK membership card credential. Download as print-ready PDF for official verification.
+                    </p>
+                  </div>
+                </div>
+
+                <MembershipCard
+                  fullName={profile?.fullName || user.displayName || "Member"}
+                  membershipId={profile?.membershipId}
+                  branch={profile?.branch}
+                  yearSemester={profile?.yearSemester || profile?.year}
+                  email={profile?.email || user.email}
+                />
               </div>
 
               {errorMessage ? (
