@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import {
   browserLocalPersistence,
   browserSessionPersistence,
+  sendPasswordResetEmail,
   setPersistence,
   signInWithEmailAndPassword,
 } from "firebase/auth";
@@ -27,6 +28,62 @@ export default function LoginPage() {
   const [statusMessage, setStatusMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSendingReset, setIsSendingReset] = useState(false);
+
+  const handleForgotPassword = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    setErrorMessage("");
+    setStatusMessage("");
+
+    if (!auth || !db) {
+      setErrorMessage("Firebase authentication is not configured.");
+      return;
+    }
+
+    const trimmedIdentifier = identifier.trim();
+    if (!trimmedIdentifier) {
+      setErrorMessage("Please enter your Email or Membership ID in the input box above, then click 'Forgot password?'.");
+      return;
+    }
+
+    setIsSendingReset(true);
+    try {
+      let emailToUse = trimmedIdentifier;
+
+      // Resolve Membership ID to Email if needed
+      if (!trimmedIdentifier.includes("@")) {
+        const userQuery = query(
+          collection(db, "users"),
+          where("membershipId", "==", trimmedIdentifier)
+        );
+        const snapshot = await getDocs(userQuery);
+
+        if (snapshot.empty) {
+          setErrorMessage("No registered member account was found with that Membership ID.");
+          setIsSendingReset(false);
+          return;
+        }
+
+        emailToUse = snapshot.docs[0].data().email as string;
+      }
+
+      await sendPasswordResetEmail(auth, emailToUse);
+      setStatusMessage(
+        `✓ Password reset link sent to ${emailToUse}! Please check your email inbox (and spam folder).`
+      );
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : "Failed to send password reset email.";
+      if (msg.includes("auth/user-not-found")) {
+        setErrorMessage("No registered account found with that email address.");
+      } else if (msg.includes("auth/invalid-email")) {
+        setErrorMessage("Please enter a valid email address.");
+      } else {
+        setErrorMessage(msg);
+      }
+    } finally {
+      setIsSendingReset(false);
+    }
+  };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -91,7 +148,7 @@ export default function LoginPage() {
 
       {/* HEADER with Navigation */}
       <header className="w-full border-b dark:border-zinc-900 border-zinc-300 dark:bg-black/95 bg-white/95 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-6 sm:px-10 lg:px-16 py-3 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-3 sm:px-10 lg:px-16 py-2.5 sm:py-3 flex items-center justify-between">
           <Link
             href="/"
             className="flex items-center gap-2 hover:opacity-80 transition"
@@ -99,20 +156,20 @@ export default function LoginPage() {
             <Image
               src="/logo_white.png"
               alt="ROBOCEK logo"
-              width={32}
-              height={32}
+              width={30}
+              height={30}
               className="hidden dark:block select-none"
               style={{ width: "auto", height: "auto" }}
             />
             <Image
               src="/logo_black.png"
               alt="ROBOCEK logo"
-              width={32}
-              height={32}
+              width={30}
+              height={30}
               className="block dark:hidden select-none"
               style={{ width: "auto", height: "auto" }}
             />
-            <span className="text-sm font-semibold tracking-widest uppercase">
+            <span className="text-xs sm:text-sm font-semibold tracking-widest uppercase">
               ROBOCEK
             </span>
           </Link>
@@ -121,7 +178,7 @@ export default function LoginPage() {
             className="inline-flex items-center justify-center rounded-full border
               dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-100 dark:hover:text-zinc-50 dark:hover:bg-zinc-900/50
               border-zinc-400 text-zinc-700 hover:border-zinc-800 hover:text-black hover:bg-gray-100
-              px-5 py-2 text-xs font-medium uppercase tracking-[0.15em] transition"
+              px-3 py-1.5 text-[11px] sm:px-5 sm:py-2 sm:text-xs font-medium uppercase tracking-[0.12em] transition"
           >
             Join ROBOCEK
           </Link>
@@ -129,8 +186,8 @@ export default function LoginPage() {
       </header>
 
       {/* MAIN CONTENT */}
-      <main className="flex-1 w-full flex flex-col items-center justify-center py-12 sm:py-16">
-        <div className="w-full max-w-md px-6 sm:px-10">
+      <main className="flex-1 w-full flex flex-col items-center justify-center py-6 sm:py-16">
+        <div className="w-full max-w-md px-4 sm:px-10">
           {/* Header */}
           <div className="mb-10 text-center">
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight mb-4">
@@ -219,12 +276,14 @@ export default function LoginPage() {
                     Remember me
                   </span>
                 </label>
-                <a
-                  href="mailto:robocek@gcek.ac.in"
-                  className="dark:text-zinc-400 text-zinc-600 hover:dark:text-zinc-200 hover:text-zinc-800 transition"
+                <button
+                  type="button"
+                  onClick={handleForgotPassword}
+                  disabled={isSendingReset}
+                  className="dark:text-emerald-400 text-emerald-600 hover:underline font-medium transition cursor-pointer disabled:opacity-50"
                 >
-                  Forgot password?
-                </a>
+                  {isSendingReset ? "Sending reset..." : "Forgot password?"}
+                </button>
               </div>
 
               {/* Submit Button */}

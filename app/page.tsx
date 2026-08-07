@@ -55,35 +55,35 @@ export default function Home() {
 
       {/* HEADER with Member Login */}
       <header className="w-full border-b dark:border-zinc-900 border-zinc-300 dark:bg-black/95 bg-white/95 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-6 sm:px-10 lg:px-16 py-3 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-3 sm:px-10 lg:px-16 py-2.5 sm:py-3 flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <Image
               src="/logo_white.png"
               alt="ROBOCEK logo"
-              width={32}
-              height={32}
+              width={30}
+              height={30}
               className="hidden dark:block select-none"
               style={{ width: "auto", height: "auto" }}
             />
             <Image
               src="/logo_black.png"
               alt="ROBOCEK logo"
-              width={32}
-              height={32}
+              width={30}
+              height={30}
               className="block dark:hidden select-none"
               style={{ width: "auto", height: "auto" }}
             />
-            <span className="text-sm font-semibold tracking-widest uppercase">
+            <span className="text-xs sm:text-sm font-semibold tracking-widest uppercase">
               ROBOCEK
             </span>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3 flex-wrap">
             <Link
               href="/events"
               className="inline-flex items-center justify-center rounded-full border
                 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-100 dark:hover:text-zinc-50 dark:hover:bg-zinc-900/50
                 border-zinc-400 text-zinc-700 hover:border-zinc-800 hover:text-black hover:bg-gray-100
-                px-4 py-2 text-xs font-medium uppercase tracking-[0.15em] transition"
+                px-2.5 py-1.5 sm:px-4 sm:py-2 text-[10px] sm:text-xs font-medium uppercase tracking-[0.12em] transition"
             >
               Events
             </Link>
@@ -92,7 +92,7 @@ export default function Home() {
               className="inline-flex items-center justify-center rounded-full border
                 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-100 dark:hover:text-zinc-50 dark:hover:bg-zinc-900/50
                 border-zinc-400 text-zinc-700 hover:border-zinc-800 hover:text-black hover:bg-gray-100
-                px-4 py-2 text-xs font-medium uppercase tracking-[0.15em] transition"
+                px-2.5 py-1.5 sm:px-4 sm:py-2 text-[10px] sm:text-xs font-medium uppercase tracking-[0.12em] transition"
             >
               Project Hub
             </Link>
@@ -110,7 +110,7 @@ export default function Home() {
             </a>
             <Link
               href="/login"
-              className="inline-flex items-center justify-center rounded-full dark:bg-zinc-50 bg-black px-5 py-2 text-xs font-semibold uppercase tracking-[0.15em] dark:text-black text-white dark:hover:bg-zinc-200 hover:bg-zinc-900 transition"
+              className="inline-flex items-center justify-center rounded-full dark:bg-zinc-50 bg-black px-3 py-1.5 sm:px-5 sm:py-2 text-[10px] sm:text-xs font-semibold uppercase tracking-[0.12em] dark:text-black text-white dark:hover:bg-zinc-200 hover:bg-zinc-900 transition"
             >
               Member Login
             </Link>
@@ -120,34 +120,34 @@ export default function Home() {
 
       {/* HERO */}
       <main className="flex-1 w-full flex flex-col items-center">
-        <section className="w-full max-w-6xl px-6 sm:px-10 lg:px-16 pt-10 pb-16 sm:pt-16 sm:pb-24">
-          <div className="flex flex-col lg:flex-row items-center lg:items-start justify-between gap-12">
+        <section className="w-full max-w-6xl px-4 sm:px-10 lg:px-16 pt-6 pb-12 sm:pt-16 sm:pb-24">
+          <div className="flex flex-col lg:flex-row items-center lg:items-start justify-between gap-8 sm:gap-12">
             {/* Left: Title + CTAs */}
-            <div className="flex-1 flex flex-col items-center lg:items-start text-center lg:text-left gap-6">
-              <div className="flex items-center gap-3">
+            <div className="flex-1 flex flex-col items-center lg:items-start text-center lg:text-left gap-4 sm:gap-6">
+              <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-center lg:justify-start">
                 <Image
                   src="/logo_white.png"
                   alt="ROBOCEK logo"
-                  width={52}
-                  height={52}
-                  className="hidden dark:block select-none"
+                  width={42}
+                  height={42}
+                  className="hidden dark:block select-none w-8 h-8 sm:w-12 sm:h-12"
                   style={{ width: "auto", height: "auto" }}
                   priority
                 />
                 <Image
                   src="/logo_black.png"
                   alt="ROBOCEK logo"
-                  width={52}
-                  height={52}
-                  className="block dark:hidden select-none"
+                  width={42}
+                  height={42}
+                  className="block dark:hidden select-none w-8 h-8 sm:w-12 sm:h-12"
                   style={{ width: "auto", height: "auto" }}
                   priority
                 />
                 <span
-                  className="inline-flex items-center gap-2 rounded-full border
+                  className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full border
                   dark:border-zinc-700/70 dark:bg-zinc-900/60 dark:text-zinc-400
                   border-zinc-300 bg-zinc-100 text-zinc-700
-                  px-4 py-1 text-xs font-medium tracking-[0.18em] uppercase"
+                  px-3 py-1 text-[10px] sm:text-xs font-medium tracking-[0.15em] sm:tracking-[0.18em] uppercase"
                 >
                   <span
                     className="h-1.5 w-1.5 rounded-full
@@ -159,34 +159,34 @@ export default function Home() {
 
               <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-semibold tracking-tight leading-tight">
                 ROBOCEK
-                <span className="block dark:text-zinc-400 text-zinc-600 text-xl sm:text-2xl lg:text-3xl mt-2 font-normal tracking-[0.25em] uppercase">
+                <span className="block dark:text-zinc-400 text-zinc-600 text-xs sm:text-2xl lg:text-3xl mt-1.5 sm:mt-2 font-normal tracking-[0.18em] sm:tracking-[0.25em] uppercase">
                   Robotics & Innovation Collective
                 </span>
               </h1>
 
-              <p className="max-w-xl text-sm sm:text-base dark:text-zinc-400 text-zinc-700 leading-relaxed">
+              <p className="max-w-xl text-xs sm:text-base dark:text-zinc-400 text-zinc-700 leading-relaxed">
                 Official robotics club of Government College of Engineering
                 Kannur — designing autonomous systems, intelligent machines and
                 the engineers who build them.
               </p>
 
-              <div className="flex flex-col sm:flex-row items-center gap-4 mt-2">
+              <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 mt-2 w-full sm:w-auto">
                 <a
                   href="/register"
-                  className="group inline-flex items-center justify-center rounded-full border
+                  className="group w-full sm:w-auto inline-flex items-center justify-center rounded-full border
                     dark:border-zinc-50 dark:bg-zinc-50 dark:text-black dark:hover:bg-black dark:hover:text-zinc-50 dark:hover:border-zinc-500
                     border-black bg-black text-white hover:bg-white hover:text-black hover:border-zinc-700
-                    px-7 py-2.5 text-sm font-medium uppercase tracking-[0.18em] transition"
+                    px-6 sm:px-7 py-2.5 text-xs sm:text-sm font-medium uppercase tracking-[0.15em] sm:tracking-[0.18em] transition"
                 >
                   Join the circuit
                   <span className="ml-2 h-px w-6 dark:bg-black bg-black group-hover:dark:bg-zinc-50 group-hover:bg-white transition-all group-hover:w-10" />
                 </a>
                 <a
                   href="#projects"
-                  className="inline-flex items-center justify-center rounded-full border
+                  className="w-full sm:w-auto inline-flex items-center justify-center rounded-full border
                     dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-100 dark:hover:text-zinc-50
                     border-zinc-400 text-zinc-700 hover:border-zinc-800 hover:text-black
-                    px-7 py-2.5 text-xs sm:text-sm font-medium uppercase tracking-[0.18em] transition"
+                    px-6 sm:px-7 py-2.5 text-xs sm:text-sm font-medium uppercase tracking-[0.15em] sm:tracking-[0.18em] transition"
                 >
                   View projects
                 </a>

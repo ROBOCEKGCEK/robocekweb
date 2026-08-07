@@ -166,7 +166,7 @@ export default function RegisterPage() {
 
       {/* HEADER with Navigation */}
       <header className="w-full border-b dark:border-zinc-900 border-zinc-300 dark:bg-black/95 bg-white/95 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-6 sm:px-10 lg:px-16 py-3 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-3 sm:px-10 lg:px-16 py-2.5 sm:py-3 flex items-center justify-between">
           <Link
             href="/"
             className="flex items-center gap-2 hover:opacity-80 transition"
@@ -174,20 +174,20 @@ export default function RegisterPage() {
             <Image
               src="/logo_white.png"
               alt="ROBOCEK logo"
-              width={32}
-              height={32}
+              width={30}
+              height={30}
               className="hidden dark:block select-none"
               style={{ width: "auto", height: "auto" }}
             />
             <Image
               src="/logo_black.png"
               alt="ROBOCEK logo"
-              width={32}
-              height={32}
+              width={30}
+              height={30}
               className="block dark:hidden select-none"
               style={{ width: "auto", height: "auto" }}
             />
-            <span className="text-sm font-semibold tracking-widest uppercase">
+            <span className="text-xs sm:text-sm font-semibold tracking-widest uppercase">
               ROBOCEK
             </span>
           </Link>
@@ -196,7 +196,7 @@ export default function RegisterPage() {
             className="inline-flex items-center justify-center rounded-full border
               dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-100 dark:hover:text-zinc-50 dark:hover:bg-zinc-900/50
               border-zinc-400 text-zinc-700 hover:border-zinc-800 hover:text-black hover:bg-gray-100
-              px-5 py-2 text-xs font-medium uppercase tracking-[0.15em] transition"
+              px-3 py-1.5 text-[11px] sm:px-5 sm:py-2 sm:text-xs font-medium uppercase tracking-[0.12em] transition"
           >
             Member Login
           </Link>
@@ -204,21 +204,21 @@ export default function RegisterPage() {
       </header>
 
       {/* MAIN CONTENT */}
-      <main className="flex-1 w-full flex flex-col items-center py-12 sm:py-16">
-        <div className="w-full max-w-2xl px-6 sm:px-10 lg:px-16">
+      <main className="flex-1 w-full flex flex-col items-center py-6 sm:py-16">
+        <div className="w-full max-w-2xl px-4 sm:px-10 lg:px-16">
           {/* Header */}
-          <div className="mb-10 text-center">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight mb-4">
+          <div className="mb-6 sm:mb-10 text-center">
+            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-semibold tracking-tight mb-2 sm:mb-4">
               Join ROBOCEK
             </h1>
-            <p className="text-sm sm:text-base dark:text-zinc-400 text-zinc-700 max-w-md mx-auto">
+            <p className="text-xs sm:text-base dark:text-zinc-400 text-zinc-700 max-w-md mx-auto leading-relaxed">
               Register your interest in the Robotics Club and fill out the
               details below. We'll get back to you with information about
               upcoming sessions and events.
             </p>
-          </div>{" "}
+          </div>
           {/* Registration Form */}
-          <div className="rounded-3xl border dark:border-zinc-800 border-zinc-300 dark:bg-zinc-950/40 bg-white p-6 sm:p-8">            {/* Email Requirement Notice */}
+          <div className="rounded-2xl sm:rounded-3xl border dark:border-zinc-800 border-zinc-300 dark:bg-zinc-950/40 bg-white p-4 sm:p-8">            {/* Email Requirement Notice */}
             <div className="mb-6 p-3 rounded-lg dark:bg-blue-950/40 bg-blue-50 border dark:border-blue-900/50 border-blue-200">
               <p className="text-xs dark:text-blue-200 text-blue-800">
                 ⓘ Any email address is accepted for registration.

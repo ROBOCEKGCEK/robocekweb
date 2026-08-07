@@ -240,36 +240,36 @@ export default function DashboardPage() {
 
   return (
     <main className="min-h-screen bg-white text-black dark:bg-black dark:text-zinc-50 font-sans">
-      <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col px-6 py-8 sm:px-10 lg:px-16">
+      <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 py-6 sm:px-10 lg:px-16">
         {/* HEADER */}
-        <header className="mb-10 flex flex-col gap-4 border-b border-zinc-200 pb-6 dark:border-zinc-800 sm:flex-row sm:items-end sm:justify-between">
+        <header className="mb-6 sm:mb-10 flex flex-col gap-4 border-b border-zinc-200 pb-6 dark:border-zinc-800 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-[0.7rem] uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400">
+            <p className="text-[0.65rem] sm:text-[0.7rem] uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400">
               ROBOCEK Member Area
             </p>
-            <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
+            <h1 className="mt-1 sm:mt-2 text-2xl font-semibold tracking-tight sm:text-4xl">
               Dashboard
             </h1>
-            <p className="mt-2 max-w-2xl text-sm text-zinc-600 dark:text-zinc-400">
+            <p className="mt-1 sm:mt-2 max-w-2xl text-xs sm:text-sm text-zinc-600 dark:text-zinc-400">
               Your personal control room for club updates, projects, and member-only resources.
             </p>
           </div>
-          <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
             <Link
               href="/events"
-              className="inline-flex items-center justify-center rounded-full border border-zinc-300 px-4 py-2 text-xs font-medium uppercase tracking-[0.15em] text-zinc-700 transition hover:border-zinc-800 hover:text-black dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-100 dark:hover:text-zinc-50"
+              className="inline-flex items-center justify-center rounded-full border border-zinc-300 px-3 py-1.5 text-[11px] sm:px-4 sm:py-2 sm:text-xs font-medium uppercase tracking-[0.15em] text-zinc-700 transition hover:border-zinc-800 hover:text-black dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-100 dark:hover:text-zinc-50"
             >
               Events
             </Link>
             <Link
               href="/projects"
-              className="inline-flex items-center justify-center rounded-full border border-zinc-300 px-4 py-2 text-xs font-medium uppercase tracking-[0.15em] text-zinc-700 transition hover:border-zinc-800 hover:text-black dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-100 dark:hover:text-zinc-50"
+              className="inline-flex items-center justify-center rounded-full border border-zinc-300 px-3 py-1.5 text-[11px] sm:px-4 sm:py-2 sm:text-xs font-medium uppercase tracking-[0.15em] text-zinc-700 transition hover:border-zinc-800 hover:text-black dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-100 dark:hover:text-zinc-50"
             >
               Project Hub
             </Link>
             <Link
               href="/logout"
-              className="inline-flex items-center justify-center rounded-full border border-zinc-300 px-4 py-2 text-xs font-medium uppercase tracking-[0.18em] text-zinc-700 transition hover:border-zinc-800 hover:text-black dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-100 dark:hover:text-zinc-50"
+              className="inline-flex items-center justify-center rounded-full border border-zinc-300 px-3 py-1.5 text-[11px] sm:px-4 sm:py-2 sm:text-xs font-medium uppercase tracking-[0.18em] text-zinc-700 transition hover:border-zinc-800 hover:text-black dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-100 dark:hover:text-zinc-50"
             >
               Sign Out
             </Link>
@@ -286,49 +286,49 @@ export default function DashboardPage() {
           <div className="grid gap-6 lg:grid-cols-[1.35fr_0.9fr]">
             <section className="space-y-6">
               {/* PROFILE SUMMARY CARD */}
-              <div className="rounded-3xl border border-zinc-200 bg-zinc-50 p-6 dark:border-zinc-800 dark:bg-zinc-950/40 sm:p-8">
-                <p className="text-[0.7rem] uppercase tracking-[0.24em] text-zinc-500 dark:text-zinc-400">
+              <div className="rounded-2xl sm:rounded-3xl border border-zinc-200 bg-zinc-50 p-4 sm:p-8 dark:border-zinc-800 dark:bg-zinc-950/40">
+                <p className="text-[0.65rem] sm:text-[0.7rem] uppercase tracking-[0.24em] text-zinc-500 dark:text-zinc-400">
                   Signed In As
                 </p>
-                <div className="mt-3 flex flex-col gap-2">
-                  <h2 className="text-2xl font-semibold sm:text-3xl">
+                <div className="mt-2 sm:mt-3 flex flex-col gap-1 sm:gap-2">
+                  <h2 className="text-xl font-semibold sm:text-3xl">
                     {profile?.fullName ?? user.displayName ?? "Member"}
                   </h2>
-                  <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                  <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400">
                     {profile?.email ?? user.email}
                   </p>
                 </div>
 
-                <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                  <div className="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-black/40">
-                    <p className="text-[0.68rem] uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-500">
+                <div className="mt-4 sm:mt-6 grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
+                  <div className="rounded-xl sm:rounded-2xl border border-zinc-200 bg-white p-3 sm:p-4 dark:border-zinc-800 dark:bg-black/40">
+                    <p className="text-[0.62rem] sm:text-[0.68rem] uppercase tracking-[0.18em] text-zinc-500 dark:text-zinc-500">
                       Membership ID
                     </p>
-                    <p className="mt-2 break-all text-sm font-medium text-black dark:text-zinc-100">
+                    <p className="mt-1 sm:mt-2 break-all text-xs sm:text-sm font-medium text-black dark:text-zinc-100">
                       {profile?.membershipId ? profile.membershipId : "Pending Admin Confirmation"}
                     </p>
                   </div>
-                  <div className="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-black/40">
-                    <p className="text-[0.68rem] uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-500">
+                  <div className="rounded-xl sm:rounded-2xl border border-zinc-200 bg-white p-3 sm:p-4 dark:border-zinc-800 dark:bg-black/40">
+                    <p className="text-[0.62rem] sm:text-[0.68rem] uppercase tracking-[0.18em] text-zinc-500 dark:text-zinc-500">
                       Branch
                     </p>
-                    <p className="mt-2 text-sm font-medium text-black dark:text-zinc-100">
+                    <p className="mt-1 sm:mt-2 text-xs sm:text-sm font-medium text-black dark:text-zinc-100">
                       {profile?.branch ?? "Not saved yet"}
                     </p>
                   </div>
-                  <div className="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-black/40">
-                    <p className="text-[0.68rem] uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-500">
-                      Semester
+                  <div className="rounded-xl sm:rounded-2xl border border-zinc-200 bg-white p-3 sm:p-4 dark:border-zinc-800 dark:bg-black/40">
+                    <p className="text-[0.62rem] sm:text-[0.68rem] uppercase tracking-[0.18em] text-zinc-500 dark:text-zinc-500">
+                      Batch
                     </p>
-                    <p className="mt-2 text-sm font-medium text-black dark:text-zinc-100">
+                    <p className="mt-1 sm:mt-2 text-xs sm:text-sm font-medium text-black dark:text-zinc-100">
                       {profile?.yearSemester || profile?.year || "Not saved yet"}
                     </p>
                   </div>
-                  <div className="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-black/40">
-                    <p className="text-[0.68rem] uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-500">
+                  <div className="rounded-xl sm:rounded-2xl border border-zinc-200 bg-white p-3 sm:p-4 dark:border-zinc-800 dark:bg-black/40">
+                    <p className="text-[0.62rem] sm:text-[0.68rem] uppercase tracking-[0.18em] text-zinc-500 dark:text-zinc-500">
                       Interests
                     </p>
-                    <p className="mt-2 text-sm font-medium text-black dark:text-zinc-100">
+                    <p className="mt-1 sm:mt-2 text-xs sm:text-sm font-medium text-black dark:text-zinc-100">
                       {profile?.interests?.length ? profile.interests.length : 0} selected
                     </p>
                   </div>
@@ -336,7 +336,7 @@ export default function DashboardPage() {
               </div>
 
               {/* DIGITAL MEMBERSHIP CARD SECTION */}
-              <div className="rounded-3xl border border-emerald-900/40 bg-zinc-950 p-6 sm:p-8 relative overflow-hidden shadow-2xl">
+              <div className="rounded-2xl sm:rounded-3xl border border-emerald-900/40 bg-zinc-950 p-4 sm:p-8 relative overflow-hidden shadow-2xl">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
                   <div>
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[0.68rem] uppercase tracking-[0.2em] font-mono text-emerald-400 font-medium">

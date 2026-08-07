@@ -126,30 +126,30 @@ export default function ProjectsPage() {
 
       {/* HEADER */}
       <header className="w-full border-b dark:border-zinc-900 border-zinc-300 dark:bg-black/95 bg-white/95 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-6 sm:px-10 lg:px-16 py-3 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-3 sm:px-10 lg:px-16 py-2.5 sm:py-3 flex flex-wrap items-center justify-between gap-2">
           <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition">
             <Image
               src="/logo_white.png"
               alt="ROBOCEK logo"
-              width={32}
-              height={32}
+              width={30}
+              height={30}
               className="hidden dark:block select-none"
               style={{ width: "auto", height: "auto" }}
             />
             <Image
               src="/logo_black.png"
               alt="ROBOCEK logo"
-              width={32}
-              height={32}
+              width={30}
+              height={30}
               className="block dark:hidden select-none"
               style={{ width: "auto", height: "auto" }}
             />
-            <span className="text-sm font-semibold tracking-widest uppercase">
+            <span className="text-xs sm:text-sm font-semibold tracking-widest uppercase">
               ROBOCEK
             </span>
           </Link>
 
-          <nav className="flex items-center gap-3 sm:gap-4 text-xs font-medium uppercase tracking-[0.15em]">
+          <nav className="flex items-center gap-2 sm:gap-4 text-[11px] sm:text-xs font-medium uppercase tracking-[0.12em]">
             <Link
               href="/events"
               className="dark:text-zinc-400 text-zinc-600 hover:dark:text-zinc-100 hover:text-black transition"
@@ -167,7 +167,7 @@ export default function ProjectsPage() {
               className="inline-flex items-center justify-center rounded-full border
                 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-100 dark:hover:text-zinc-50 dark:hover:bg-zinc-900/50
                 border-zinc-400 text-zinc-700 hover:border-zinc-800 hover:text-black hover:bg-gray-100
-                px-4 py-1.5 transition"
+                px-3 py-1 sm:px-4 sm:py-1.5 transition"
             >
               Dashboard
             </Link>
@@ -176,23 +176,23 @@ export default function ProjectsPage() {
       </header>
 
       {/* MAIN CONTENT */}
-      <main className="flex-1 w-full max-w-6xl mx-auto px-6 sm:px-10 lg:px-16 py-12 sm:py-16">
+      <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-10 lg:px-16 py-6 sm:py-16">
         {/* HERO SECTION */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 border-b dark:border-zinc-800 border-zinc-200 pb-8">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6 mb-8 sm:mb-12 border-b dark:border-zinc-800 border-zinc-200 pb-6 sm:pb-8">
           <div>
-            <span className="text-[0.7rem] uppercase tracking-[0.25em] text-zinc-500 dark:text-zinc-400">
+            <span className="text-[0.65rem] sm:text-[0.7rem] uppercase tracking-[0.25em] text-zinc-500 dark:text-zinc-400">
               ROBOCEK Innovation Hub
             </span>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight mt-2">
+            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-semibold tracking-tight mt-1.5 sm:mt-2">
               Project Hub
             </h1>
-            <p className="text-sm sm:text-base dark:text-zinc-400 text-zinc-600 max-w-2xl mt-3 leading-relaxed">
+            <p className="text-xs sm:text-base dark:text-zinc-400 text-zinc-600 max-w-2xl mt-2 sm:mt-3 leading-relaxed">
               Explore hardware builds, autonomous robotics platforms, embedded firmware, and software innovations built by ROBOCEK members.
             </p>
           </div>
           <Link
             href="/dashboard"
-            className="inline-flex items-center gap-2 rounded-full dark:bg-zinc-50 bg-black px-6 py-3 text-xs font-semibold uppercase tracking-[0.18em] dark:text-black text-white dark:hover:bg-zinc-200 hover:bg-zinc-900 transition shrink-0"
+            className="inline-flex items-center justify-center gap-2 rounded-full dark:bg-zinc-50 bg-black px-4 py-2.5 sm:px-6 sm:py-3 text-[11px] sm:text-xs font-semibold uppercase tracking-[0.15em] sm:tracking-[0.18em] dark:text-black text-white dark:hover:bg-zinc-200 hover:bg-zinc-900 transition shrink-0 w-full sm:w-auto"
           >
             + Publish Your Project
           </Link>

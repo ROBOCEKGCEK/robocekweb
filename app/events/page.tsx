@@ -164,30 +164,30 @@ export default function EventsPage() {
 
       {/* HEADER */}
       <header className="w-full border-b dark:border-zinc-900 border-zinc-300 dark:bg-black/95 bg-white/95 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-6 sm:px-10 lg:px-16 py-3 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-3 sm:px-10 lg:px-16 py-2.5 sm:py-3 flex flex-wrap items-center justify-between gap-2">
           <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition">
             <Image
               src="/logo_white.png"
               alt="ROBOCEK logo"
-              width={32}
-              height={32}
+              width={30}
+              height={30}
               className="hidden dark:block select-none"
               style={{ width: "auto", height: "auto" }}
             />
             <Image
               src="/logo_black.png"
               alt="ROBOCEK logo"
-              width={32}
-              height={32}
+              width={30}
+              height={30}
               className="block dark:hidden select-none"
               style={{ width: "auto", height: "auto" }}
             />
-            <span className="text-sm font-semibold tracking-widest uppercase">
+            <span className="text-xs sm:text-sm font-semibold tracking-widest uppercase">
               ROBOCEK
             </span>
           </Link>
 
-          <nav className="flex items-center gap-3 sm:gap-4 text-xs font-medium uppercase tracking-[0.15em]">
+          <nav className="flex items-center gap-2 sm:gap-4 text-[11px] sm:text-xs font-medium uppercase tracking-[0.12em]">
             <Link
               href="/events"
               className="dark:text-zinc-100 text-black font-semibold underline underline-offset-4"
@@ -205,7 +205,7 @@ export default function EventsPage() {
               className="inline-flex items-center justify-center rounded-full border
                 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-100 dark:hover:text-zinc-50 dark:hover:bg-zinc-900/50
                 border-zinc-400 text-zinc-700 hover:border-zinc-800 hover:text-black hover:bg-gray-100
-                px-4 py-1.5 transition"
+                px-3 py-1 sm:px-4 sm:py-1.5 transition"
             >
               Dashboard
             </Link>
@@ -214,27 +214,27 @@ export default function EventsPage() {
       </header>
 
       {/* MAIN CONTENT */}
-      <main className="flex-1 w-full max-w-6xl mx-auto px-6 sm:px-10 lg:px-16 py-12 sm:py-16">
+      <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-10 lg:px-16 py-6 sm:py-16">
         {/* HERO SECTION */}
-        <div className="mb-12 border-b dark:border-zinc-800 border-zinc-200 pb-8">
-          <span className="text-[0.7rem] uppercase tracking-[0.25em] text-zinc-500 dark:text-zinc-400">
+        <div className="mb-8 sm:mb-12 border-b dark:border-zinc-800 border-zinc-200 pb-6 sm:pb-8">
+          <span className="text-[0.65rem] sm:text-[0.7rem] uppercase tracking-[0.25em] text-zinc-500 dark:text-zinc-400">
             ROBOCEK Club Activities
           </span>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight mt-2">
+          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-semibold tracking-tight mt-1.5 sm:mt-2">
             Events & Workshops
           </h1>
-          <p className="text-sm sm:text-base dark:text-zinc-400 text-zinc-600 max-w-2xl mt-3 leading-relaxed">
+          <p className="text-xs sm:text-base dark:text-zinc-400 text-zinc-600 max-w-2xl mt-2 sm:mt-3 leading-relaxed">
             Hands-on technical boot camps, hackathons, guest lectures, and robotics competitions organized by ROBOCEK at GCE Kannur.
           </p>
         </div>
 
         {/* CATEGORY FILTER PILLS */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-8 scrollbar-none">
+        <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-3 mb-6 sm:mb-8 scrollbar-none">
           {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => setFilterCategory(cat)}
-              className={`rounded-full px-5 py-2 text-xs font-medium transition shrink-0 ${
+              className={`rounded-full px-3.5 py-1.5 sm:px-5 sm:py-2 text-[11px] sm:text-xs font-medium transition shrink-0 ${
                 filterCategory === cat
                   ? "dark:bg-zinc-100 bg-black dark:text-black text-white"
                   : "dark:bg-zinc-900 bg-zinc-100 dark:text-zinc-400 text-zinc-600 dark:hover:text-zinc-200 hover:text-black"
