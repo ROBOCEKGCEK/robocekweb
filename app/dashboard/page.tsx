@@ -17,6 +17,7 @@ import {
 } from "firebase/firestore";
 import { auth, db } from "../firebase/client";
 import MembershipCard from "./MembershipCard";
+import PasswordResetModal from "./PasswordResetModal";
 
 type UserProfile = {
   membershipId?: string | null;
@@ -29,6 +30,7 @@ type UserProfile = {
   year?: string;
   interests?: string[];
   status?: string;
+  mustChangePassword?: boolean;
 };
 
 type UserProject = {
@@ -238,8 +240,18 @@ export default function DashboardPage() {
     }
   };
 
+  const handlePasswordResetSuccess = () => {
+    if (profile) {
+      setProfile({ ...profile, mustChangePassword: false });
+    }
+  };
+
   return (
     <main className="min-h-screen bg-white text-black dark:bg-black dark:text-zinc-50 font-sans">
+      {profile?.mustChangePassword ? (
+        <PasswordResetModal onSuccess={handlePasswordResetSuccess} />
+      ) : null}
+
       <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 py-6 sm:px-10 lg:px-16">
         {/* HEADER */}
         <header className="mb-6 sm:mb-10 flex flex-col gap-4 border-b border-zinc-200 pb-6 dark:border-zinc-800 sm:flex-row sm:items-end sm:justify-between">
