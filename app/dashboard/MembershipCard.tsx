@@ -235,60 +235,60 @@ Status: VERIFIED MEMBER`;
 
           {/* 2. MAIN BODY ROW (Member Details) */}
           <div className="relative z-10 my-auto py-1 sm:py-2 grid grid-cols-[1fr_auto] gap-2 sm:gap-4 items-center">
-            <div className="space-y-1.5 sm:space-y-3 min-w-0">
+            <div className="space-y-1.5 sm:space-y-2.5 min-w-0">
               {/* Member Full Name */}
               <div>
                 <p
-                  className="text-[7px] sm:text-[9px] uppercase tracking-[0.18em] font-mono"
+                  className="text-[6.5px] sm:text-[8.5px] uppercase tracking-[0.18em] font-mono"
                   style={{ color: "rgba(52, 211, 153, 0.8)" }}
                 >
                   MEMBER NAME
                 </p>
-                <h2 className="text-xs sm:text-xl font-bold tracking-tight text-white uppercase drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] truncate max-w-[200px] sm:max-w-[320px]">
+                <h2 className="text-xs sm:text-lg font-bold tracking-tight text-white uppercase drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] truncate max-w-[200px] sm:max-w-[340px]">
                   {displayName}
                 </h2>
               </div>
 
-              {/* Grid of Attributes */}
-              <div className="grid grid-cols-3 gap-1 sm:gap-3 text-left">
-                {/* ID */}
-                <div className="col-span-1 min-w-0">
-                  <p
-                    className="text-[6px] sm:text-[8px] uppercase tracking-wider font-mono truncate"
-                    style={{ color: "rgba(52, 211, 153, 0.7)" }}
-                  >
-                    MEMBERSHIP ID
-                  </p>
-                  <p
-                    className="text-[9px] sm:text-xs font-mono font-bold tracking-wider truncate"
-                    style={{ color: "#6ee7b7" }}
-                  >
-                    {displayId}
-                  </p>
-                </div>
+              {/* Membership ID - FULLY VISIBLE ALWAYS */}
+              <div>
+                <p
+                  className="text-[6.5px] sm:text-[8.5px] uppercase tracking-wider font-mono"
+                  style={{ color: "rgba(52, 211, 153, 0.8)" }}
+                >
+                  MEMBERSHIP ID
+                </p>
+                <p
+                  className="text-[10px] sm:text-sm font-mono font-extrabold tracking-widest text-emerald-300 whitespace-nowrap overflow-visible"
+                  style={{ color: "#6ee7b7" }}
+                >
+                  {displayId}
+                </p>
+              </div>
 
+              {/* Branch & Batch Row */}
+              <div className="flex items-center gap-4 sm:gap-8 text-left">
                 {/* Branch */}
-                <div className="col-span-1 min-w-0">
+                <div>
                   <p
-                    className="text-[6px] sm:text-[8px] uppercase tracking-wider font-mono truncate"
+                    className="text-[6.5px] sm:text-[8.5px] uppercase tracking-wider font-mono"
                     style={{ color: "rgba(52, 211, 153, 0.7)" }}
                   >
                     BRANCH
                   </p>
-                  <p className="text-[8.5px] sm:text-[11px] font-semibold text-zinc-100 truncate">
+                  <p className="text-[9px] sm:text-[11px] font-semibold text-zinc-100 uppercase">
                     {displayBranch}
                   </p>
                 </div>
 
                 {/* Batch */}
-                <div className="col-span-1 min-w-0">
+                <div>
                   <p
-                    className="text-[6px] sm:text-[8px] uppercase tracking-wider font-mono truncate"
+                    className="text-[6.5px] sm:text-[8.5px] uppercase tracking-wider font-mono"
                     style={{ color: "rgba(52, 211, 153, 0.7)" }}
                   >
-                    BATCH / YEAR
+                    BATCH
                   </p>
-                  <p className="text-[8.5px] sm:text-[11px] font-semibold text-zinc-100 truncate">
+                  <p className="text-[9px] sm:text-[11px] font-semibold text-zinc-100 uppercase">
                     {displayBatch}
                   </p>
                 </div>
