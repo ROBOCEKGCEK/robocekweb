@@ -18,6 +18,7 @@ import {
 import { auth, db } from "../firebase/client";
 import MembershipCard from "./MembershipCard";
 import PasswordResetModal from "./PasswordResetModal";
+import EditProfileModal from "./EditProfileModal";
 
 type UserProfile = {
   membershipId?: string | null;
@@ -76,6 +77,7 @@ export default function DashboardPage() {
   const [publishSuccess, setPublishSuccess] = useState("");
   const [publishError, setPublishError] = useState("");
   const [showPublishModal, setShowPublishModal] = useState(false);
+  const [showEditProfileModal, setShowEditProfileModal] = useState(false);
 
   // Form fields
   const [projectTitle, setProjectTitle] = useState("");
@@ -252,6 +254,15 @@ export default function DashboardPage() {
         <PasswordResetModal onSuccess={handlePasswordResetSuccess} />
       ) : null}
 
+      {showEditProfileModal && user ? (
+        <EditProfileModal
+          profile={profile}
+          userUid={user.uid}
+          onClose={() => setShowEditProfileModal(false)}
+          onUpdate={(updated) => setProfile(updated)}
+        />
+      ) : null}
+
       <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 py-6 sm:px-10 lg:px-16">
         {/* HEADER */}
         <header className="mb-6 sm:mb-10 flex flex-col gap-4 border-b border-zinc-200 pb-6 dark:border-zinc-800 sm:flex-row sm:items-end sm:justify-between">
@@ -299,9 +310,17 @@ export default function DashboardPage() {
             <section className="space-y-6">
               {/* PROFILE SUMMARY CARD */}
               <div className="rounded-2xl sm:rounded-3xl border border-zinc-200 bg-zinc-50 p-4 sm:p-8 dark:border-zinc-800 dark:bg-zinc-950/40">
-                <p className="text-[0.65rem] sm:text-[0.7rem] uppercase tracking-[0.24em] text-zinc-500 dark:text-zinc-400">
-                  Signed In As
-                </p>
+                <div className="flex items-center justify-between gap-4">
+                  <p className="text-[0.65rem] sm:text-[0.7rem] uppercase tracking-[0.24em] text-zinc-500 dark:text-zinc-400">
+                    Signed In As
+                  </p>
+                  <button
+                    onClick={() => setShowEditProfileModal(true)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-black text-[11px] font-medium text-zinc-700 dark:text-zinc-300 hover:border-zinc-800 dark:hover:border-zinc-400 transition cursor-pointer"
+                  >
+                    ⚙ Edit Profile
+                  </button>
+                </div>
                 <div className="mt-2 sm:mt-3 flex flex-col gap-1 sm:gap-2">
                   <h2 className="text-xl font-semibold sm:text-3xl">
                     {profile?.fullName ?? user.displayName ?? "Member"}
@@ -619,12 +638,12 @@ export default function DashboardPage() {
                   >
                     View Upcoming Events
                   </Link>
-                  <Link
-                    href="/register"
-                    className="block rounded-2xl border border-zinc-200 bg-white px-4 py-3 transition hover:border-zinc-800 dark:border-zinc-800 dark:bg-black/40 dark:hover:border-zinc-500"
+                  <button
+                    onClick={() => setShowEditProfileModal(true)}
+                    className="w-full text-left block rounded-2xl border border-zinc-200 bg-white px-4 py-3 transition hover:border-zinc-800 dark:border-zinc-800 dark:bg-black/40 dark:hover:border-zinc-500 cursor-pointer"
                   >
                     Update registration
-                  </Link>
+                  </button>
                   <a
                     href="mailto:robocek@gcek.ac.in"
                     className="block rounded-2xl border border-zinc-200 bg-white px-4 py-3 transition hover:border-zinc-800 dark:border-zinc-800 dark:bg-black/40 dark:hover:border-zinc-500"

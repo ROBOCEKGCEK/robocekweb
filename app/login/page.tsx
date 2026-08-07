@@ -128,6 +128,7 @@ export default function LoginPage() {
 
         if (snapshot.empty) {
           setErrorMessage("No account matched that Membership ID.");
+          setIsSubmitting(false);
           return;
         }
 
@@ -141,6 +142,16 @@ export default function LoginPage() {
         const snapshot = await getDocs(userQuery);
         if (!snapshot.empty) {
           userDocSnap = snapshot.docs[0];
+        } else {
+          // Fallback: Case-insensitive email search across Firestore users
+          const allSnap = await getDocs(collection(db, "users"));
+          const match = allSnap.docs.find(
+            (d) => (d.data().email || "").toString().trim().toLowerCase() === trimmedIdentifier.toLowerCase()
+          );
+          if (match) {
+            userDocSnap = match;
+            emailToUse = (match.data().email as string) || trimmedIdentifier;
+          }
         }
       }
 
@@ -148,38 +159,58 @@ export default function LoginPage() {
       try {
         await signInWithEmailAndPassword(auth, emailToUse, trimmedPassword);
       } catch (authErr: unknown) {
+        const errCode = (authErr as { code?: string })?.code || "";
         const errStr = authErr instanceof Error ? authErr.message : "";
-        const isUserNotFound = errStr.includes("auth/user-not-found") || errStr.includes("auth/invalid-credential");
+        const isUserNotFound =
+          errCode === "auth/user-not-found" ||
+          errCode === "auth/invalid-credential" ||
+          errStr.includes("auth/user-not-found") ||
+          errStr.includes("auth/invalid-credential");
 
-        // 3. If member document exists in Firestore (e.g. uploaded via Excel by Admin) but not yet in Auth
-        if (userDocSnap && isUserNotFound && (userDocSnap.data().mustChangePassword || userDocSnap.data().defaultPassword)) {
-          const defaultPass = userDocSnap.data().defaultPassword || "Robocek@2026";
+        // 3. If member document exists in Firestore (e.g. uploaded via Excel or approved by Admin)
+        if (userDocSnap && isUserNotFound) {
+          const expectedDefaultPass = userDocSnap.data().defaultPassword || "Robocek@2026";
           
-          // Verify provided password matches the initial default password or user attempt
-          if (trimmedPassword === defaultPass || trimmedPassword === "Robocek@2026") {
-            // Auto-provision their Firebase Auth user account on the fly!
-            const newCred = await createUserWithEmailAndPassword(auth, emailToUse, trimmedPassword);
-            
-            if (newCred.user) {
-              const oldDocRef = doc(db, "users", userDocSnap.id);
-              const newDocRef = doc(db, "users", newCred.user.uid);
+          // Verify provided password matches the default password
+          if (trimmedPassword === expectedDefaultPass || trimmedPassword === "Robocek@2026") {
+            try {
+              // Auto-provision their Firebase Auth user account on the fly!
+              const newCred = await createUserWithEmailAndPassword(auth, emailToUse, trimmedPassword);
               
-              // Move document to new Auth UID
-              await setDoc(newDocRef, {
-                ...userDocSnap.data(),
-                uid: newCred.user.uid,
-                mustChangePassword: true,
-              });
+              if (newCred.user) {
+                const oldDocRef = doc(db, "users", userDocSnap.id);
+                const newDocRef = doc(db, "users", newCred.user.uid);
+                
+                // Move document to new Auth UID
+                await setDoc(newDocRef, {
+                  ...userDocSnap.data(),
+                  uid: newCred.user.uid,
+                  mustChangePassword: true,
+                });
 
-              if (userDocSnap.id !== newCred.user.uid) {
-                await deleteDoc(oldDocRef);
+                if (userDocSnap.id !== newCred.user.uid) {
+                  await deleteDoc(oldDocRef);
+                }
               }
+            } catch (createErr: unknown) {
+              const createCode = (createErr as { code?: string })?.code || "";
+              if (createCode === "auth/email-already-in-use") {
+                setErrorMessage("Incorrect password. If you forgot your password, please click 'Forgot password?' below to reset it.");
+                return;
+              }
+              throw createErr;
             }
           } else {
-            throw authErr;
+            setErrorMessage("Incorrect password. For first-time login, use default password: Robocek@2026");
+            return;
           }
         } else {
-          throw authErr;
+          setErrorMessage(
+            errCode === "auth/invalid-credential" || errStr.includes("invalid-credential")
+              ? "Invalid email or password. If logging in for the first time, use default password: Robocek@2026"
+              : errStr || "Sign in failed."
+          );
+          return;
         }
       }
 

@@ -3,18 +3,21 @@
 import Image from "next/image";
 import ThemeToggle from "../ThemeToggle";
 import Link from "next/link";
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   browserLocalPersistence,
   createUserWithEmailAndPassword,
+  onAuthStateChanged,
   setPersistence,
   updateProfile,
 } from "firebase/auth";
 import {
   doc,
+  getDoc,
   serverTimestamp,
   setDoc,
+  updateDoc,
 } from "firebase/firestore";
 import { auth, db } from "../firebase/client";
 
@@ -33,6 +36,7 @@ export default function RegisterPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoggedInUser, setIsLoggedInUser] = useState(false);
 
   const interestOptions = useMemo(
     () => [
@@ -62,6 +66,31 @@ export default function RegisterPage() {
     );
   };
 
+  useEffect(() => {
+    if (!auth || !db) return;
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        setIsLoggedInUser(true);
+        setEmail(user.email || "");
+        setFullName(user.displayName || "");
+        try {
+          const userDocSnap = await getDoc(doc(db, "users", user.uid));
+          if (userDocSnap.exists()) {
+            const d = userDocSnap.data();
+            if (d.fullName) setFullName(d.fullName);
+            if (d.phoneNumber || d.phone) setPhoneNumber(d.phoneNumber || d.phone);
+            if (d.branch) setBranch(d.branch);
+            if (d.yearSemester || d.year) setYearSemester(d.yearSemester || d.year);
+            if (Array.isArray(d.interests)) setSelectedInterests(d.interests);
+          }
+        } catch (err) {
+          console.warn("Could not pre-fill registration details:", err);
+        }
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setErrorMessage("");
@@ -79,13 +108,48 @@ export default function RegisterPage() {
     const trimmedYearSemester = yearSemester.trim();
     const trimmedPassword = password.trim();
 
-    if (!trimmedFullName || !trimmedEmail || !trimmedPhone || !trimmedBranch || !trimmedYearSemester || !trimmedPassword) {
+    if (!trimmedFullName || !trimmedEmail || !trimmedPhone || !trimmedBranch || !trimmedYearSemester) {
       setErrorMessage("Fill in all required fields.");
       return;
     }
 
     if (selectedInterests.length === 0) {
       setErrorMessage("Select at least one area of interest.");
+      return;
+    }
+
+    // If existing logged-in user updating profile
+    if (isLoggedInUser && auth.currentUser) {
+      setIsSubmitting(true);
+      try {
+        const userRef = doc(db, "users", auth.currentUser.uid);
+        await updateDoc(userRef, {
+          fullName: trimmedFullName,
+          phone: trimmedPhone,
+          phoneNumber: trimmedPhone,
+          branch: trimmedBranch,
+          yearSemester: trimmedYearSemester,
+          year: trimmedYearSemester,
+          interests: selectedInterests,
+          comments: comments.trim(),
+          updatedAt: serverTimestamp(),
+        });
+
+        await updateProfile(auth.currentUser, { displayName: trimmedFullName });
+        setStatusMessage("✓ Profile registration details updated successfully!");
+        setTimeout(() => {
+          router.replace("/dashboard");
+        }, 1200);
+      } catch (err: unknown) {
+        setErrorMessage(err instanceof Error ? err.message : "Failed to update profile.");
+      } finally {
+        setIsSubmitting(false);
+      }
+      return;
+    }
+
+    if (!trimmedPassword) {
+      setErrorMessage("Password is required.");
       return;
     }
 
