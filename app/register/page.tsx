@@ -46,6 +46,14 @@ export default function RegisterPage() {
     [],
   );
 
+  const batchOptions = useMemo(() => {
+    const currentYear = new Date().getFullYear();
+    return Array.from({ length: 4 }, (_, i) => {
+      const year = currentYear - i;
+      return `2k${year.toString().slice(-2)}`;
+    });
+  }, []);
+
   const toggleInterest = (interest: string) => {
     setSelectedInterests((current) =>
       current.includes(interest)
@@ -399,10 +407,11 @@ export default function RegisterPage() {
                       transition cursor-pointer"
                   >
                     <option value="" disabled>Select Batch</option>
-                    <option value="2k26">2k26</option>
-                    <option value="2k25">2k25</option>
-                    <option value="2k24">2k24</option>
-                    <option value="2k23">2k23</option>
+                    {batchOptions.map((batchYr) => (
+                      <option key={batchYr} value={batchYr}>
+                        {batchYr}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
