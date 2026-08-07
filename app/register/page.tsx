@@ -356,45 +356,54 @@ export default function RegisterPage() {
                     transition"
                 />
               </div>
-              {/* Branch and Year */}
+              {/* Branch and Batch Dropdowns */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="flex flex-col gap-2">
                   <label className="text-[0.75rem] uppercase tracking-[0.18em] dark:text-zinc-400 text-zinc-700 font-medium">
                     Branch <span className="text-red-500">*</span>
                   </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. ECE, ME, CS"
+                  <select
                     required
                     value={branch}
                     onChange={(event) => setBranch(event.target.value)}
                     className="h-11 rounded-xl border
-                      dark:border-zinc-800 dark:bg-black dark:text-zinc-100 dark:placeholder:text-zinc-600
-                      border-zinc-300 bg-white text-black placeholder:text-zinc-500
+                      dark:border-zinc-800 dark:bg-black dark:text-zinc-100
+                      border-zinc-300 bg-white text-black
                       px-4 text-sm focus:outline-none focus:ring-2
                       dark:focus:ring-zinc-400 dark:focus:border-zinc-400
                       focus:ring-zinc-600 focus:border-zinc-600
-                      transition"
-                  />
+                      transition cursor-pointer"
+                  >
+                    <option value="" disabled>Select Branch</option>
+                    <option value="CS">CS</option>
+                    <option value="CE">CE</option>
+                    <option value="ECE">ECE</option>
+                    <option value="ME">ME</option>
+                    <option value="EEE">EEE</option>
+                  </select>
                 </div>
                 <div className="flex flex-col gap-2">
                   <label className="text-[0.75rem] uppercase tracking-[0.18em] dark:text-zinc-400 text-zinc-700 font-medium">
-                    Year / Semester <span className="text-red-500">*</span>
+                    Batch <span className="text-red-500">*</span>
                   </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. S3, S5, S7"
+                  <select
                     required
                     value={yearSemester}
                     onChange={(event) => setYearSemester(event.target.value)}
                     className="h-11 rounded-xl border
-                      dark:border-zinc-800 dark:bg-black dark:text-zinc-100 dark:placeholder:text-zinc-600
-                      border-zinc-300 bg-white text-black placeholder:text-zinc-500
+                      dark:border-zinc-800 dark:bg-black dark:text-zinc-100
+                      border-zinc-300 bg-white text-black
                       px-4 text-sm focus:outline-none focus:ring-2
                       dark:focus:ring-zinc-400 dark:focus:border-zinc-400
                       focus:ring-zinc-600 focus:border-zinc-600
-                      transition"
-                  />
+                      transition cursor-pointer"
+                  >
+                    <option value="" disabled>Select Batch</option>
+                    <option value="2k26">2k26</option>
+                    <option value="2k25">2k25</option>
+                    <option value="2k24">2k24</option>
+                    <option value="2k23">2k23</option>
+                  </select>
                 </div>
               </div>
               {/* Areas of Interest */}
