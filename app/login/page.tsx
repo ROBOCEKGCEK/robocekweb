@@ -12,12 +12,14 @@ import {
   sendPasswordResetEmail,
   setPersistence,
   signInWithEmailAndPassword,
+  signOut,
 } from "firebase/auth";
 import { auth, db } from "../firebase/client";
 import {
   collection,
   deleteDoc,
   doc,
+  getDoc,
   getDocs,
   query,
   setDoc,
@@ -157,7 +159,28 @@ export default function LoginPage() {
 
       // 2. Try standard Firebase Auth Sign-in
       try {
-        await signInWithEmailAndPassword(auth, emailToUse, trimmedPassword);
+        const cred = await signInWithEmailAndPassword(auth, emailToUse, trimmedPassword);
+
+        // Check if member profile document was deleted by admin
+        if (cred.user) {
+          const profileSnap = await getDoc(doc(db, "users", cred.user.uid));
+          if (!profileSnap.exists() && !userDocSnap) {
+            await signOut(auth);
+            setErrorMessage("Your member account has been deleted by an administrator. Please contact robocek@gcek.ac.in for assistance.");
+            setIsSubmitting(false);
+            return;
+          }
+          // Block access until admin approves the user
+          if (profileSnap.exists()) {
+            const st = (profileSnap.data().status || "").toString().toLowerCase();
+            if (st !== "approved") {
+              await signOut(auth);
+              setErrorMessage("Your account is pending admin approval. Please wait for confirmation or contact robocek@gcek.ac.in.");
+              setIsSubmitting(false);
+              return;
+            }
+          }
+        }
       } catch (authErr: unknown) {
         const errCode = (authErr as { code?: string })?.code || "";
         const errStr = authErr instanceof Error ? authErr.message : "";

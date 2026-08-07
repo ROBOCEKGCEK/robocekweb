@@ -36,6 +36,8 @@ export default function RegisterPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isPendingApproval, setIsPendingApproval] = useState(false);
+  const [membershipIdState, setMembershipIdState] = useState<string | null>(null);
   const [isLoggedInUser, setIsLoggedInUser] = useState(false);
 
   const interestOptions = useMemo(
@@ -195,11 +197,10 @@ export default function RegisterPage() {
       });
 
       setStatusMessage(
-        "Registration successful! Your account was saved to users and is pending admin confirmation. Redirecting to your dashboard...",
+        "Registration successful! Your account was saved and is pending admin confirmation.",
       );
-      setTimeout(() => {
-        router.replace("/dashboard");
-      }, 1500);
+      setIsPendingApproval(true);
+      // Do not auto-redirect — wait for admin approval. Provide membershipId if assigned later.
     } catch (error: unknown) {
       let msg = "Registration failed.";
       if (typeof error === "object" && error !== null && "code" in error) {
@@ -219,6 +220,31 @@ export default function RegisterPage() {
       setErrorMessage(msg);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const checkApprovalStatus = async () => {
+    if (!auth || !db || !auth.currentUser) return;
+    try {
+      const userDocSnap = await getDoc(doc(db, "users", auth.currentUser.uid));
+      if (!userDocSnap.exists()) {
+        setStatusMessage("No profile found yet. Please wait for admin to approve your registration.");
+        return;
+      }
+
+      const data = userDocSnap.data();
+      const status = (data.status || "").toString().toLowerCase();
+      const mid = data.membershipId || null;
+      if (mid) setMembershipIdState(mid as string);
+
+      if (status === "approved") {
+        setStatusMessage("✓ Your account has been approved. Redirecting to dashboard...");
+        setTimeout(() => router.replace("/dashboard"), 800);
+      } else {
+        setStatusMessage("Your account is still pending approval. Click Refresh to check again.");
+      }
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : "Failed to check approval status.");
     }
   };
 
@@ -298,6 +324,30 @@ export default function RegisterPage() {
               {statusMessage ? (
                 <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-xs text-emerald-800 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-200">
                   {statusMessage}
+                </div>
+              ) : null}
+              {isPendingApproval ? (
+                <div className="rounded-xl border border-zinc-300 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-4 text-sm text-zinc-800 dark:text-zinc-200">
+                  <p className="font-semibold">Registration pending approval</p>
+                  <p className="text-xs mt-2">Your account is waiting for an administrator to approve it. You can refresh the status below to check for updates.</p>
+                  {membershipIdState ? (
+                    <p className="mt-2 text-sm">Membership ID: <span className="font-mono">{membershipIdState}</span></p>
+                  ) : null}
+                  <div className="mt-4 flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={checkApprovalStatus}
+                      className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-medium"
+                    >
+                      Refresh status
+                    </button>
+                    <Link
+                      href="/login"
+                      className="text-xs underline text-zinc-700 dark:text-zinc-300"
+                    >
+                      Go to Login
+                    </Link>
+                  </div>
                 </div>
               ) : null}
               {/* Full Name */}
@@ -529,10 +579,10 @@ export default function RegisterPage() {
               <div className="pt-4">
                 <button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || isPendingApproval}
                   className="w-full inline-flex items-center justify-center rounded-full dark:bg-zinc-50 bg-black px-6 py-3 text-sm font-medium uppercase tracking-[0.18em] dark:text-black text-white dark:hover:bg-zinc-200 hover:bg-zinc-900 transition disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  {isSubmitting ? "Saving..." : "Complete Registration"}
+                  {isPendingApproval ? "Pending approval" : isSubmitting ? "Saving..." : "Complete Registration"}
                 </button>
               </div>
             </form>
