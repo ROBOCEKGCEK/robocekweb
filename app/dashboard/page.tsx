@@ -345,18 +345,40 @@ export default function DashboardPage() {
                     </span>
                     <h3 className="text-xl font-semibold mt-2 text-white">Digital Membership Card</h3>
                     <p className="text-xs text-zinc-400 mt-1 max-w-xl">
-                      Pitch-black & dark green ROBOCEK membership card credential. Download as print-ready PDF for official verification.
+                      Pitch-black & dark green ROBOCEK membership card credential. Available to verified members.
                     </p>
                   </div>
                 </div>
 
-                <MembershipCard
-                  fullName={profile?.fullName || user.displayName || "Member"}
-                  membershipId={profile?.membershipId}
-                  branch={profile?.branch}
-                  yearSemester={profile?.yearSemester || profile?.year}
-                  email={profile?.email || user.email}
-                />
+                {profile?.membershipId &&
+                profile.membershipId !== "Pending Admin Confirmation" &&
+                (profile.status?.toLowerCase() === "approved" || profile.status?.toLowerCase() === "verified") ? (
+                  <MembershipCard
+                    fullName={profile?.fullName || user.displayName || "Member"}
+                    membershipId={profile?.membershipId}
+                    branch={profile?.branch}
+                    yearSemester={profile?.yearSemester || profile?.year}
+                    email={profile?.email || user.email}
+                  />
+                ) : (
+                  <div className="mt-4 rounded-2xl border border-emerald-500/30 bg-emerald-950/20 p-6 sm:p-8 text-center flex flex-col items-center justify-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-emerald-900/40 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
+                      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 className="text-base font-semibold text-white">Verification Pending</h4>
+                      <p className="mt-1 text-xs text-zinc-400 max-w-md mx-auto">
+                        Your membership card will be unlocked and available to download once your account is verified and approved by a ROBOCEK administrator.
+                      </p>
+                    </div>
+                    <span className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-[0.7rem] uppercase tracking-wider font-mono text-amber-400">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping"></span>
+                      Status: {profile?.status || "Pending Approval"}
+                    </span>
+                  </div>
+                )}
               </div>
 
               {errorMessage ? (
