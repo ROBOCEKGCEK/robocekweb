@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import {
   browserLocalPersistence,
   browserSessionPersistence,
+  createUserWithEmailAndPassword,
   sendPasswordResetEmail,
   setPersistence,
   signInWithEmailAndPassword,
@@ -15,8 +16,11 @@ import {
 import { auth, db } from "../firebase/client";
 import {
   collection,
+  deleteDoc,
+  doc,
   getDocs,
   query,
+  setDoc,
   where,
 } from "firebase/firestore";
 
@@ -112,7 +116,9 @@ export default function LoginPage() {
       );
 
       let emailToUse = trimmedIdentifier;
+      let userDocSnap = null;
 
+      // 1. Resolve identifier to email and find Firestore document
       if (!trimmedIdentifier.includes("@")) {
         const userQuery = query(
           collection(db, "users"),
@@ -121,14 +127,62 @@ export default function LoginPage() {
         const snapshot = await getDocs(userQuery);
 
         if (snapshot.empty) {
-          setErrorMessage("No membership ID matched that account.");
+          setErrorMessage("No account matched that Membership ID.");
           return;
         }
 
-        emailToUse = snapshot.docs[0].data().email as string;
+        userDocSnap = snapshot.docs[0];
+        emailToUse = userDocSnap.data().email as string;
+      } else {
+        const userQuery = query(
+          collection(db, "users"),
+          where("email", "==", trimmedIdentifier),
+        );
+        const snapshot = await getDocs(userQuery);
+        if (!snapshot.empty) {
+          userDocSnap = snapshot.docs[0];
+        }
       }
 
-      await signInWithEmailAndPassword(auth, emailToUse, trimmedPassword);
+      // 2. Try standard Firebase Auth Sign-in
+      try {
+        await signInWithEmailAndPassword(auth, emailToUse, trimmedPassword);
+      } catch (authErr: unknown) {
+        const errStr = authErr instanceof Error ? authErr.message : "";
+        const isUserNotFound = errStr.includes("auth/user-not-found") || errStr.includes("auth/invalid-credential");
+
+        // 3. If member document exists in Firestore (e.g. uploaded via Excel by Admin) but not yet in Auth
+        if (userDocSnap && isUserNotFound && (userDocSnap.data().mustChangePassword || userDocSnap.data().defaultPassword)) {
+          const defaultPass = userDocSnap.data().defaultPassword || "Robocek@2026";
+          
+          // Verify provided password matches the initial default password or user attempt
+          if (trimmedPassword === defaultPass || trimmedPassword === "Robocek@2026") {
+            // Auto-provision their Firebase Auth user account on the fly!
+            const newCred = await createUserWithEmailAndPassword(auth, emailToUse, trimmedPassword);
+            
+            if (newCred.user) {
+              const oldDocRef = doc(db, "users", userDocSnap.id);
+              const newDocRef = doc(db, "users", newCred.user.uid);
+              
+              // Move document to new Auth UID
+              await setDoc(newDocRef, {
+                ...userDocSnap.data(),
+                uid: newCred.user.uid,
+                mustChangePassword: true,
+              });
+
+              if (userDocSnap.id !== newCred.user.uid) {
+                await deleteDoc(oldDocRef);
+              }
+            }
+          } else {
+            throw authErr;
+          }
+        } else {
+          throw authErr;
+        }
+      }
+
       setStatusMessage("Signed in successfully. Redirecting...");
       router.replace("/dashboard");
     } catch (error) {
