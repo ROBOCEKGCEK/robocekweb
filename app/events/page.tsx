@@ -22,6 +22,9 @@ type ClubEvent = {
   hasRegistrationForm?: boolean;
   isPaid?: boolean;
   registrationFee?: string;
+  isFreeForMembers?: boolean;
+  memberFee?: string;
+  nonMemberFee?: string;
   whatsappGroupLink?: string;
   confirmationMessage?: string;
 };
@@ -137,17 +140,29 @@ export default function EventsPage() {
       setCurrentUser(u);
       if (u && db) {
         try {
+          let userData: any = null;
           const userDoc = await getDoc(doc(db, "users", u.uid));
           if (userDoc.exists()) {
-            const d = userDoc.data();
+            userData = userDoc.data();
+          } else if (u.email) {
+            const allUsersSnap = await getDocs(collection(db, "users"));
+            const matchedUser = allUsersSnap.docs.find(
+              (d) => formatFieldToString(d.data().email).toLowerCase() === u.email?.toLowerCase()
+            );
+            if (matchedUser) {
+              userData = matchedUser.data();
+            }
+          }
+
+          if (userData) {
             setRegForm((prev) => ({
               ...prev,
-              fullName: formatFieldToString(d.fullName, u.displayName || ""),
-              email: formatFieldToString(d.email, u.email || ""),
-              phone: formatFieldToString(d.phone || d.phoneNumber, ""),
-              branch: formatFieldToString(d.branch, ""),
-              year: formatFieldToString(d.yearSemester || d.year, ""),
-              membershipId: formatFieldToString(d.membershipId, ""),
+              fullName: formatFieldToString(userData.fullName, u.displayName || ""),
+              email: formatFieldToString(userData.email, u.email || ""),
+              phone: formatFieldToString(userData.phone || userData.phoneNumber, ""),
+              branch: formatFieldToString(userData.branch, ""),
+              year: formatFieldToString(userData.yearSemester || userData.year, ""),
+              membershipId: formatFieldToString(userData.membershipId, ""),
             }));
           } else {
             setRegForm((prev) => ({
@@ -200,6 +215,9 @@ export default function EventsPage() {
               hasRegistrationForm: Boolean(data.hasRegistrationForm),
               isPaid: Boolean(data.isPaid),
               registrationFee: formatFieldToString(data.registrationFee, "₹50"),
+              isFreeForMembers: Boolean(data.isFreeForMembers),
+              memberFee: formatFieldToString(data.memberFee, "Free"),
+              nonMemberFee: formatFieldToString(data.nonMemberFee || data.registrationFee, "₹50"),
               whatsappGroupLink: formatFieldToString(data.whatsappGroupLink, ""),
               confirmationMessage: formatFieldToString(
                 data.confirmationMessage,
@@ -252,6 +270,19 @@ export default function EventsPage() {
     setQrLoadError(false);
   };
 
+  // Calculate dynamic event fee
+  const cleanMemId = regForm.membershipId.trim();
+  const hasMembershipId = Boolean(cleanMemId);
+  const activeMemberFee = registeringEvent?.memberFee || (registeringEvent?.isFreeForMembers ? "Free" : "Free");
+  const activeNonMemberFee = registeringEvent?.nonMemberFee || registeringEvent?.registrationFee || "₹50";
+
+  const appliedEventFee = hasMembershipId
+    ? (registeringEvent?.isFreeForMembers ? "Free" : activeMemberFee)
+    : (registeringEvent?.isPaid ? activeNonMemberFee : "Free");
+
+  const isAppliedFeeFree = appliedEventFee.toLowerCase() === "free" || appliedEventFee === "₹0" || appliedEventFee === "0" || !registeringEvent?.isPaid;
+  const isEventPaymentRequired = Boolean(registeringEvent?.isPaid) && !isAppliedFeeFree;
+
   const handleRegistrationSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!db || !registeringEvent) return;
@@ -262,7 +293,7 @@ export default function EventsPage() {
       return;
     }
 
-    if (registeringEvent.isPaid) {
+    if (isEventPaymentRequired) {
       const cleanUtr = regForm.utrNumber.trim();
       if (!cleanUtr || cleanUtr.length < 6) {
         setRegError("Please enter your 12-digit UPI UTR / Transaction Reference Number.");
@@ -282,9 +313,11 @@ export default function EventsPage() {
         phone: regForm.phone.trim(),
         branch: regForm.branch.trim(),
         year: regForm.year.trim(),
-        membershipId: regForm.membershipId.trim() || null,
-        utrNumber: registeringEvent.isPaid ? regForm.utrNumber.trim() : "N/A",
-        paymentStatus: registeringEvent.isPaid ? "Pending" : "Verified",
+        membershipId: cleanMemId || "N/A",
+        isMemberDiscountApplied: hasMembershipId,
+        feePaid: appliedEventFee,
+        utrNumber: isEventPaymentRequired ? regForm.utrNumber.trim() : `N/A (${appliedEventFee})`,
+        paymentStatus: isEventPaymentRequired ? "Pending" : "Verified",
         registeredAt: new Date().toISOString(),
       };
 
@@ -387,8 +420,12 @@ export default function EventsPage() {
                       {ev.category}
                     </span>
                     {ev.hasRegistrationForm && (
-                      <span className="rounded-full px-2.5 py-0.5 text-[0.65rem] font-semibold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
-                        {ev.isPaid ? `Paid (${ev.registrationFee || "₹50"})` : "Free Event"}
+                      <span className="rounded-full px-2.5 py-0.5 text-[0.65rem] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
+                        {ev.isFreeForMembers
+                          ? `Members: FREE | Non-Members: ${ev.nonMemberFee || ev.registrationFee || "₹50"}`
+                          : ev.isPaid
+                          ? `Members: ${ev.memberFee || "FREE"} | Non-Members: ${ev.nonMemberFee || ev.registrationFee || "₹50"}`
+                          : "Free Registration"}
                       </span>
                     )}
                   </div>
@@ -562,11 +599,63 @@ export default function EventsPage() {
                   </div>
                 </div>
 
+                {/* ROBOCEK MEMBERSHIP ID FIELD */}
+                <div className="p-3.5 rounded-2xl border border-indigo-500/30 bg-indigo-500/5 space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <label className="block uppercase font-bold text-indigo-300 text-[0.7rem]">
+                      ROBOCEK Membership ID (Auto-filled if logged in)
+                    </label>
+                    {hasMembershipId && (
+                      <span className="text-[0.6rem] font-bold text-emerald-400 bg-emerald-500/20 px-2 py-0.5 rounded-full border border-emerald-500/40 font-mono">
+                        ✓ Member Rate Active
+                      </span>
+                    )}
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="e.g. RBC-2026-0042 (Auto-filled if logged in)"
+                    value={regForm.membershipId}
+                    onChange={(e) => setRegForm({ ...regForm, membershipId: e.target.value.toUpperCase() })}
+                    className="w-full h-9 rounded-xl border border-indigo-500/40 bg-black px-3 text-xs font-mono text-indigo-200 uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                  />
+                  <p className="text-[0.6rem] text-zinc-400">
+                    {hasMembershipId
+                      ? `ROBOCEK Member Rate (${appliedEventFee}) applied for ID: ${cleanMemId}.`
+                      : `Enter Membership ID to claim Member Rate (${registeringEvent.isFreeForMembers ? "FREE" : activeMemberFee}). Non-Member Rate: ${activeNonMemberFee}`}
+                  </p>
+                </div>
+
+                {/* DYNAMIC PRICING BANNER */}
                 {registeringEvent.isPaid && (
+                  <div className={`p-3.5 rounded-2xl border text-xs flex items-center justify-between transition ${
+                    hasMembershipId
+                      ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
+                      : "border-amber-500/40 bg-amber-500/10 text-amber-300"
+                  }`}>
+                    <div>
+                      <span className="font-bold text-xs block">
+                        {hasMembershipId
+                          ? `⚡ ROBOCEK Member Price: ${appliedEventFee}`
+                          : `Standard Non-Member Price: ${appliedEventFee}`}
+                      </span>
+                      <span className="text-[0.6rem] opacity-80 block mt-0.5">
+                        {hasMembershipId
+                          ? `Member discount active for ID: ${cleanMemId}`
+                          : `Non-Member fee applied. Enter Membership ID above to get member discount!`}
+                      </span>
+                    </div>
+                    <span className="text-xs font-bold font-mono px-3 py-1 rounded-xl bg-black/60 border border-current shadow">
+                      {appliedEventFee}
+                    </span>
+                  </div>
+                )}
+
+                {/* PAYMENT SECTION - ONLY WHEN PAYMENT IS REQUIRED */}
+                {isEventPaymentRequired && (
                   <div className="p-4 rounded-2xl border border-amber-500/30 bg-amber-500/5 space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-semibold text-amber-400 uppercase tracking-wider">
-                        💳 UPI Payment Required ({registeringEvent.registrationFee || "₹50"})
+                        💳 UPI Payment Required ({appliedEventFee})
                       </span>
                     </div>
 
@@ -588,7 +677,7 @@ export default function EventsPage() {
                         </div>
                       )}
                       <p className="text-[0.65rem] text-zinc-400 leading-snug">
-                        Scan QR code using GPay / PhonePe / Paytm to pay <strong>{registeringEvent.registrationFee || "₹50"}</strong>.
+                        Scan QR code using GPay / PhonePe / Paytm to pay <strong>{appliedEventFee}</strong>.
                       </p>
                     </div>
 

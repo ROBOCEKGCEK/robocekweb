@@ -24,6 +24,9 @@ interface FormConfig {
   status?: string;
   isPaid?: boolean;
   registrationFee?: string;
+  isFreeForMembers?: boolean;
+  memberFee?: string;
+  nonMemberFee?: string;
   whatsappGroupLink?: string;
   confirmationMessage?: string;
   fields?: CustomFormField[];
@@ -66,24 +69,36 @@ export default function StandaloneFormPage({
   const [successInfo, setSuccessInfo] = useState<{ message: string; whatsappLink?: string } | null>(null);
   const [qrLoadError, setQrLoadError] = useState(false);
 
-  // Fetch logged in user to pre-fill profile data
+  // Fetch logged in user to pre-fill profile data (with email fallback for batch-imported users)
   useEffect(() => {
     if (!auth) return;
     const unsub = onAuthStateChanged(auth, async (u) => {
       setCurrentUser(u);
       if (u && db) {
         try {
+          let userData: any = null;
           const userDoc = await getDoc(doc(db, "users", u.uid));
           if (userDoc.exists()) {
-            const d = userDoc.data();
+            userData = userDoc.data();
+          } else if (u.email) {
+            const allUsersSnap = await getDocs(collection(db, "users"));
+            const matchedUser = allUsersSnap.docs.find(
+              (d) => formatFieldToString(d.data().email).toLowerCase() === u.email?.toLowerCase()
+            );
+            if (matchedUser) {
+              userData = matchedUser.data();
+            }
+          }
+
+          if (userData) {
             setRegForm((prev) => ({
               ...prev,
-              fullName: formatFieldToString(d.fullName, u.displayName || ""),
-              email: formatFieldToString(d.email, u.email || ""),
-              phone: formatFieldToString(d.phone || d.phoneNumber, ""),
-              branch: formatFieldToString(d.branch, ""),
-              year: formatFieldToString(d.yearSemester || d.year, ""),
-              membershipId: formatFieldToString(d.membershipId, ""),
+              fullName: formatFieldToString(userData.fullName, u.displayName || ""),
+              email: formatFieldToString(userData.email, u.email || ""),
+              phone: formatFieldToString(userData.phone || userData.phoneNumber, ""),
+              branch: formatFieldToString(userData.branch, ""),
+              year: formatFieldToString(userData.yearSemester || userData.year, ""),
+              membershipId: formatFieldToString(userData.membershipId, ""),
             }));
           } else {
             setRegForm((prev) => ({
@@ -122,6 +137,9 @@ export default function StandaloneFormPage({
             status: formatFieldToString(data.status, "Active"),
             isPaid: Boolean(data.isPaid),
             registrationFee: formatFieldToString(data.registrationFee, "₹50"),
+            isFreeForMembers: Boolean(data.isFreeForMembers),
+            memberFee: formatFieldToString(data.memberFee, "Free"),
+            nonMemberFee: formatFieldToString(data.nonMemberFee || data.registrationFee, "₹50"),
             whatsappGroupLink: formatFieldToString(data.whatsappGroupLink, ""),
             confirmationMessage: formatFieldToString(
               data.confirmationMessage,
@@ -145,6 +163,9 @@ export default function StandaloneFormPage({
             status: formatFieldToString(data.status, "Upcoming"),
             isPaid: Boolean(data.isPaid),
             registrationFee: formatFieldToString(data.registrationFee, "₹50"),
+            isFreeForMembers: Boolean(data.isFreeForMembers),
+            memberFee: formatFieldToString(data.memberFee, "Free"),
+            nonMemberFee: formatFieldToString(data.nonMemberFee || data.registrationFee, "₹50"),
             whatsappGroupLink: formatFieldToString(data.whatsappGroupLink, ""),
             confirmationMessage: formatFieldToString(
               data.confirmationMessage,
@@ -176,6 +197,9 @@ export default function StandaloneFormPage({
             status: formatFieldToString(data.status, "Active"),
             isPaid: Boolean(data.isPaid),
             registrationFee: formatFieldToString(data.registrationFee, "₹50"),
+            isFreeForMembers: Boolean(data.isFreeForMembers),
+            memberFee: formatFieldToString(data.memberFee, "Free"),
+            nonMemberFee: formatFieldToString(data.nonMemberFee || data.registrationFee, "₹50"),
             whatsappGroupLink: formatFieldToString(data.whatsappGroupLink, ""),
             confirmationMessage: formatFieldToString(
               data.confirmationMessage,
@@ -206,6 +230,9 @@ export default function StandaloneFormPage({
             status: formatFieldToString(data.status, "Upcoming"),
             isPaid: Boolean(data.isPaid),
             registrationFee: formatFieldToString(data.registrationFee, "₹50"),
+            isFreeForMembers: Boolean(data.isFreeForMembers),
+            memberFee: formatFieldToString(data.memberFee, "Free"),
+            nonMemberFee: formatFieldToString(data.nonMemberFee || data.registrationFee, "₹50"),
             whatsappGroupLink: formatFieldToString(data.whatsappGroupLink, ""),
             confirmationMessage: formatFieldToString(
               data.confirmationMessage,
@@ -230,6 +257,35 @@ export default function StandaloneFormPage({
     void loadForm();
   }, [formId]);
 
+  const cleanObjectForFirestore = (obj: any): any => {
+    if (obj === null || obj === undefined) return null;
+    if (Array.isArray(obj)) {
+      return obj.map(cleanObjectForFirestore);
+    }
+    if (typeof obj === "object" && !(obj instanceof Date)) {
+      const cleaned: Record<string, any> = {};
+      for (const [key, value] of Object.entries(obj)) {
+        if (value !== undefined) {
+          cleaned[key] = cleanObjectForFirestore(value);
+        }
+      }
+      return cleaned;
+    }
+    return obj;
+  };
+
+  // Calculate fee dynamically
+  const cleanMemId = regForm.membershipId.trim();
+  const hasMembershipId = Boolean(cleanMemId);
+  const rawMemberFee = formConfig?.memberFee || (formConfig?.isFreeForMembers ? "Free" : "Free");
+  const rawNonMemberFee = formConfig?.nonMemberFee || formConfig?.registrationFee || "₹50";
+  const activeFee = hasMembershipId
+    ? (formConfig?.isFreeForMembers ? "Free" : rawMemberFee)
+    : (formConfig?.isPaid ? rawNonMemberFee : "Free");
+
+  const isFeeFree = activeFee.toLowerCase() === "free" || activeFee === "₹0" || activeFee === "0";
+  const isPaymentRequired = Boolean(formConfig?.isPaid) && !isFeeFree;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!db || !formConfig) return;
@@ -240,7 +296,7 @@ export default function StandaloneFormPage({
       return;
     }
 
-    if (formConfig.isPaid) {
+    if (isPaymentRequired) {
       const cleanUtr = regForm.utrNumber.trim();
       if (!cleanUtr || cleanUtr.length < 6) {
         setErrorMessage("Please enter your 12-digit UPI UTR / Transaction Reference Number.");
@@ -251,7 +307,7 @@ export default function StandaloneFormPage({
     setIsSubmitting(true);
 
     try {
-      const payload = {
+      const rawPayload = {
         formId: formConfig.id,
         formTitle: formConfig.title,
         userId: currentUser?.uid || null,
@@ -260,13 +316,17 @@ export default function StandaloneFormPage({
         phone: regForm.phone.trim(),
         branch: regForm.branch.trim(),
         year: regForm.year.trim(),
-        membershipId: regForm.membershipId.trim() || null,
-        utrNumber: formConfig.isPaid ? regForm.utrNumber.trim() : "N/A",
-        paymentStatus: formConfig.isPaid ? "Pending" : "Verified",
+        membershipId: cleanMemId || "N/A",
+        isMemberDiscountApplied: hasMembershipId,
+        feePaid: activeFee,
+        utrNumber: isPaymentRequired ? regForm.utrNumber.trim() : `N/A (${activeFee})`,
+        paymentStatus: isPaymentRequired ? "Pending" : "Verified",
         customAnswers: regForm.customAnswers || {},
         submittedAt: new Date().toISOString(),
         registeredAt: new Date().toISOString(),
       };
+
+      const payload = cleanObjectForFirestore(rawPayload);
 
       if (formConfig.isEventForm) {
         await addDoc(collection(db, "events", formConfig.id, "registrations"), payload);
@@ -347,10 +407,21 @@ export default function StandaloneFormPage({
         <div className="rounded-3xl border dark:border-zinc-800 border-zinc-300 dark:bg-zinc-950 bg-white p-6 sm:p-10 shadow-2xl space-y-6">
           {/* Form Header */}
           <div className="border-b dark:border-zinc-800 border-zinc-200 pb-6 space-y-3">
-            <div className="flex items-center gap-2">
-              <span className="px-3 py-1 rounded-full text-[0.65rem] font-semibold uppercase tracking-widest bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 font-mono">
-                {formConfig.isPaid ? `Paid (${formConfig.registrationFee || "₹50"})` : "Free Registration"}
-              </span>
+            <div className="flex items-center gap-2 flex-wrap">
+              {formConfig.isPaid ? (
+                <div className="flex items-center gap-2 flex-wrap font-mono text-[0.65rem]">
+                  <span className="px-3 py-1 rounded-full font-semibold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                    ⚡ ROBOCEK Members: {formConfig.isFreeForMembers ? "FREE" : (formConfig.memberFee || "FREE")}
+                  </span>
+                  <span className="px-3 py-1 rounded-full font-semibold uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/30">
+                    Non-Members: {formConfig.nonMemberFee || formConfig.registrationFee || "₹50"}
+                  </span>
+                </div>
+              ) : (
+                <span className="px-3 py-1 rounded-full text-[0.65rem] font-semibold uppercase tracking-widest bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 font-mono">
+                  🎉 Free Registration for Everyone
+                </span>
+              )}
               {isClosed && (
                 <span className="px-3 py-1 rounded-full text-[0.65rem] font-semibold uppercase tracking-widest bg-red-500/10 text-red-400 border border-red-500/20 font-mono">
                   Closed
@@ -480,6 +551,57 @@ export default function StandaloneFormPage({
                 </div>
               </div>
 
+              {/* ROBOCEK MEMBERSHIP ID FIELD */}
+              <div className="p-4 rounded-2xl border border-indigo-500/30 bg-indigo-500/5 space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="block uppercase font-bold text-indigo-300 text-xs">
+                    ROBOCEK Membership ID (Auto-filled if logged in as Member)
+                  </label>
+                  {hasMembershipId && (
+                    <span className="text-[0.65rem] font-bold text-emerald-400 bg-emerald-500/20 px-2.5 py-0.5 rounded-full border border-emerald-500/40 flex items-center gap-1 font-mono">
+                      ✓ Member Rate Active
+                    </span>
+                  )}
+                </div>
+                <input
+                  type="text"
+                  placeholder="e.g. RBC-2026-0042 (Auto-filled if logged in)"
+                  value={regForm.membershipId}
+                  onChange={(e) => setRegForm({ ...regForm, membershipId: e.target.value.toUpperCase() })}
+                  className="w-full h-11 rounded-xl border border-indigo-500/40 bg-black px-4 text-xs font-mono text-indigo-200 uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                />
+                <p className="text-[0.65rem] text-zinc-400">
+                  {hasMembershipId
+                    ? `ROBOCEK Member Rate (${activeFee}) applied for ID: ${cleanMemId}. Your ID will be verified against the official member roster.`
+                    : `Enter your ROBOCEK Membership ID to claim Member Rate (${formConfig.isFreeForMembers ? "FREE" : rawMemberFee}). Non-Member Rate: ${rawNonMemberFee}`}
+                </p>
+              </div>
+
+              {/* DYNAMIC PRICING RATE BANNER */}
+              {formConfig.isPaid && (
+                <div className={`p-4 rounded-2xl border text-xs flex items-center justify-between transition ${
+                  hasMembershipId
+                    ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
+                    : "border-amber-500/40 bg-amber-500/10 text-amber-300"
+                }`}>
+                  <div>
+                    <span className="font-bold text-sm block">
+                      {hasMembershipId
+                        ? `⚡ ROBOCEK Member Price: ${activeFee}`
+                        : `Standard Non-Member Price: ${activeFee}`}
+                    </span>
+                    <span className="text-[0.65rem] opacity-80 block mt-0.5">
+                      {hasMembershipId
+                        ? `Member discount active for ID: ${cleanMemId}`
+                        : `Non-Member fee applied. Have a ROBOCEK Membership ID? Enter it in the box above to claim Member Price!`}
+                    </span>
+                  </div>
+                  <span className="text-base font-bold font-mono px-3.5 py-1.5 rounded-xl bg-black/60 border border-current shadow-lg">
+                    {activeFee}
+                  </span>
+                </div>
+              )}
+
               {/* DYNAMIC CUSTOM FIELDS */}
               {formConfig.fields && formConfig.fields.length > 0 ? (
                 <div className="pt-3 border-t dark:border-zinc-800 border-zinc-200 space-y-4">
@@ -542,12 +664,12 @@ export default function StandaloneFormPage({
                 </div>
               ) : null}
 
-              {/* PAYMENT SECTION FOR PAID FORMS */}
-              {formConfig.isPaid && (
+              {/* PAYMENT SECTION FOR PAID FORMS WHEN PAYMENT IS REQUIRED */}
+              {isPaymentRequired && (
                 <div className="p-5 rounded-2xl border border-amber-500/30 bg-amber-500/5 space-y-4">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-semibold text-amber-400 uppercase tracking-wider">
-                      💳 UPI Payment Required ({formConfig.registrationFee || "₹50"})
+                      💳 UPI Payment Required ({activeFee})
                     </span>
                   </div>
 
@@ -569,7 +691,7 @@ export default function StandaloneFormPage({
                       </div>
                     )}
                     <p className="text-[0.7rem] text-zinc-400 leading-snug">
-                      Scan QR code using GPay / PhonePe / Paytm to pay <strong>{formConfig.registrationFee || "₹50"}</strong>.
+                      Scan QR code using GPay / PhonePe / Paytm to pay <strong>{activeFee}</strong>.
                     </p>
                   </div>
 
