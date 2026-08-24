@@ -376,7 +376,9 @@ export default function StandaloneFormPage({
     );
   }
 
-  const isClosed = formConfig.status === "Closed";
+  const isClosed =
+    formConfig.status === "Closed" ||
+    (formConfig.isEventForm && formConfig.status === "Registration Completed");
 
   return (
     <div className="min-h-screen flex flex-col font-sans dark:bg-black dark:text-zinc-50 bg-zinc-50 text-zinc-900 transition-colors duration-200">
@@ -477,8 +479,18 @@ export default function StandaloneFormPage({
               </div>
             </div>
           ) : isClosed ? (
-            <div className="py-12 text-center text-xs dark:text-zinc-400 text-zinc-600">
-              This registration form is currently closed for responses.
+            <div className="py-12 text-center space-y-3">
+              <span className="text-4xl block">🔒</span>
+              <p className="text-sm font-semibold dark:text-zinc-200 text-zinc-700">
+                {formConfig.isEventForm && formConfig.status === "Registration Completed"
+                  ? "Registrations for this event are now closed."
+                  : "This registration form is currently closed."}
+              </p>
+              <p className="text-xs dark:text-zinc-500 text-zinc-500">
+                {formConfig.isEventForm && formConfig.status === "Registration Completed"
+                  ? "The registration window has ended. Please check back for future events."
+                  : "The form is not accepting responses at this time."}
+              </p>
             </div>
           ) : (
             /* FORM INPUTS */
