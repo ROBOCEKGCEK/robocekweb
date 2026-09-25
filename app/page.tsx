@@ -96,6 +96,15 @@ export default function Home() {
             >
               Project Hub
             </Link>
+            <Link
+              href="/downloads"
+              className="inline-flex items-center justify-center rounded-full border
+                dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-100 dark:hover:text-zinc-50 dark:hover:bg-zinc-900/50
+                border-zinc-400 text-zinc-700 hover:border-zinc-800 hover:text-black hover:bg-gray-100
+                px-2.5 py-1.5 sm:px-4 sm:py-2 text-[10px] sm:text-xs font-medium uppercase tracking-[0.12em] transition"
+            >
+              Downloads
+            </Link>
             <a
               href="https://robocek-components.web.app/"
               target="_blank"

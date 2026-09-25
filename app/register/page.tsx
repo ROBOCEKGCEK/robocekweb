@@ -303,7 +303,7 @@ export default function RegisterPage() {
             </h1>
             <p className="text-xs sm:text-base dark:text-zinc-400 text-zinc-700 max-w-md mx-auto leading-relaxed">
               Register your interest in the Robotics Club and fill out the
-              details below. We'll get back to you with information about
+              details below. We&apos;ll get back to you with information about
               upcoming sessions and events.
             </p>
           </div>
@@ -637,12 +637,12 @@ export default function RegisterPage() {
               Designed in B/W
             </span>
             <span className="h-px w-10 dark:bg-zinc-700 bg-zinc-300" />
-            <a
+            <Link
               href="/"
               className="dark:hover:text-zinc-200 hover:text-zinc-800 transition uppercase tracking-[0.16em]"
             >
               Home
-            </a>
+            </Link>
           </div>
         </div>
       </footer>

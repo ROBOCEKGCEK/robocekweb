@@ -163,6 +163,12 @@ export default function ProjectsPage() {
               Projects
             </Link>
             <Link
+              href="/downloads"
+              className="dark:text-zinc-400 text-zinc-600 hover:dark:text-zinc-100 hover:text-black transition"
+            >
+              Downloads
+            </Link>
+            <Link
               href="/dashboard"
               className="inline-flex items-center justify-center rounded-full border
                 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-100 dark:hover:text-zinc-50 dark:hover:bg-zinc-900/50

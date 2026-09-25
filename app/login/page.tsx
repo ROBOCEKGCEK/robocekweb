@@ -460,12 +460,12 @@ export default function LoginPage() {
               Designed in B/W
             </span>
             <span className="h-px w-10 dark:bg-zinc-700 bg-zinc-300" />
-            <a
+            <Link
               href="/"
               className="dark:hover:text-zinc-200 hover:text-zinc-800 transition uppercase tracking-[0.16em]"
             >
               Home
-            </a>
+            </Link>
           </div>
         </div>
       </footer>
