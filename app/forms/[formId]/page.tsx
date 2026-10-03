@@ -31,6 +31,7 @@ interface FormConfig {
   confirmationMessage?: string;
   fields?: CustomFormField[];
   isEventForm?: boolean;
+  paymentQr?: string;
 }
 
 function formatFieldToString(val: any, fallback = ""): string {
@@ -147,6 +148,7 @@ export default function StandaloneFormPage({
             ),
             fields: Array.isArray(data.fields) ? data.fields : [],
             isEventForm: false,
+            paymentQr: formatFieldToString(data.paymentQr, "/qr.jpg"),
           });
           setLoading(false);
           return;
@@ -173,6 +175,7 @@ export default function StandaloneFormPage({
             ),
             fields: Array.isArray(data.customFields) ? data.customFields : [],
             isEventForm: true,
+            paymentQr: formatFieldToString(data.paymentQr, "/qr.jpg"),
           });
           setLoading(false);
           return;
@@ -207,6 +210,7 @@ export default function StandaloneFormPage({
             ),
             fields: Array.isArray(data.fields) ? data.fields : [],
             isEventForm: false,
+            paymentQr: formatFieldToString(data.paymentQr, "/qr.jpg"),
           });
           setLoading(false);
           return;
@@ -240,6 +244,7 @@ export default function StandaloneFormPage({
             ),
             fields: Array.isArray(data.customFields) ? data.customFields : [],
             isEventForm: true,
+            paymentQr: formatFieldToString(data.paymentQr, "/qr.jpg"),
           });
           setLoading(false);
           return;
@@ -688,7 +693,7 @@ export default function StandaloneFormPage({
                   <div className="flex flex-col items-center justify-center p-4 rounded-xl bg-black/40 border border-zinc-800 text-center">
                     {!qrLoadError ? (
                       <Image
-                        src="/qr.jpg"
+                        src={formConfig.paymentQr || "/qr.jpg"}
                         alt="ROBOCEK UPI Payment QR"
                         width={180}
                         height={180}

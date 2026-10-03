@@ -27,6 +27,7 @@ type ClubEvent = {
   nonMemberFee?: string;
   whatsappGroupLink?: string;
   confirmationMessage?: string;
+  paymentQr?: string;
 };
 
 const sampleEvents: ClubEvent[] = [
@@ -223,6 +224,7 @@ export default function EventsPage() {
                 data.confirmationMessage,
                 "You are registered successfully! Go on and join the official WhatsApp group for updates."
               ),
+              paymentQr: formatFieldToString(data.paymentQr, "/qr.jpg"),
             };
           });
           setEvents(fetched);
@@ -662,7 +664,7 @@ export default function EventsPage() {
                     <div className="flex flex-col items-center justify-center p-3 rounded-xl bg-black/40 border border-zinc-800 text-center">
                       {!qrLoadError ? (
                         <Image
-                          src="/qr.jpg"
+                          src={registeringEvent.paymentQr || "/qr.jpg"}
                           alt="ROBOCEK UPI Payment QR"
                           width={160}
                           height={160}
