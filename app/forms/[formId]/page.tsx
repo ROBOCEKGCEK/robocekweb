@@ -32,6 +32,9 @@ interface FormConfig {
   fields?: CustomFormField[];
   isEventForm?: boolean;
   paymentQr?: string;
+  openAt?: string;
+  closeAt?: string;
+  maxResponses?: number | string | null;
 }
 
 function formatFieldToString(val: any, fallback = ""): string {
@@ -69,6 +72,7 @@ export default function StandaloneFormPage({
   const [errorMessage, setErrorMessage] = useState("");
   const [successInfo, setSuccessInfo] = useState<{ message: string; whatsappLink?: string } | null>(null);
   const [qrLoadError, setQrLoadError] = useState(false);
+  const [responseCount, setResponseCount] = useState<number | null>(null);
 
   // Fetch logged in user to pre-fill profile data (with email fallback for batch-imported users)
   useEffect(() => {
@@ -149,6 +153,9 @@ export default function StandaloneFormPage({
             fields: Array.isArray(data.fields) ? data.fields : [],
             isEventForm: false,
             paymentQr: formatFieldToString(data.paymentQr, "/qr.jpg"),
+            openAt: formatFieldToString(data.openAt, ""),
+            closeAt: formatFieldToString(data.closeAt, ""),
+            maxResponses: data.maxResponses ?? null,
           });
           setLoading(false);
           return;
@@ -176,6 +183,9 @@ export default function StandaloneFormPage({
             fields: Array.isArray(data.customFields) ? data.customFields : [],
             isEventForm: true,
             paymentQr: formatFieldToString(data.paymentQr, "/qr.jpg"),
+            openAt: formatFieldToString(data.openAt, ""),
+            closeAt: formatFieldToString(data.closeAt, ""),
+            maxResponses: data.maxResponses ?? null,
           });
           setLoading(false);
           return;
@@ -211,6 +221,9 @@ export default function StandaloneFormPage({
             fields: Array.isArray(data.fields) ? data.fields : [],
             isEventForm: false,
             paymentQr: formatFieldToString(data.paymentQr, "/qr.jpg"),
+            openAt: formatFieldToString(data.openAt, ""),
+            closeAt: formatFieldToString(data.closeAt, ""),
+            maxResponses: data.maxResponses ?? null,
           });
           setLoading(false);
           return;
@@ -245,6 +258,9 @@ export default function StandaloneFormPage({
             fields: Array.isArray(data.customFields) ? data.customFields : [],
             isEventForm: true,
             paymentQr: formatFieldToString(data.paymentQr, "/qr.jpg"),
+            openAt: formatFieldToString(data.openAt, ""),
+            closeAt: formatFieldToString(data.closeAt, ""),
+            maxResponses: data.maxResponses ?? null,
           });
           setLoading(false);
           return;
@@ -261,6 +277,17 @@ export default function StandaloneFormPage({
 
     void loadForm();
   }, [formId]);
+
+  // Count existing responses/registrations for the limit check
+  useEffect(() => {
+    if (!db || !formConfig) return;
+    const subCollection = formConfig.isEventForm
+      ? collection(db, "events", formConfig.id, "registrations")
+      : collection(db, "custom_forms", formConfig.id, "responses");
+    getDocs(subCollection)
+      .then((snap) => setResponseCount(snap.size))
+      .catch(() => setResponseCount(null));
+  }, [formConfig]);
 
   const cleanObjectForFirestore = (obj: any): any => {
     if (obj === null || obj === undefined) return null;
@@ -294,6 +321,16 @@ export default function StandaloneFormPage({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!db || !formConfig) return;
+    if (isUnavailable) {
+      setErrorMessage(
+        unavailableReason === "limit"
+          ? "Registration limit reached."
+          : unavailableReason === "not_open"
+            ? "Registrations haven't opened yet."
+            : "Registrations are closed."
+      );
+      return;
+    }
     setErrorMessage("");
 
     if (!regForm.fullName.trim() || !regForm.email.trim() || !regForm.phone.trim()) {
@@ -384,6 +421,24 @@ export default function StandaloneFormPage({
   const isClosed =
     formConfig.status === "Closed" ||
     (formConfig.isEventForm && formConfig.status === "Registration Completed");
+
+  const openTimeMs = formConfig.openAt ? new Date(formConfig.openAt).getTime() : null;
+  const closeTimeMs = formConfig.closeAt ? new Date(formConfig.closeAt).getTime() : null;
+  const nowMs = Date.now();
+  const isBeforeOpen = openTimeMs !== null && !Number.isNaN(openTimeMs) && nowMs < openTimeMs;
+  const isAfterClose = closeTimeMs !== null && !Number.isNaN(closeTimeMs) && nowMs > closeTimeMs;
+  const maxResponsesNum = formConfig.maxResponses ? Number(formConfig.maxResponses) : null;
+  const isLimitReached =
+    maxResponsesNum !== null && responseCount !== null && responseCount >= maxResponsesNum;
+  const isUnavailable = isBeforeOpen || isAfterClose || isLimitReached;
+
+  const unavailableReason = isLimitReached
+    ? "limit"
+    : isBeforeOpen
+      ? "not_open"
+      : isAfterClose
+        ? "ended"
+        : "closed";
 
   return (
     <div className="min-h-screen flex flex-col font-sans dark:bg-black dark:text-zinc-50 bg-zinc-50 text-zinc-900 transition-colors duration-200">
@@ -495,6 +550,24 @@ export default function StandaloneFormPage({
                 {formConfig.isEventForm && formConfig.status === "Registration Completed"
                   ? "The registration window has ended. Please check back for future events."
                   : "The form is not accepting responses at this time."}
+              </p>
+            </div>
+          ) : isUnavailable ? (
+            <div className="py-12 text-center space-y-3">
+              <span className="text-4xl block">{unavailableReason === "limit" ? "🚫" : unavailableReason === "not_open" ? "⏳" : "🔒"}</span>
+              <p className="text-sm font-semibold dark:text-zinc-200 text-zinc-700">
+                {unavailableReason === "limit"
+                  ? "Registration limit reached."
+                  : unavailableReason === "not_open"
+                    ? "Registrations haven't opened yet."
+                    : "Registrations have ended."}
+              </p>
+              <p className="text-xs dark:text-zinc-500 text-zinc-500">
+                {unavailableReason === "limit"
+                  ? "The maximum number of responses has been reached. Thank you for your interest!"
+                  : unavailableReason === "not_open"
+                    ? `Registrations will open on ${new Date(formConfig.openAt as string).toLocaleString()}.`
+                    : `Registrations closed on ${new Date(formConfig.closeAt as string).toLocaleString()}.`}
               </p>
             </div>
           ) : (

@@ -28,6 +28,9 @@ type ClubEvent = {
   whatsappGroupLink?: string;
   confirmationMessage?: string;
   paymentQr?: string;
+  openAt?: string;
+  closeAt?: string;
+  maxResponses?: number | string | null;
 };
 
 const sampleEvents: ClubEvent[] = [
@@ -121,6 +124,7 @@ export default function EventsPage() {
 
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [registeringEvent, setRegisteringEvent] = useState<ClubEvent | null>(null);
+  const [eventResponseCount, setEventResponseCount] = useState<number | null>(null);
   const [regForm, setRegForm] = useState({
     fullName: "",
     email: "",
@@ -225,6 +229,9 @@ export default function EventsPage() {
                 "You are registered successfully! Go on and join the official WhatsApp group for updates."
               ),
               paymentQr: formatFieldToString(data.paymentQr, "/qr.jpg"),
+              openAt: formatFieldToString(data.openAt, ""),
+              closeAt: formatFieldToString(data.closeAt, ""),
+              maxResponses: data.maxResponses ?? null,
             };
           });
           setEvents(fetched);
@@ -270,7 +277,27 @@ export default function EventsPage() {
     setRegError("");
     setRegSuccessInfo(null);
     setQrLoadError(false);
+    setEventResponseCount(null);
   };
+
+  // Count existing registrations for the response-limit check
+  useEffect(() => {
+    if (!db || !registeringEvent) return;
+    getDocs(collection(db, "events", registeringEvent.id, "registrations"))
+      .then((snap) => setEventResponseCount(snap.size))
+      .catch(() => setEventResponseCount(null));
+  }, [registeringEvent]);
+
+  // Timer + response limit enforcement
+  const evOpenTimeMs = registeringEvent?.openAt ? new Date(registeringEvent.openAt).getTime() : null;
+  const evCloseTimeMs = registeringEvent?.closeAt ? new Date(registeringEvent.closeAt).getTime() : null;
+  const evNowMs = Date.now();
+  const evIsBeforeOpen = evOpenTimeMs !== null && !Number.isNaN(evOpenTimeMs) && evNowMs < evOpenTimeMs;
+  const evIsAfterClose = evCloseTimeMs !== null && !Number.isNaN(evCloseTimeMs) && evNowMs > evCloseTimeMs;
+  const evMaxResponses = registeringEvent?.maxResponses ? Number(registeringEvent.maxResponses) : null;
+  const evIsLimitReached = evMaxResponses !== null && eventResponseCount !== null && eventResponseCount >= evMaxResponses;
+  const evIsUnavailable = evIsBeforeOpen || evIsAfterClose || evIsLimitReached;
+  const evUnavailableReason = evIsLimitReached ? "limit" : evIsBeforeOpen ? "not_open" : evIsAfterClose ? "ended" : "closed";
 
   // Calculate dynamic event fee
   const cleanMemId = regForm.membershipId.trim();
@@ -289,6 +316,17 @@ export default function EventsPage() {
     e.preventDefault();
     if (!db || !registeringEvent) return;
     setRegError("");
+
+    if (evIsUnavailable) {
+      setRegError(
+        evUnavailableReason === "limit"
+          ? "Registration limit reached."
+          : evUnavailableReason === "not_open"
+            ? "Registrations haven't opened yet."
+            : "Registrations are closed."
+      );
+      return;
+    }
 
     if (!regForm.fullName.trim() || !regForm.email.trim() || !regForm.phone.trim()) {
       setRegError("Please fill in your Full Name, Email Address, and Mobile Phone Number.");
@@ -532,6 +570,24 @@ export default function EventsPage() {
                     Done & Close
                   </button>
                 </div>
+              </div>
+            ) : evIsUnavailable ? (
+              <div className="py-10 text-center space-y-3">
+                <span className="text-4xl block">{evUnavailableReason === "limit" ? "🚫" : evUnavailableReason === "not_open" ? "⏳" : "🔒"}</span>
+                <p className="text-sm font-semibold dark:text-zinc-200 text-zinc-700">
+                  {evUnavailableReason === "limit"
+                    ? "Registration limit reached."
+                    : evUnavailableReason === "not_open"
+                      ? "Registrations haven't opened yet."
+                      : "Registrations have ended."}
+                </p>
+                <p className="text-xs dark:text-zinc-500 text-zinc-500">
+                  {evUnavailableReason === "limit"
+                    ? "The maximum number of responses has been reached. Thank you for your interest!"
+                    : evUnavailableReason === "not_open"
+                      ? `Registrations will open on ${new Date(registeringEvent.openAt as string).toLocaleString()}.`
+                      : `Registrations closed on ${new Date(registeringEvent.closeAt as string).toLocaleString()}.`}
+                </p>
               </div>
             ) : (
               <form onSubmit={handleRegistrationSubmit} className="space-y-4 text-xs">
