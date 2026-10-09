@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import ThemeToggle from "../ThemeToggle";
+import UiIcon from "../components/UiIcon";
 import { collection, getDocs, doc, getDoc, addDoc } from "firebase/firestore";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { auth, db } from "../firebase/client";
@@ -535,8 +536,8 @@ export default function EventsPage() {
 
             {regSuccessInfo ? (
               <div className="space-y-6 text-center py-4">
-                <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center mx-auto text-3xl animate-bounce">
-                  ✓
+                <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center mx-auto animate-bounce">
+                  <UiIcon name="check" className="h-8 w-8" />
                 </div>
 
                 <div className="space-y-2">
@@ -554,7 +555,8 @@ export default function EventsPage() {
                       rel="noreferrer"
                       className="inline-flex items-center justify-center gap-2 w-full py-3.5 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs uppercase tracking-wider transition shadow-xl shadow-emerald-600/30"
                     >
-                      💬 Join Official WhatsApp Group
+                      <UiIcon name="message" className="h-4 w-4" />
+                      Join Official WhatsApp Group
                     </a>
                     <p className="text-[0.65rem] text-zinc-500 mt-2">
                       Join for important schedule updates, venue announcements, and Q&A.
@@ -573,7 +575,9 @@ export default function EventsPage() {
               </div>
             ) : evIsUnavailable ? (
               <div className="py-10 text-center space-y-3">
-                <span className="text-4xl block">{evUnavailableReason === "limit" ? "🚫" : evUnavailableReason === "not_open" ? "⏳" : "🔒"}</span>
+                <span className="text-emerald-400 flex justify-center">
+                  <UiIcon name={evUnavailableReason === "limit" ? "ban" : evUnavailableReason === "not_open" ? "clock" : "lock"} className="h-10 w-10" />
+                </span>
                 <p className="text-sm font-semibold dark:text-zinc-200 text-zinc-700">
                   {evUnavailableReason === "limit"
                     ? "Registration limit reached."
@@ -593,7 +597,8 @@ export default function EventsPage() {
               <form onSubmit={handleRegistrationSubmit} className="space-y-4 text-xs">
                 {regError ? (
                   <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs">
-                    ⚠️ {regError}
+                    <UiIcon name="alert" className="mr-1 inline h-4 w-4 align-text-bottom" />
+                    {regError}
                   </div>
                 ) : null}
 
@@ -665,7 +670,7 @@ export default function EventsPage() {
                     </label>
                     {hasMembershipId && (
                       <span className="text-[0.6rem] font-bold text-emerald-400 bg-emerald-500/20 px-2 py-0.5 rounded-full border border-emerald-500/40 font-mono">
-                        ✓ Member Rate Active
+                        <UiIcon name="check" className="inline h-3 w-3 align-text-bottom" /> Member Rate Active
                       </span>
                     )}
                   </div>
@@ -693,7 +698,7 @@ export default function EventsPage() {
                     <div>
                       <span className="font-bold text-xs block">
                         {hasMembershipId
-                          ? `⚡ ROBOCEK Member Price: ${appliedEventFee}`
+                          ? `ROBOCEK Member Price: ${appliedEventFee}`
                           : `Standard Non-Member Price: ${appliedEventFee}`}
                       </span>
                       <span className="text-[0.6rem] opacity-80 block mt-0.5">

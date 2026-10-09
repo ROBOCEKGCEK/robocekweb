@@ -4,6 +4,7 @@ import { use, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import ThemeToggle from "../../ThemeToggle";
+import UiIcon from "../../components/UiIcon";
 import { doc, getDoc, getDocs, addDoc, collection } from "firebase/firestore";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { auth, db } from "../../firebase/client";
@@ -473,7 +474,7 @@ export default function StandaloneFormPage({
               {formConfig.isPaid ? (
                 <div className="flex items-center gap-2 flex-wrap font-mono text-[0.65rem]">
                   <span className="px-3 py-1 rounded-full font-semibold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-                    ⚡ ROBOCEK Members: {formConfig.isFreeForMembers ? "FREE" : (formConfig.memberFee || "FREE")}
+                    <UiIcon name="bolt" className="inline h-3 w-3 align-text-bottom" /> ROBOCEK Members: {formConfig.isFreeForMembers ? "FREE" : (formConfig.memberFee || "FREE")}
                   </span>
                   <span className="px-3 py-1 rounded-full font-semibold uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/30">
                     Non-Members: {formConfig.nonMemberFee || formConfig.registrationFee || "₹50"}
@@ -481,7 +482,7 @@ export default function StandaloneFormPage({
                 </div>
               ) : (
                 <span className="px-3 py-1 rounded-full text-[0.65rem] font-semibold uppercase tracking-widest bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 font-mono">
-                  🎉 Free Registration for Everyone
+                  <UiIcon name="check" className="inline h-3 w-3 align-text-bottom" /> Free Registration for Everyone
                 </span>
               )}
               {isClosed && (
@@ -503,7 +504,7 @@ export default function StandaloneFormPage({
           {successInfo ? (
             <div className="space-y-6 text-center py-6">
               <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center mx-auto text-3xl animate-bounce">
-                ✓
+                <UiIcon name="check" className="h-8 w-8" />
               </div>
 
               <div className="space-y-2">
@@ -521,7 +522,8 @@ export default function StandaloneFormPage({
                     rel="noreferrer"
                     className="inline-flex items-center justify-center gap-2 w-full py-4 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs sm:text-sm uppercase tracking-wider transition shadow-xl shadow-emerald-600/30"
                   >
-                    💬 Join Official WhatsApp Group
+                    <UiIcon name="message" className="h-4 w-4" />
+                    Join Official WhatsApp Group
                   </a>
                   <p className="text-[0.65rem] text-zinc-500 mt-2">
                     Click to join for instant updates, announcements, and coordinator Q&A.
@@ -540,7 +542,7 @@ export default function StandaloneFormPage({
             </div>
           ) : isClosed ? (
             <div className="py-12 text-center space-y-3">
-              <span className="text-4xl block">🔒</span>
+              <span className="text-emerald-400 flex justify-center"><UiIcon name="lock" className="h-10 w-10" /></span>
               <p className="text-sm font-semibold dark:text-zinc-200 text-zinc-700">
                 {formConfig.isEventForm && formConfig.status === "Registration Completed"
                   ? "Registrations for this event are now closed."
@@ -554,7 +556,7 @@ export default function StandaloneFormPage({
             </div>
           ) : isUnavailable ? (
             <div className="py-12 text-center space-y-3">
-              <span className="text-4xl block">{unavailableReason === "limit" ? "🚫" : unavailableReason === "not_open" ? "⏳" : "🔒"}</span>
+              <span className="text-emerald-400 flex justify-center"><UiIcon name={unavailableReason === "limit" ? "ban" : unavailableReason === "not_open" ? "clock" : "lock"} className="h-10 w-10" /></span>
               <p className="text-sm font-semibold dark:text-zinc-200 text-zinc-700">
                 {unavailableReason === "limit"
                   ? "Registration limit reached."
@@ -575,7 +577,8 @@ export default function StandaloneFormPage({
             <form onSubmit={handleSubmit} className="space-y-5 text-xs">
               {errorMessage ? (
                 <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs">
-                  ⚠️ {errorMessage}
+                  <UiIcon name="alert" className="mr-1 inline h-4 w-4 align-text-bottom" />
+                  {errorMessage}
                 </div>
               ) : null}
 
@@ -649,7 +652,7 @@ export default function StandaloneFormPage({
                   </label>
                   {hasMembershipId && (
                     <span className="text-[0.65rem] font-bold text-emerald-400 bg-emerald-500/20 px-2.5 py-0.5 rounded-full border border-emerald-500/40 flex items-center gap-1 font-mono">
-                      ✓ Member Rate Active
+                      <UiIcon name="check" className="inline h-3 w-3 align-text-bottom" /> Member Rate Active
                     </span>
                   )}
                 </div>
@@ -677,7 +680,7 @@ export default function StandaloneFormPage({
                   <div>
                     <span className="font-bold text-sm block">
                       {hasMembershipId
-                        ? `⚡ ROBOCEK Member Price: ${activeFee}`
+                        ? `ROBOCEK Member Price: ${activeFee}`
                         : `Standard Non-Member Price: ${activeFee}`}
                     </span>
                     <span className="text-[0.65rem] opacity-80 block mt-0.5">

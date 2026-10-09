@@ -125,52 +125,18 @@ Status: VERIFIED MEMBER`;
     <div className="flex flex-col gap-5 items-center w-full max-w-2xl mx-auto my-2 sm:my-4">
       {/* RESPONSIVE SCROLL CONTAINER FOR MOBILE SAFEGUARD */}
       <div className="relative group w-full flex justify-center overflow-x-auto py-1 scrollbar-none">
-        {/* Glow backdrop behind card */}
-        <div className="absolute -inset-1 rounded-3xl bg-gradient-to-r from-emerald-600/30 via-green-500/20 to-emerald-800/40 blur-xl opacity-75 group-hover:opacity-100 transition duration-1000"></div>
-
         {/* PHYSICAL ID CARD (CR80 Ratio 85.6 : 53.98 approx 1.586) */}
         <div
           ref={cardRef}
           style={{
             backgroundColor: "#050806",
             borderColor: "rgba(16, 185, 129, 0.4)",
-            backgroundImage: `
-              radial-gradient(circle at 10% 20%, rgba(16, 185, 129, 0.12) 0%, transparent 40%),
-              radial-gradient(circle at 90% 80%, rgba(5, 150, 105, 0.15) 0%, transparent 45%),
-              linear-gradient(135deg, rgba(12, 22, 16, 0.95) 0%, rgba(3, 7, 4, 1) 100%)
-            `,
           }}
-          className="relative w-full min-w-[300px] max-w-[560px] aspect-[1.586/1] rounded-xl sm:rounded-2xl border p-3.5 sm:p-6 text-white shadow-2xl flex flex-col justify-between overflow-hidden select-none"
+          className="relative w-full min-w-[300px] max-w-[560px] aspect-[1.586/1] rounded-xl sm:rounded-2xl border p-3.5 sm:p-6 text-white shadow-lg flex flex-col justify-between overflow-hidden select-none"
         >
-          {/* Cybernetic Circuit Grid Background Overlay */}
-          <div
-            className="absolute inset-0 opacity-15 pointer-events-none"
-            style={{
-              backgroundImage: `
-                linear-gradient(to right, rgba(0,255,136,0.15) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(0,255,136,0.15) 1px, transparent 1px)
-              `,
-              backgroundSize: "24px 24px",
-            }}
-          />
-
-          {/* Accent Corner Lines */}
-          <div
-            className="absolute top-0 right-0 w-24 sm:w-32 h-24 sm:h-32 rounded-full blur-2xl pointer-events-none"
-            style={{ backgroundColor: "rgba(16, 185, 129, 0.1)" }}
-          />
-          <div
-            className="absolute bottom-0 left-0 w-16 sm:w-24 h-16 sm:h-24 rounded-full blur-xl pointer-events-none"
-            style={{ backgroundColor: "rgba(5, 150, 105, 0.15)" }}
-          />
-
-          {/* Glowing Top Emerald Stripe */}
           <div
             className="absolute top-0 left-0 right-0 h-[2.5px] sm:h-[3px]"
-            style={{
-              background: "linear-gradient(to right, #059669, #34d399, #15803d)",
-              boxShadow: "0 0 12px #10b981",
-            }}
+            style={{ backgroundColor: "#10b981" }}
           />
 
           {/* 1. HEADER ROW */}
@@ -186,18 +152,13 @@ Status: VERIFIED MEMBER`;
                   alt="ROBOCEK Logo"
                   width={42}
                   height={42}
-                  className="h-7 sm:h-10 w-auto object-contain drop-shadow-[0_0_10px_rgba(16,185,129,0.5)]"
+                  className="h-7 sm:h-10 w-auto object-contain"
                   priority
                 />
               </div>
               <div className="min-w-0">
                 <h3
-                  className="font-extrabold tracking-wider text-xs sm:text-lg uppercase drop-shadow leading-tight truncate"
-                  style={{
-                    background: "linear-gradient(to right, #6ee7b7, #ecfdf5, #ffffff)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                  }}
+                  className="font-extrabold tracking-wider text-xs sm:text-lg uppercase leading-tight truncate"
                 >
                   ROBOCEK
                 </h3>
@@ -244,7 +205,7 @@ Status: VERIFIED MEMBER`;
                 >
                   MEMBER NAME
                 </p>
-                <h2 className="text-xs sm:text-lg font-bold tracking-tight text-white uppercase drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] truncate max-w-[200px] sm:max-w-[340px]">
+                <h2 className="text-xs sm:text-lg font-bold tracking-tight text-white uppercase truncate max-w-[200px] sm:max-w-[340px]">
                   {displayName}
                 </h2>
               </div>
@@ -346,7 +307,7 @@ Status: VERIFIED MEMBER`;
               className="flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2 py-0.5 rounded-full border font-bold text-[6.5px] sm:text-[8px] shadow-sm shrink-0"
               style={{
                 borderColor: "rgba(52, 211, 153, 0.4)",
-                background: "linear-gradient(to right, #022c22, #064e3b, #000000)",
+                backgroundColor: "#022c22",
                 color: "#6ee7b7",
               }}
             >
@@ -366,7 +327,7 @@ Status: VERIFIED MEMBER`;
           type="button"
           onClick={downloadPDF}
           disabled={isExporting}
-          className="flex-1 min-w-[140px] inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-black font-semibold text-xs py-2.5 sm:py-3 px-3 sm:px-4 shadow-[0_0_20px_rgba(16,185,129,0.3)] transition active:scale-[0.98] disabled:opacity-50 uppercase tracking-wider cursor-pointer"
+          className="flex-1 min-w-[140px] inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-black font-semibold text-xs py-2.5 sm:py-3 px-3 sm:px-4 shadow-md transition active:scale-[0.98] disabled:opacity-50 uppercase tracking-wider cursor-pointer"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />

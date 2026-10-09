@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import { updatePassword } from "firebase/auth";
 import { doc, updateDoc } from "firebase/firestore";
 import { auth, db } from "../firebase/client";
+import UiIcon from "../components/UiIcon";
 
 interface PasswordResetModalProps {
   onSuccess: () => void;
@@ -51,7 +52,7 @@ export default function PasswordResetModal({ onSuccess }: PasswordResetModalProp
         });
       }
 
-      setStatusMessage("✓ Password updated successfully! Redirecting...");
+      setStatusMessage("Password updated successfully! Redirecting...");
       setTimeout(() => {
         onSuccess();
       }, 1200);
@@ -70,9 +71,6 @@ export default function PasswordResetModal({ onSuccess }: PasswordResetModalProp
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 sm:p-6">
       <div className="w-full max-w-md rounded-2xl sm:rounded-3xl border border-emerald-500/40 bg-zinc-950 p-6 sm:p-8 shadow-2xl relative overflow-hidden">
-        {/* Glow accent */}
-        <div className="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-emerald-500/10 blur-3xl" />
-
         <div className="relative z-10 text-center mb-6">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[0.65rem] uppercase tracking-[0.2em] font-mono text-emerald-400 font-medium mb-3">
             First-Time Security Setup
@@ -94,6 +92,7 @@ export default function PasswordResetModal({ onSuccess }: PasswordResetModalProp
 
           {statusMessage ? (
             <div className="rounded-xl border border-emerald-900/60 bg-emerald-950/40 p-3 text-xs text-emerald-300">
+              <UiIcon name="check" className="mr-1 inline h-4 w-4 align-text-bottom" />
               {statusMessage}
             </div>
           ) : null}

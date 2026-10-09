@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import ThemeToggle from "./ThemeToggle";
+import UiIcon from "./components/UiIcon";
 
 const slideshowImages = [
   {
@@ -169,14 +170,13 @@ export default function Home() {
               <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-semibold tracking-tight leading-tight">
                 ROBOCEK
                 <span className="block dark:text-zinc-400 text-zinc-600 text-xs sm:text-2xl lg:text-3xl mt-1.5 sm:mt-2 font-normal tracking-[0.18em] sm:tracking-[0.25em] uppercase">
-                  Robotics & Innovation Collective
+                  Robotics Club
                 </span>
               </h1>
 
               <p className="max-w-xl text-xs sm:text-base dark:text-zinc-400 text-zinc-700 leading-relaxed">
-                Official robotics club of Government College of Engineering
-                Kannur — designing autonomous systems, intelligent machines and
-                the engineers who build them.
+                Student teams at Government College of Engineering Kannur build,
+                test and compete with autonomous and embedded systems.
               </p>
 
               <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 mt-2 w-full sm:w-auto">
@@ -187,7 +187,7 @@ export default function Home() {
                     border-black bg-black text-white hover:bg-white hover:text-black hover:border-zinc-700
                     px-6 sm:px-7 py-2.5 text-xs sm:text-sm font-medium uppercase tracking-[0.15em] sm:tracking-[0.18em] transition"
                 >
-                  Join the circuit
+                  Join ROBOCEK
                   <span className="ml-2 h-px w-6 dark:bg-black bg-black group-hover:dark:bg-zinc-50 group-hover:bg-white transition-all group-hover:w-10" />
                 </a>
                 <a
@@ -210,7 +210,7 @@ export default function Home() {
                     Est. 2012
                   </p>
                   <p className="dark:text-zinc-500 text-zinc-600">
-                    Continuously evolving lab culture
+                    Active since 2012
                   </p>
                 </div>
                 <div>
@@ -218,7 +218,7 @@ export default function Home() {
                     Robotics
                   </p>
                   <p className="dark:text-zinc-500 text-zinc-600">
-                    Autonomous, embedded & AI systems
+                    Embedded and autonomous systems
                   </p>
                 </div>
                 <div>
@@ -232,50 +232,38 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Right: Techy card */}
+            {/* Current club work */}
             <div className="flex-1 w-full max-w-md lg:max-w-lg">
-              <div className="relative rounded-3xl border border-zinc-800 bg-linear-to-br from-zinc-900 via-black to-zinc-950 p-6 sm:p-8 shadow-[0_0_80px_rgba(255,255,255,0.05)] overflow-hidden">
-                {/* glow */}
-                <div
-                  className="pointer-events-none absolute inset-0 opacity-40 mix-blend-screen"
-                  aria-hidden="true"
-                >
-                  <div className="absolute -inset-px bg-[radial-gradient(circle_at_top,white_0,transparent_60%)]" />
+              <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-6 sm:p-8 shadow-lg overflow-hidden">
+                <div className="mb-6 text-xs text-zinc-400">
+                  <span className="uppercase tracking-[0.2em]">Current work</span>
                 </div>
 
-                <div className="relative flex items-center justify-between mb-6 text-xs text-zinc-400">
-                  <span className="inline-flex items-center gap-2">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    Lab status · Online
-                  </span>
-                  <span className="tracking-[0.25em] uppercase">ROBOCEK</span>
-                </div>
-
-                <div className="relative flex flex-col gap-6">
+                <div className="flex flex-col gap-6">
                   <div>
                     <p className="text-[0.65rem] uppercase tracking-[0.22em] text-zinc-500 mb-2">
-                      Focus Areas
+                      What members are building
                     </p>
                     <div className="grid grid-cols-2 gap-3 text-xs text-zinc-200">
-                      <div className="rounded-xl border border-zinc-700/70 bg-zinc-900/60 px-3 py-2">
+                      <div className="border-b border-zinc-800 pb-3">
                         <p className="font-medium">Robotics</p>
                         <p className="text-[0.7rem] text-zinc-500 mt-1">
                           Line follower · Battle bot · Swarm
                         </p>
                       </div>
-                      <div className="rounded-xl border border-zinc-700/70 bg-zinc-900/60 px-3 py-2">
+                      <div className="border-b border-zinc-800 pb-3">
                         <p className="font-medium">Embedded</p>
                         <p className="text-[0.7rem] text-zinc-500 mt-1">
                           Microcontrollers · ROS · Control
                         </p>
                       </div>
-                      <div className="rounded-xl border border-zinc-700/70 bg-zinc-900/60 px-3 py-2">
+                      <div className="border-b border-zinc-800 pb-3">
                         <p className="font-medium">Computer Vision</p>
                         <p className="text-[0.7rem] text-zinc-500 mt-1">
                           Perception · Tracking
                         </p>
                       </div>
-                      <div className="rounded-xl border border-zinc-700/70 bg-zinc-900/60 px-3 py-2">
+                      <div className="border-b border-zinc-800 pb-3">
                         <p className="font-medium">Autonomy</p>
                         <p className="text-[0.7rem] text-zinc-500 mt-1">
                           Navigation · Decision systems
@@ -298,19 +286,12 @@ export default function Home() {
                         Mode
                       </span>
                       <span className="text-zinc-300">
-                        Build · Learn · Compete
+                        Build · Test · Compete
                       </span>
                     </div>
                   </div>
                 </div>
 
-                {/* subtle grid */}
-                <div
-                  className="pointer-events-none absolute inset-0 opacity-[0.04]"
-                  aria-hidden="true"
-                >
-                  <div className="h-full w-full bg-[linear-gradient(to_right,white_1px,transparent_1px),linear-gradient(to_bottom,white_1px,transparent_1px)] bg-size-[32px_32px]" />
-                </div>
               </div>
             </div>
           </div>
@@ -498,21 +479,14 @@ export default function Home() {
 
               {/* CTA Card */}
               <div className="flex-1 w-full max-w-md">
-                <div className="relative rounded-2xl border dark:border-zinc-800 border-zinc-300 dark:bg-zinc-950 bg-white p-6 sm:p-8 overflow-hidden shadow-[0_0_60px_rgba(255,255,255,0.03)]">
-                  {/* glow accent */}
-                  <div
-                    className="pointer-events-none absolute -top-10 -right-10 h-40 w-40 rounded-full
-                      dark:bg-emerald-500/10 bg-emerald-400/20 blur-3xl"
-                    aria-hidden="true"
-                  />
-                  <div className="relative flex flex-col gap-5">
+                <div className="rounded-2xl border dark:border-zinc-800 border-zinc-300 dark:bg-zinc-950 bg-white p-6 sm:p-8">
+                  <div className="flex flex-col gap-5">
                     <div className="flex items-center justify-between">
                       <span className="text-[0.65rem] uppercase tracking-[0.22em] dark:text-zinc-500 text-zinc-500">
                         robocek-components.web.app
                       </span>
-                      <span className="inline-flex items-center gap-1.5 text-[0.65rem] dark:text-emerald-400 text-emerald-600">
-                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                        Live
+                      <span className="text-[0.65rem] dark:text-zinc-500 text-zinc-500">
+                        Online catalogue
                       </span>
                     </div>
 
@@ -521,7 +495,7 @@ export default function Home() {
                         ROBOCEK Component Hub
                       </p>
                       <p className="mt-1 text-xs dark:text-zinc-400 text-zinc-600">
-                        Browse · Reserve · Pick up from lab
+                        Browse · Reserve · Collect from the lab
                       </p>
                     </div>
 
@@ -600,7 +574,7 @@ export default function Home() {
                       />
                     ) : (
                       <div className="w-full h-full flex flex-col items-center justify-center gap-2">
-                        <span className="text-3xl opacity-20">👤</span>
+                        <UiIcon name="user" className="h-8 w-8 opacity-20" />
                         <span className="text-[0.6rem] uppercase tracking-widest dark:text-zinc-600 text-zinc-400">Photo</span>
                       </div>
                     )}
@@ -645,7 +619,7 @@ export default function Home() {
                       />
                     ) : (
                       <div className="w-full h-full flex flex-col items-center justify-center gap-2">
-                        <span className="text-3xl opacity-20">👤</span>
+                        <UiIcon name="user" className="h-8 w-8 opacity-20" />
                         <span className="text-[0.6rem] uppercase tracking-widest dark:text-zinc-600 text-zinc-400">Photo</span>
                       </div>
                     )}
@@ -687,7 +661,7 @@ export default function Home() {
                       />
                     ) : (
                       <div className="w-full h-full flex flex-col items-center justify-center gap-2">
-                        <span className="text-3xl opacity-20">👤</span>
+                        <UiIcon name="user" className="h-8 w-8 opacity-20" />
                         <span className="text-[0.6rem] uppercase tracking-widest dark:text-zinc-600 text-zinc-400">Photo</span>
                       </div>
                     )}

@@ -5,6 +5,7 @@ import ThemeToggle from "../ThemeToggle";
 import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import UiIcon from "../components/UiIcon";
 import {
   browserLocalPersistence,
   createUserWithEmailAndPassword,
@@ -138,7 +139,7 @@ export default function RegisterPage() {
         });
 
         await updateProfile(auth.currentUser, { displayName: trimmedFullName });
-        setStatusMessage("✓ Profile registration details updated successfully!");
+        setStatusMessage("Profile registration details updated successfully!");
         setTimeout(() => {
           router.replace("/dashboard");
         }, 1200);
@@ -238,7 +239,7 @@ export default function RegisterPage() {
       if (mid) setMembershipIdState(mid as string);
 
       if (status === "approved") {
-        setStatusMessage("✓ Your account has been approved. Redirecting to dashboard...");
+        setStatusMessage("Your account has been approved. Redirecting to dashboard...");
         setTimeout(() => router.replace("/dashboard"), 800);
       } else {
         setStatusMessage("Your account is still pending approval. Click Refresh to check again.");
@@ -311,7 +312,8 @@ export default function RegisterPage() {
           <div className="rounded-2xl sm:rounded-3xl border dark:border-zinc-800 border-zinc-300 dark:bg-zinc-950/40 bg-white p-4 sm:p-8">            {/* Email Requirement Notice */}
             <div className="mb-6 p-3 rounded-lg dark:bg-blue-950/40 bg-blue-50 border dark:border-blue-900/50 border-blue-200">
               <p className="text-xs dark:text-blue-200 text-blue-800">
-                ⓘ Any email address is accepted for registration.
+                <UiIcon name="info" className="mr-1 inline h-4 w-4 align-text-bottom" />
+                Any email address is accepted for registration.
               </p>
             </div>
 
@@ -591,7 +593,8 @@ export default function RegisterPage() {
             <div className="mt-8 pt-6 border-t dark:border-zinc-800 border-zinc-300">
               <div className="rounded-xl dark:bg-zinc-900/50 bg-gray-100 p-4 border dark:border-zinc-800 border-zinc-300">
                 <p className="text-[0.75rem] uppercase tracking-[0.18em] dark:text-zinc-400 text-zinc-700 font-semibold mb-2">
-                  ⚡ Important
+                  <UiIcon name="bolt" className="mr-1 inline h-4 w-4 align-text-bottom" />
+                  Important
                 </p>
                 <p className="text-xs dark:text-zinc-300 text-zinc-800 leading-relaxed">
                   After filling out this form, please send an email to{" "}
@@ -606,7 +609,8 @@ export default function RegisterPage() {
                   for faster processing.
                 </p>
                 <p className="text-xs dark:text-zinc-400 text-zinc-600 mt-3">
-                  💡 <span className="italic">Pro tip:</span> Also check the
+                  <UiIcon name="info" className="mr-1 inline h-4 w-4 align-text-bottom" />
+                  <span className="italic">Tip:</span> Also check the
                   official GCEK notice board and announcements for official
                   ROBOCEK recruitment sessions and workshops.
                 </p>

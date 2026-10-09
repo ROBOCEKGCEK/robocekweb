@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import ThemeToggle from "../ThemeToggle";
+import UiIcon from "../components/UiIcon";
 
 type OSPlatform = "windows" | "mac" | "linux" | "cli";
 
@@ -128,7 +129,7 @@ export default function DownloadsPage() {
               <div className="flex items-center gap-3 flex-wrap justify-center lg:justify-start">
                 <span className="inline-flex items-center gap-2 rounded-full border dark:border-emerald-500/40 dark:bg-emerald-950/30 dark:text-emerald-400 border-emerald-600/30 bg-emerald-50 text-emerald-700 px-3.5 py-1 text-xs font-semibold tracking-wider uppercase">
                   <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                  Latest Release · v0.2.1
+                  Version v0.2.1
                 </span>
                 <span className="text-xs dark:text-zinc-400 text-zinc-600">
                   Detected OS: <strong className="dark:text-zinc-200 text-zinc-900">{getOSLabel(detectedOS)}</strong>
@@ -143,7 +144,7 @@ export default function DownloadsPage() {
               </h1>
 
               <p className="max-w-xl text-sm sm:text-base dark:text-zinc-400 text-zinc-700 leading-relaxed">
-                Official desktop IDE built for GCEK robotics engineers. Features integrated Monaco code editor, board flashing, telemetry serial monitor, and seamless ROBOCEK CLI integration.
+                Desktop tools for GCEK robotics teams: code editing, board flashing, serial monitoring, and ROBOCEK CLI support.
               </p>
 
               <div className="flex flex-wrap items-center gap-4 mt-2">
@@ -159,32 +160,32 @@ export default function DownloadsPage() {
                   <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
                     <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
                   </svg>
-                  View on GitHub Releases
+                  Release files
                 </a>
               </div>
             </div>
 
-            {/* Quick Feature Badge Card */}
+            {/* Included tools */}
             <div className="w-full max-w-md rounded-3xl border dark:border-zinc-800 border-zinc-200 dark:bg-zinc-950 bg-gray-50 p-6 shadow-xl">
               <div className="flex items-center justify-between text-xs dark:text-zinc-400 text-zinc-600 border-b dark:border-zinc-800 border-zinc-200 pb-4 mb-4">
-                <span className="font-semibold dark:text-zinc-200 text-zinc-900">ROBOCEK Studio Platform</span>
+                <span className="font-semibold dark:text-zinc-200 text-zinc-900">Included tools</span>
                 <span className="uppercase tracking-widest text-[0.65rem] dark:bg-zinc-800 bg-zinc-200 px-2 py-0.5 rounded dark:text-zinc-300 text-zinc-800">Tauri v2 Native</span>
               </div>
               <ul className="space-y-3 text-xs dark:text-zinc-300 text-zinc-700">
                 <li className="flex items-start gap-2.5">
-                  <span className="text-emerald-500 font-bold mt-0.5">✓</span>
+                  <UiIcon name="check" className="mt-0.5 h-4 w-4 text-emerald-500" />
                   <span><strong>Integrated Monaco Editor:</strong> Code highlighting &amp; auto-complete for robotics firmware.</span>
                 </li>
                 <li className="flex items-start gap-2.5">
-                  <span className="text-emerald-500 font-bold mt-0.5">✓</span>
+                  <UiIcon name="check" className="mt-0.5 h-4 w-4 text-emerald-500" />
                   <span><strong>ROBOCEK CLI Engine:</strong> Flash microcontrollers, run test suites, generate bot templates.</span>
                 </li>
                 <li className="flex items-start gap-2.5">
-                  <span className="text-emerald-500 font-bold mt-0.5">✓</span>
+                  <UiIcon name="check" className="mt-0.5 h-4 w-4 text-emerald-500" />
                   <span><strong>Serial Monitor:</strong> Live stream sensor data &amp; diagnostic telemetrics.</span>
                 </li>
                 <li className="flex items-start gap-2.5">
-                  <span className="text-emerald-500 font-bold mt-0.5">✓</span>
+                  <UiIcon name="check" className="mt-0.5 h-4 w-4 text-emerald-500" />
                   <span><strong>Cross-Platform:</strong> Native builds for Windows, macOS, and Linux.</span>
                 </li>
               </ul>
@@ -226,7 +227,7 @@ export default function DownloadsPage() {
                   <div className="flex items-center justify-between border-b dark:border-zinc-800 border-zinc-200 pb-4">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-2xl dark:bg-zinc-900 bg-zinc-100 flex items-center justify-center text-xl">
-                        🪟
+                        <UiIcon name="monitor" className="h-5 w-5" />
                       </div>
                       <div>
                         <h3 className="text-lg font-semibold">ROBOCEK Studio for Windows</h3>
@@ -247,7 +248,7 @@ export default function DownloadsPage() {
                     >
                       <div>
                         <span className="text-[0.65rem] uppercase tracking-widest font-bold text-emerald-500 block mb-1">
-                          Recommended Installer
+                          Windows installer
                         </span>
                         <h4 className="text-sm font-semibold dark:text-zinc-100 text-black">
                           Executable Installer (.exe)
@@ -258,7 +259,7 @@ export default function DownloadsPage() {
                       </div>
                       <div className="mt-4 pt-3 border-t dark:border-zinc-800 border-zinc-200 flex items-center justify-between text-xs font-semibold text-emerald-500 group-hover:translate-x-0.5 transition">
                         <span>Download .exe (x64)</span>
-                        <span>↓</span>
+                        <UiIcon name="download" className="h-4 w-4" />
                       </div>
                     </a>
 
@@ -279,7 +280,7 @@ export default function DownloadsPage() {
                       </div>
                       <div className="mt-4 pt-3 border-t dark:border-zinc-800 border-zinc-200 flex items-center justify-between text-xs font-semibold dark:text-zinc-300 text-zinc-700 group-hover:translate-x-0.5 transition">
                         <span>Download .msi (x64)</span>
-                        <span>↓</span>
+                        <UiIcon name="download" className="h-4 w-4" />
                       </div>
                     </a>
                   </div>
@@ -292,7 +293,7 @@ export default function DownloadsPage() {
                   <div className="flex items-center justify-between border-b dark:border-zinc-800 border-zinc-200 pb-4">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-2xl dark:bg-zinc-900 bg-zinc-100 flex items-center justify-center text-xl">
-                        🍏
+                        <UiIcon name="monitor" className="h-5 w-5" />
                       </div>
                       <div>
                         <h3 className="text-lg font-semibold">ROBOCEK Studio for macOS</h3>
@@ -334,7 +335,7 @@ export default function DownloadsPage() {
                   <div className="flex items-center justify-between border-b dark:border-zinc-800 border-zinc-200 pb-4">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-2xl dark:bg-zinc-900 bg-zinc-100 flex items-center justify-center text-xl">
-                        🐧
+                        <UiIcon name="terminal" className="h-5 w-5" />
                       </div>
                       <div>
                         <h3 className="text-lg font-semibold">ROBOCEK Studio for Linux</h3>
@@ -355,7 +356,7 @@ export default function DownloadsPage() {
                     >
                       <div>
                         <span className="text-[0.65rem] uppercase tracking-widest font-bold text-emerald-500 block mb-1">
-                          Universal Binary
+                          Linux package
                         </span>
                         <h4 className="text-sm font-semibold dark:text-zinc-100 text-black">
                           AppImage (.AppImage)
@@ -366,7 +367,7 @@ export default function DownloadsPage() {
                       </div>
                       <div className="mt-4 pt-3 border-t dark:border-zinc-800 border-zinc-200 flex items-center justify-between text-xs font-semibold text-emerald-500 group-hover:translate-x-0.5 transition">
                         <span>Download AppImage</span>
-                        <span>↓</span>
+                        <UiIcon name="download" className="h-4 w-4" />
                       </div>
                     </a>
 
@@ -387,7 +388,7 @@ export default function DownloadsPage() {
                       </div>
                       <div className="mt-4 pt-3 border-t dark:border-zinc-800 border-zinc-200 flex items-center justify-between text-xs font-semibold dark:text-zinc-300 text-zinc-700 group-hover:translate-x-0.5 transition">
                         <span>Download .deb Package</span>
-                        <span>↓</span>
+                        <UiIcon name="download" className="h-4 w-4" />
                       </div>
                     </a>
                   </div>
@@ -400,7 +401,7 @@ export default function DownloadsPage() {
                   <div className="flex items-center justify-between border-b dark:border-zinc-800 border-zinc-200 pb-4">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-2xl dark:bg-zinc-900 bg-zinc-100 flex items-center justify-center text-xl">
-                        💻
+                        <UiIcon name="terminal" className="h-5 w-5" />
                       </div>
                       <div>
                         <h3 className="text-lg font-semibold">ROBOCEK CLI Tool</h3>
@@ -420,12 +421,12 @@ export default function DownloadsPage() {
                         onClick={handleCopyCLI}
                         className="px-3 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-[0.7rem] uppercase font-sans tracking-wider text-zinc-300 transition"
                       >
-                        {copied ? "Copied! ✓" : "Copy"}
+                        {copied ? "Copied" : "Copy"}
                       </button>
                     </div>
 
                     <div className="p-4 rounded-xl dark:bg-zinc-900/40 bg-gray-100 border dark:border-zinc-800 border-zinc-200 text-xs space-y-2">
-                      <p className="font-semibold text-emerald-500">⚡ Quick Start Commands:</p>
+                      <p className="font-semibold text-emerald-500">Commands</p>
                       <ul className="space-y-1 font-mono text-[0.75rem] dark:text-zinc-300 text-zinc-800">
                         <li>robocek init my-bot &nbsp;&nbsp;# Generate project boilerplate</li>
                         <li>robocek flash &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Flash connected microcontroller</li>
@@ -444,7 +445,7 @@ export default function DownloadsPage() {
           <div className="max-w-6xl mx-auto px-4 sm:px-10 lg:px-16 grid md:grid-cols-2 gap-8">
             <div className="rounded-2xl border dark:border-zinc-800 border-zinc-300 dark:bg-zinc-950/40 bg-white p-6 space-y-3">
               <h3 className="text-base font-semibold dark:text-zinc-100 text-black flex items-center gap-2">
-                <span>🛠️</span> System Prerequisites
+                <UiIcon name="monitor" className="h-4 w-4" /> System Prerequisites
               </h3>
               <p className="text-xs dark:text-zinc-400 text-zinc-700 leading-relaxed">
                 Before running firmware compilation or board flashing within ROBOCEK Studio, please ensure the following runtime packages are installed on your machine:
@@ -467,7 +468,7 @@ export default function DownloadsPage() {
 
             <div className="rounded-2xl border dark:border-zinc-800 border-zinc-300 dark:bg-zinc-950/40 bg-white p-6 space-y-3">
               <h3 className="text-base font-semibold dark:text-zinc-100 text-black flex items-center gap-2">
-                <span>📋</span> Release Notes (v0.2.1)
+                <UiIcon name="info" className="h-4 w-4" /> Release Notes (v0.2.1)
               </h3>
               <p className="text-xs dark:text-zinc-400 text-zinc-700 leading-relaxed">
                 Key updates in ROBOCEK Studio release v0.2.1:

@@ -16,6 +16,7 @@ import {
   where,
 } from "firebase/firestore";
 import { auth, db } from "../firebase/client";
+import UiIcon from "../components/UiIcon";
 import MembershipCard from "./MembershipCard";
 import PasswordResetModal from "./PasswordResetModal";
 import EditProfileModal from "./EditProfileModal";
@@ -440,7 +441,8 @@ export default function DashboardPage() {
 
                 {publishSuccess ? (
                   <div className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-xs text-emerald-800 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-200">
-                    ✓ {publishSuccess}
+                    <UiIcon name="check" className="mr-1 inline h-4 w-4 align-text-bottom" />
+                    {publishSuccess}
                   </div>
                 ) : null}
 

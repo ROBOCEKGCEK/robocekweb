@@ -5,6 +5,7 @@ import ThemeToggle from "../ThemeToggle";
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import UiIcon from "../components/UiIcon";
 import {
   browserLocalPersistence,
   browserSessionPersistence,
@@ -75,7 +76,7 @@ export default function LoginPage() {
 
       await sendPasswordResetEmail(auth, emailToUse);
       setStatusMessage(
-        `✓ Password reset link sent to ${emailToUse}! Please check your email inbox (and spam folder).`
+        `Password reset link sent to ${emailToUse}! Please check your email inbox (and spam folder).`
       );
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : "Failed to send password reset email.";
@@ -302,14 +303,15 @@ export default function LoginPage() {
               Member Login
             </h1>
             <p className="text-sm sm:text-base dark:text-zinc-400 text-zinc-700">
-              Access exclusive member resources and updates
+              Sign in to view member resources and updates
             </p>
           </div>{" "}
           {/* Login Form Container */}
           <div className="rounded-3xl border dark:border-zinc-800 border-zinc-300 dark:bg-zinc-950/40 bg-white p-6 sm:p-8">            {/* Email Requirement Notice */}
             <div className="mb-6 p-3 rounded-lg dark:bg-blue-950/40 bg-blue-50 border dark:border-blue-900/50 border-blue-200">
               <p className="text-xs dark:text-blue-200 text-blue-800">
-                ⓘ Enter either your email or membership ID to login.
+                <UiIcon name="info" className="mr-1 inline h-4 w-4 align-text-bottom" />
+                Enter either your email or membership ID to login.
               </p>
             </div>
             <form className="space-y-6" onSubmit={handleSubmit}>

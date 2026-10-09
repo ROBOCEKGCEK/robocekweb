@@ -4,6 +4,7 @@ import { FormEvent, useMemo, useState } from "react";
 import { updateProfile } from "firebase/auth";
 import { doc, updateDoc } from "firebase/firestore";
 import { auth, db } from "../firebase/client";
+import UiIcon from "../components/UiIcon";
 
 interface EditProfileModalProps {
   profile: {
@@ -101,7 +102,7 @@ export default function EditProfileModal({ profile, userUid, onClose, onUpdate }
         await updateProfile(auth.currentUser, { displayName: trimmedFullName });
       }
 
-      setStatusMessage("✓ Registration details updated successfully!");
+      setStatusMessage("Registration details updated successfully!");
       onUpdate({
         ...profile,
         ...updatedPayload,
@@ -237,7 +238,7 @@ export default function EditProfileModal({ profile, userUid, onClose, onUpdate }
                         : "dark:bg-zinc-900 bg-zinc-100 dark:text-zinc-400 text-zinc-600 hover:dark:text-zinc-200 hover:text-black"
                     }`}
                   >
-                    {isSelected ? "✓ " : "+ "}
+                    <UiIcon name={isSelected ? "check" : "plus"} className="mr-1 inline h-3 w-3 align-text-bottom" />
                     {interest}
                   </button>
                 );

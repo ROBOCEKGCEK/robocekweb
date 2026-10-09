@@ -23,7 +23,7 @@ const sampleProjects: Project[] = [
   {
     id: "sample-1",
     title: "Autonomous Line Follower & Maze Solver",
-    authorName: "ROBOCEK Tech Team",
+    authorName: "ROBOCEK members",
     description: "High-speed line follower robot using PID control algorithms, 8-channel IR sensor array, and STM32 microcontroller platform for national robotics challenges.",
     githubUrl: "https://github.com/ROBOCEKGCEK/lineFollowerBot",
     tags: ["Embedded C", "PID Control", "STM32", "Hardware"],
@@ -32,7 +32,7 @@ const sampleProjects: Project[] = [
   {
     id: "sample-2",
     title: "ROS2 Swarm Robotics Platform",
-    authorName: "Hardware & AI Lab",
+    authorName: "ROBOCEK members",
     description: "Distributed swarm control framework for multi-agent obstacle avoidance, SLAM mapping, and dynamic path planning in indoor environments.",
     githubUrl: "https://github.com/ROBOCEKGCEK",
     tags: ["ROS2", "Python", "SLAM", "Robotics"],
@@ -41,7 +41,7 @@ const sampleProjects: Project[] = [
   {
     id: "sample-3",
     title: "AI Visual Defect Inspector",
-    authorName: "Computer Vision Division",
+    authorName: "ROBOCEK members",
     description: "Real-time edge AI visual inspection system using YOLOv8 and OpenCV deployed on Jetson Nano for industrial PCB quality control.",
     githubUrl: "https://github.com/ROBOCEKGCEK",
     tags: ["Computer Vision", "YOLOv8", "Jetson Nano", "Python"],
@@ -50,7 +50,7 @@ const sampleProjects: Project[] = [
   {
     id: "sample-4",
     title: "IoT Environmental Telemetry Node",
-    authorName: "Embedded Systems Team",
+    authorName: "ROBOCEK members",
     description: "Low-power ESP32 sensor cluster for continuous lab environment monitoring, telemetry streaming over MQTT, and real-time dashboard analytics.",
     githubUrl: "https://github.com/ROBOCEKGCEK",
     tags: ["ESP32", "MQTT", "IoT", "C++"],
@@ -187,20 +187,20 @@ export default function ProjectsPage() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6 mb-8 sm:mb-12 border-b dark:border-zinc-800 border-zinc-200 pb-6 sm:pb-8">
           <div>
             <span className="text-[0.65rem] sm:text-[0.7rem] uppercase tracking-[0.25em] text-zinc-500 dark:text-zinc-400">
-              ROBOCEK Innovation Hub
+              Member projects
             </span>
             <h1 className="text-2xl sm:text-4xl lg:text-5xl font-semibold tracking-tight mt-1.5 sm:mt-2">
               Project Hub
             </h1>
             <p className="text-xs sm:text-base dark:text-zinc-400 text-zinc-600 max-w-2xl mt-2 sm:mt-3 leading-relaxed">
-              Explore hardware builds, autonomous robotics platforms, embedded firmware, and software innovations built by ROBOCEK members.
+              Projects shared by ROBOCEK members, from robot hardware and firmware to software tools.
             </p>
           </div>
           <Link
             href="/dashboard"
             className="inline-flex items-center justify-center gap-2 rounded-full dark:bg-zinc-50 bg-black px-4 py-2.5 sm:px-6 sm:py-3 text-[11px] sm:text-xs font-semibold uppercase tracking-[0.15em] sm:tracking-[0.18em] dark:text-black text-white dark:hover:bg-zinc-200 hover:bg-zinc-900 transition shrink-0 w-full sm:w-auto"
           >
-            + Publish Your Project
+            Publish a project
           </Link>
         </div>
 
@@ -238,7 +238,7 @@ export default function ProjectsPage() {
         {/* LOADING STATE */}
         {loading ? (
           <div className="rounded-3xl border dark:border-zinc-800 border-zinc-200 p-8 text-center text-sm dark:text-zinc-400 text-zinc-600">
-            Loading projects from Firestore...
+            Loading projects...
           </div>
         ) : null}
 

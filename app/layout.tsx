@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL("https://robocekgcek.in"),
   title: "ROBOCEK GCEK",
-  description: "ROBOCEK — The Official Robotics Club of Government College of Engineering Kannur. Explore robotics, innovation, and technology.",
+  description: "ROBOCEK is the robotics club at Government College of Engineering Kannur.",
   icons: {
     icon: "/logo_black.png",
     apple: "/logo_black.png",
