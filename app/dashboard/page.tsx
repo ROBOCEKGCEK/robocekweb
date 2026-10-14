@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { onAuthStateChanged, User } from "firebase/auth";
@@ -18,8 +19,11 @@ import {
 import { auth, db } from "../firebase/client";
 import UiIcon from "../components/UiIcon";
 import MembershipCard from "./MembershipCard";
+import HoloMembershipCard from "../components/HoloMembershipCard";
 import PasswordResetModal from "./PasswordResetModal";
 import EditProfileModal from "./EditProfileModal";
+import CyberBackground from "../components/CyberBackground";
+import TiltCard from "../components/TiltCard";
 
 type UserProfile = {
   membershipId?: string | null;
@@ -49,19 +53,23 @@ type UserProject = {
 const dashboardFeatures = [
   {
     title: "Announcements",
-    description: "Catch up on club updates, deadlines, and new opportunities.",
+    tag: "COMMS // PRIORITY",
+    description: "Catch up on club directives, lab access windows, hackathon deadlines, and telemetry releases.",
   },
   {
     title: "Events Calendar",
-    description: "Track workshops, meetings, and upcoming competitions.",
+    tag: "TIMELINE // WORKSHOPS",
+    description: "Track robotics bootcamps, hardware hackathons, guest lectures, and inter-college competitions.",
   },
   {
     title: "Project Hub",
-    description: "Browse active teams, ideas, and where you can contribute.",
+    tag: "ENGINEERING // REPO",
+    description: "Inspect collaborative firmware repos, bot designs, CAD blueprints, and sensor fusion modules.",
   },
   {
-    title: "Resources",
-    description: "Access documents, learning links, and member-only materials.",
+    title: "Lab Resources",
+    tag: "ARCHIVE // HARDWARE",
+    description: "Access datasheet library, PlatformIO development boilerplates, and component inventory checkout.",
   },
 ];
 
@@ -79,6 +87,7 @@ export default function DashboardPage() {
   const [publishError, setPublishError] = useState("");
   const [showPublishModal, setShowPublishModal] = useState(false);
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
+  const [use3dCard, setUse3dCard] = useState(true);
 
   // Form fields
   const [projectTitle, setProjectTitle] = useState("");
@@ -88,7 +97,7 @@ export default function DashboardPage() {
   const [tagsInput, setTagsInput] = useState("");
   const [description, setDescription] = useState("");
 
-  const fetchUserProjects = async (uid: string, emailStr?: string | null) => {
+  const fetchUserProjects = async (uid: string, _emailStr?: string | null) => {
     if (!db) return;
     try {
       const q = query(
@@ -249,8 +258,15 @@ export default function DashboardPage() {
     }
   };
 
+  const isApproved =
+    profile?.membershipId &&
+    profile.membershipId !== "Pending Admin Confirmation" &&
+    (profile.status?.toLowerCase() === "approved" || profile.status?.toLowerCase() === "verified");
+
   return (
-    <main className="min-h-screen bg-white text-black dark:bg-black dark:text-zinc-50 font-sans">
+    <main className="min-h-screen bg-[#030712] text-zinc-100 font-sans relative overflow-x-hidden selection:bg-cyan-500/30 selection:text-cyan-200">
+      <CyberBackground />
+
       {profile?.mustChangePassword ? (
         <PasswordResetModal onSuccess={handlePasswordResetSuccess} />
       ) : null}
@@ -264,148 +280,246 @@ export default function DashboardPage() {
         />
       ) : null}
 
-      <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 py-6 sm:px-10 lg:px-16">
-        {/* HEADER */}
-        <header className="mb-6 sm:mb-10 flex flex-col gap-4 border-b border-zinc-200 pb-6 dark:border-zinc-800 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="text-[0.65rem] sm:text-[0.7rem] uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400">
-              ROBOCEK Member Area
-            </p>
-            <h1 className="mt-1 sm:mt-2 text-2xl font-semibold tracking-tight sm:text-4xl">
-              Dashboard
-            </h1>
-            <p className="mt-1 sm:mt-2 max-w-2xl text-xs sm:text-sm text-zinc-600 dark:text-zinc-400">
-              Your personal control room for club updates, projects, and member-only resources.
-            </p>
-          </div>
+      {/* FUTURISTIC HUD NAVIGATION HEADER */}
+      <header className="w-full border-b border-cyan-500/20 bg-[#030712]/80 backdrop-blur-xl sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 py-3.5 flex items-center justify-between gap-4">
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="relative w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500/20 to-purple-500/20 border border-cyan-500/40 flex items-center justify-center p-1.5 shadow-[0_0_15px_rgba(0,240,255,0.2)] group-hover:shadow-[0_0_20px_rgba(0,240,255,0.4)] transition">
+              <Image
+                src="/logo_white.png"
+                alt="ROBOCEK"
+                width={32}
+                height={32}
+                className="w-full h-full object-contain"
+              />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-orbitron font-extrabold text-base tracking-[0.2em] bg-gradient-to-r from-white via-cyan-100 to-cyan-400 bg-clip-text text-transparent">
+                  ROBOCEK
+                </span>
+                <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded border border-cyan-500/40 text-cyan-400 bg-cyan-950/40">
+                  COMMAND
+                </span>
+              </div>
+              <p className="text-[9px] font-mono tracking-widest text-zinc-500 uppercase">
+                MEMBER DASHBOARD
+              </p>
+            </div>
+          </Link>
+
           <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
             <Link
               href="/events"
-              className="inline-flex items-center justify-center rounded-full border border-zinc-300 px-3 py-1.5 text-[11px] sm:px-4 sm:py-2 sm:text-xs font-medium uppercase tracking-[0.15em] text-zinc-700 transition hover:border-zinc-800 hover:text-black dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-100 dark:hover:text-zinc-50"
+              className="px-3 sm:px-4 py-1.5 rounded-full border border-zinc-800 hover:border-cyan-500/40 text-zinc-400 hover:text-cyan-300 bg-zinc-950/60 hover:bg-cyan-950/20 text-[11px] font-mono tracking-wider transition"
             >
-              Events
+              [01] Events
             </Link>
             <Link
               href="/projects"
-              className="inline-flex items-center justify-center rounded-full border border-zinc-300 px-3 py-1.5 text-[11px] sm:px-4 sm:py-2 sm:text-xs font-medium uppercase tracking-[0.15em] text-zinc-700 transition hover:border-zinc-800 hover:text-black dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-100 dark:hover:text-zinc-50"
+              className="px-3 sm:px-4 py-1.5 rounded-full border border-zinc-800 hover:border-cyan-500/40 text-zinc-400 hover:text-cyan-300 bg-zinc-950/60 hover:bg-cyan-950/20 text-[11px] font-mono tracking-wider transition"
             >
-              Project Hub
+              [02] Projects
+            </Link>
+            <Link
+              href="/execom"
+              className="px-3 sm:px-4 py-1.5 rounded-full border border-zinc-800 hover:border-purple-500/40 text-zinc-400 hover:text-purple-300 bg-zinc-950/60 hover:bg-purple-950/20 text-[11px] font-mono tracking-wider transition"
+            >
+              [03] ExeCom
+            </Link>
+            <Link
+              href="/downloads"
+              className="px-3 sm:px-4 py-1.5 rounded-full border border-zinc-800 hover:border-cyan-500/40 text-zinc-400 hover:text-cyan-300 bg-zinc-950/60 hover:bg-cyan-950/20 text-[11px] font-mono tracking-wider transition"
+            >
+              [04] Downloads
             </Link>
             <Link
               href="/logout"
-              className="inline-flex items-center justify-center rounded-full border border-zinc-300 px-3 py-1.5 text-[11px] sm:px-4 sm:py-2 sm:text-xs font-medium uppercase tracking-[0.18em] text-zinc-700 transition hover:border-zinc-800 hover:text-black dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-100 dark:hover:text-zinc-50"
+              className="px-3.5 py-1.5 rounded-full border border-red-500/40 text-red-400 hover:bg-red-950/30 text-[11px] font-mono tracking-wider transition"
             >
-              Sign Out
+              Sign Out ⎋
             </Link>
           </div>
-        </header>
+        </div>
+      </header>
+
+      <div className="mx-auto flex min-h-[calc(100vh-65px)] w-full max-w-7xl flex-col px-4 py-8 sm:px-8 lg:px-12 relative z-10">
+        {/* DASHBOARD HERO BANNER */}
+        <div className="mb-8 flex flex-col gap-4 border-b border-cyan-500/20 pb-6 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_rgba(0,240,255,0.8)]" />
+              <p className="text-[0.65rem] sm:text-[0.7rem] uppercase font-mono tracking-[0.25em] text-cyan-400">
+                SYS.TERMINAL // TELEMETRY LINK ACTIVE
+              </p>
+            </div>
+            <h1 className="mt-2 text-2xl sm:text-4xl font-orbitron font-extrabold tracking-tight bg-gradient-to-r from-white via-cyan-100 to-cyan-400 bg-clip-text text-transparent">
+              Command Center
+            </h1>
+            <p className="mt-2 max-w-2xl text-xs sm:text-sm text-zinc-400 font-sans">
+              Welcome back. Manage your digital membership credentials, track published engineering projects, and access exclusive lab resources.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowEditProfileModal(true)}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-cyan-500/40 bg-cyan-950/30 text-cyan-300 hover:bg-cyan-900/40 text-xs font-mono font-semibold tracking-wider transition shadow-[0_0_15px_rgba(0,240,255,0.15)] cursor-pointer"
+            >
+              <span>⚙</span> Edit Telemetry Record
+            </button>
+          </div>
+        </div>
 
         {loading ? (
-          <div className="rounded-3xl border border-zinc-200 bg-zinc-50 p-6 text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950/40 dark:text-zinc-400">
-            Loading your dashboard...
+          <div className="rounded-3xl border border-cyan-500/30 bg-zinc-950/80 p-8 text-center text-sm font-mono text-cyan-400 flex flex-col items-center justify-center gap-3 shadow-[0_0_30px_rgba(0,240,255,0.1)]">
+            <span className="w-8 h-8 rounded-full border-2 border-cyan-400 border-t-transparent animate-spin" />
+            <span>Establishing Secure Session Stream...</span>
           </div>
         ) : null}
 
         {!loading && user ? (
-          <div className="grid gap-6 lg:grid-cols-[1.35fr_0.9fr]">
-            <section className="space-y-6">
-              {/* PROFILE SUMMARY CARD */}
-              <div className="rounded-2xl sm:rounded-3xl border border-zinc-200 bg-zinc-50 p-4 sm:p-8 dark:border-zinc-800 dark:bg-zinc-950/40">
+          <div className="grid gap-8 lg:grid-cols-[1.35fr_0.9fr]">
+            <section className="space-y-8">
+              {/* PROFILE SUMMARY TILT CARD */}
+              <TiltCard className="rounded-3xl border border-cyan-500/30 bg-gradient-to-b from-zinc-950/90 to-[#030712]/90 p-6 sm:p-8 shadow-[0_0_30px_rgba(0,240,255,0.08)] relative overflow-hidden">
                 <div className="flex items-center justify-between gap-4">
-                  <p className="text-[0.65rem] sm:text-[0.7rem] uppercase tracking-[0.24em] text-zinc-500 dark:text-zinc-400">
-                    Signed In As
-                  </p>
-                  <button
-                    onClick={() => setShowEditProfileModal(true)}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-black text-[11px] font-medium text-zinc-700 dark:text-zinc-300 hover:border-zinc-800 dark:hover:border-zinc-400 transition cursor-pointer"
-                  >
-                    ⚙ Edit Profile
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+                    <p className="text-[0.65rem] sm:text-[0.7rem] uppercase font-mono tracking-[0.24em] text-cyan-400">
+                      AUTHENTICATED PROFILE
+                    </p>
+                  </div>
+                  <span className="text-[10px] font-mono px-2.5 py-1 rounded-full border border-zinc-800 bg-black/60 text-zinc-400">
+                    UID: {user.uid.slice(0, 8)}...
+                  </span>
                 </div>
-                <div className="mt-2 sm:mt-3 flex flex-col gap-1 sm:gap-2">
-                  <h2 className="text-xl font-semibold sm:text-3xl">
-                    {profile?.fullName ?? user.displayName ?? "Member"}
+
+                <div className="mt-4 flex flex-col gap-1">
+                  <h2 className="text-xl sm:text-3xl font-orbitron font-bold text-white">
+                    {profile?.fullName ?? user.displayName ?? "ROBOCEK Engineer"}
                   </h2>
-                  <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400">
+                  <p className="text-xs sm:text-sm font-mono text-zinc-400">
                     {profile?.email ?? user.email}
                   </p>
                 </div>
 
-                <div className="mt-4 sm:mt-6 grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
-                  <div className="rounded-xl sm:rounded-2xl border border-zinc-200 bg-white p-3 sm:p-4 dark:border-zinc-800 dark:bg-black/40">
-                    <p className="text-[0.62rem] sm:text-[0.68rem] uppercase tracking-[0.18em] text-zinc-500 dark:text-zinc-500">
-                      Membership ID
+                {/* Telemetry Stats Grid */}
+                <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4 font-mono">
+                  <div className="rounded-2xl border border-zinc-800 bg-black/60 p-4">
+                    <p className="text-[0.62rem] uppercase tracking-[0.18em] text-zinc-500">
+                      Member ID
                     </p>
-                    <p className="mt-1 sm:mt-2 break-all text-xs sm:text-sm font-medium text-black dark:text-zinc-100">
-                      {profile?.membershipId ? profile.membershipId : "Pending Admin Confirmation"}
+                    <p className="mt-1.5 text-xs font-bold text-cyan-400 break-all">
+                      {profile?.membershipId ? profile.membershipId : "PENDING CONFIRM"}
                     </p>
                   </div>
-                  <div className="rounded-xl sm:rounded-2xl border border-zinc-200 bg-white p-3 sm:p-4 dark:border-zinc-800 dark:bg-black/40">
-                    <p className="text-[0.62rem] sm:text-[0.68rem] uppercase tracking-[0.18em] text-zinc-500 dark:text-zinc-500">
+
+                  <div className="rounded-2xl border border-zinc-800 bg-black/60 p-4">
+                    <p className="text-[0.62rem] uppercase tracking-[0.18em] text-zinc-500">
                       Branch
                     </p>
-                    <p className="mt-1 sm:mt-2 text-xs sm:text-sm font-medium text-black dark:text-zinc-100">
-                      {profile?.branch ?? "Not saved yet"}
+                    <p className="mt-1.5 text-xs font-bold text-white">
+                      {profile?.branch ?? "Not saved"}
                     </p>
                   </div>
-                  <div className="rounded-xl sm:rounded-2xl border border-zinc-200 bg-white p-3 sm:p-4 dark:border-zinc-800 dark:bg-black/40">
-                    <p className="text-[0.62rem] sm:text-[0.68rem] uppercase tracking-[0.18em] text-zinc-500 dark:text-zinc-500">
+
+                  <div className="rounded-2xl border border-zinc-800 bg-black/60 p-4">
+                    <p className="text-[0.62rem] uppercase tracking-[0.18em] text-zinc-500">
                       Batch
                     </p>
-                    <p className="mt-1 sm:mt-2 text-xs sm:text-sm font-medium text-black dark:text-zinc-100">
-                      {profile?.yearSemester || profile?.year || "Not saved yet"}
+                    <p className="mt-1.5 text-xs font-bold text-white">
+                      {profile?.yearSemester || profile?.year || "Not saved"}
                     </p>
                   </div>
-                  <div className="rounded-xl sm:rounded-2xl border border-zinc-200 bg-white p-3 sm:p-4 dark:border-zinc-800 dark:bg-black/40">
-                    <p className="text-[0.62rem] sm:text-[0.68rem] uppercase tracking-[0.18em] text-zinc-500 dark:text-zinc-500">
-                      Interests
+
+                  <div className="rounded-2xl border border-zinc-800 bg-black/60 p-4">
+                    <p className="text-[0.62rem] uppercase tracking-[0.18em] text-zinc-500">
+                      Specialties
                     </p>
-                    <p className="mt-1 sm:mt-2 text-xs sm:text-sm font-medium text-black dark:text-zinc-100">
-                      {profile?.interests?.length ? profile.interests.length : 0} selected
+                    <p className="mt-1.5 text-xs font-bold text-purple-400">
+                      {profile?.interests?.length ? `${profile.interests.length} Domains` : "0 Domains"}
                     </p>
                   </div>
                 </div>
-              </div>
+              </TiltCard>
 
               {/* DIGITAL MEMBERSHIP CARD SECTION */}
-              <div className="rounded-2xl sm:rounded-3xl border border-emerald-900/40 bg-zinc-950 p-4 sm:p-8 relative overflow-hidden shadow-2xl">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+              <div className="rounded-3xl border border-cyan-500/30 bg-zinc-950/80 p-6 sm:p-8 relative overflow-hidden shadow-[0_0_30px_rgba(0,240,255,0.08)]">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
                   <div>
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[0.68rem] uppercase tracking-[0.2em] font-mono text-emerald-400 font-medium">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                      OFFICIAL ID CARD
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-[0.68rem] uppercase tracking-[0.2em] font-mono text-cyan-300 font-medium">
+                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+                      OFFICIAL CREDENTIAL // NFC PASS
                     </span>
-                    <h3 className="text-xl font-semibold mt-2 text-white">Digital Membership Card</h3>
-                    <p className="text-xs text-zinc-400 mt-1 max-w-xl">
-                      Pitch-black & dark green ROBOCEK membership card credential. Available to verified members.
+                    <h3 className="text-xl font-orbitron font-bold mt-2 text-white">
+                      Digital Membership Card
+                    </h3>
+                    <p className="text-xs text-zinc-400 mt-1 max-w-xl font-sans">
+                      Holographic ROBOCEK pass with tamper-proof security watermark. Interactive 3D tilt tracking.
                     </p>
                   </div>
+
+                  {isApproved && (
+                    <div className="flex items-center gap-2 self-start sm:self-auto font-mono text-[10px]">
+                      <button
+                        onClick={() => setUse3dCard(true)}
+                        className={`px-3 py-1.5 rounded-lg border transition ${
+                          use3dCard
+                            ? "border-cyan-400 bg-cyan-500/20 text-cyan-300"
+                            : "border-zinc-800 text-zinc-500 hover:text-white"
+                        }`}
+                      >
+                        3D Hologram
+                      </button>
+                      <button
+                        onClick={() => setUse3dCard(false)}
+                        className={`px-3 py-1.5 rounded-lg border transition ${
+                          !use3dCard
+                            ? "border-cyan-400 bg-cyan-500/20 text-cyan-300"
+                            : "border-zinc-800 text-zinc-500 hover:text-white"
+                        }`}
+                      >
+                        Printable View
+                      </button>
+                    </div>
+                  )}
                 </div>
 
-                {profile?.membershipId &&
-                profile.membershipId !== "Pending Admin Confirmation" &&
-                (profile.status?.toLowerCase() === "approved" || profile.status?.toLowerCase() === "verified") ? (
-                  <MembershipCard
-                    fullName={profile?.fullName || user.displayName || "Member"}
-                    membershipId={profile?.membershipId}
-                    branch={profile?.branch}
-                    yearSemester={profile?.yearSemester || profile?.year}
-                    email={profile?.email || user.email}
-                  />
+                {isApproved ? (
+                  use3dCard ? (
+                    <div className="py-2 flex justify-center">
+                      <HoloMembershipCard
+                        fullName={profile?.fullName || user.displayName || "ROBOCEK Engineer"}
+                        membershipId={profile?.membershipId || "RBC-2026-0001"}
+                        branch={profile?.branch || "ECE"}
+                        yearSemester={profile?.yearSemester || profile?.year || "2k26"}
+                        email={profile?.email || user.email || ""}
+                      />
+                    </div>
+                  ) : (
+                    <MembershipCard
+                      fullName={profile?.fullName || user.displayName || "Member"}
+                      membershipId={profile?.membershipId}
+                      branch={profile?.branch}
+                      yearSemester={profile?.yearSemester || profile?.year}
+                      email={profile?.email || user.email}
+                    />
+                  )
                 ) : (
-                  <div className="mt-4 rounded-2xl border border-emerald-500/30 bg-emerald-950/20 p-6 sm:p-8 text-center flex flex-col items-center justify-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-emerald-900/40 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
-                      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                      </svg>
+                  <div className="rounded-2xl border border-amber-500/30 bg-amber-950/20 p-8 text-center flex flex-col items-center justify-center gap-3">
+                    <div className="w-12 h-12 rounded-2xl bg-amber-950/60 border border-amber-500/40 flex items-center justify-center text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.2)]">
+                      <UiIcon name="lock" className="h-6 w-6" />
                     </div>
                     <div>
-                      <h4 className="text-base font-semibold text-white">Verification Pending</h4>
-                      <p className="mt-1 text-xs text-zinc-400 max-w-md mx-auto">
-                        Your membership card will be unlocked and available to download once your account is verified and approved by a ROBOCEK administrator.
+                      <h4 className="text-base font-orbitron font-bold text-white">
+                        Credential Pending Verification
+                      </h4>
+                      <p className="mt-1 text-xs text-zinc-400 max-w-md mx-auto font-sans leading-relaxed">
+                        Your interactive 3D holographic membership card will automatically activate once your registration details are verified by a club executive.
                       </p>
                     </div>
-                    <span className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-[0.7rem] uppercase tracking-wider font-mono text-amber-400">
+                    <span className="mt-2 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/40 text-[0.7rem] uppercase tracking-wider font-mono text-amber-300">
                       <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping"></span>
                       Status: {profile?.status || "Pending Approval"}
                     </span>
@@ -414,51 +528,53 @@ export default function DashboardPage() {
               </div>
 
               {errorMessage ? (
-                <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-200">
+                <div className="rounded-2xl border border-amber-500/40 bg-amber-950/40 p-4 text-xs font-mono text-amber-300">
                   {errorMessage}
                 </div>
               ) : null}
 
               {/* PUBLISH PROJECT SECTION */}
-              <div className="rounded-3xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950/50 sm:p-8">
+              <div className="rounded-3xl border border-cyan-500/30 bg-zinc-950/80 p-6 sm:p-8 shadow-[0_0_30px_rgba(0,240,255,0.08)]">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                   <div>
-                    <span className="text-[0.7rem] uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
-                      Showcase Your Work
+                    <span className="text-[0.65rem] uppercase font-mono tracking-[0.2em] text-cyan-400">
+                      PROJECT REGISTRY // SHOWCASE
                     </span>
-                    <h3 className="text-xl font-semibold mt-1">Publish Project to Hub</h3>
-                    <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
-                      Share your robotics builds, firmware, or hardware tools with the ROBOCEK community.
+                    <h3 className="text-xl font-orbitron font-bold mt-1 text-white">
+                      Publish to Project Hub
+                    </h3>
+                    <p className="text-xs text-zinc-400 mt-1 font-sans">
+                      Share your robotics builds, firmware repos, or sensor boards with the GCEK community.
                     </p>
                   </div>
                   <button
                     onClick={() => setShowPublishModal(!showPublishModal)}
-                    className="inline-flex items-center justify-center rounded-full dark:bg-zinc-50 bg-black px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.15em] dark:text-black text-white dark:hover:bg-zinc-200 hover:bg-zinc-900 transition shrink-0"
+                    className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-black font-orbitron font-bold px-5 py-2.5 text-xs tracking-wider uppercase transition shadow-[0_0_15px_rgba(0,240,255,0.3)] shrink-0 cursor-pointer"
                   >
-                    {showPublishModal ? "Cancel" : "+ New Project"}
+                    {showPublishModal ? "Cancel" : "+ Deploy Project"}
                   </button>
                 </div>
 
                 {publishSuccess ? (
-                  <div className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-xs text-emerald-800 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-200">
-                    <UiIcon name="check" className="mr-1 inline h-4 w-4 align-text-bottom" />
+                  <div className="mb-6 rounded-2xl border border-cyan-500/40 bg-cyan-950/40 p-4 text-xs font-mono text-cyan-300">
+                    <UiIcon name="check" className="mr-1.5 inline h-4 w-4 align-text-bottom" />
                     {publishSuccess}
                   </div>
                 ) : null}
 
-                {/* PUBLISH FORM MODAL/PANEL */}
+                {/* PUBLISH FORM */}
                 {showPublishModal ? (
-                  <form onSubmit={handlePublishProject} className="space-y-4 pt-2 border-t border-zinc-200 dark:border-zinc-800">
+                  <form onSubmit={handlePublishProject} className="space-y-4 pt-4 border-t border-zinc-800 font-mono text-xs">
                     {publishError ? (
-                      <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-800 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-200">
+                      <div className="rounded-xl border border-red-500/40 bg-red-950/40 p-3 text-red-300">
                         {publishError}
                       </div>
                     ) : null}
 
                     <div className="grid gap-4 sm:grid-cols-2">
                       <div className="flex flex-col gap-1.5">
-                        <label className="text-[0.7rem] uppercase tracking-wider text-zinc-500 font-medium">
-                          Project Title <span className="text-red-500">*</span>
+                        <label className="text-[0.7rem] uppercase tracking-wider text-zinc-400 font-medium">
+                          Project Title <span className="text-cyan-400">*</span>
                         </label>
                         <input
                           type="text"
@@ -466,13 +582,13 @@ export default function DashboardPage() {
                           placeholder="e.g. Autonomous Line Follower Bot"
                           value={projectTitle}
                           onChange={(e) => setProjectTitle(e.target.value)}
-                          className="h-10 rounded-xl border border-zinc-300 dark:border-zinc-800 dark:bg-black dark:text-zinc-100 px-3.5 text-xs focus:outline-none focus:ring-2 focus:ring-zinc-600 dark:focus:ring-zinc-400"
+                          className="h-11 rounded-xl border border-zinc-800 bg-black/80 text-zinc-100 px-4 text-xs focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition"
                         />
                       </div>
 
                       <div className="flex flex-col gap-1.5">
-                        <label className="text-[0.7rem] uppercase tracking-wider text-zinc-500 font-medium">
-                          Author Name <span className="text-red-500">*</span>
+                        <label className="text-[0.7rem] uppercase tracking-wider text-zinc-400 font-medium">
+                          Author Name <span className="text-cyan-400">*</span>
                         </label>
                         <input
                           type="text"
@@ -480,15 +596,15 @@ export default function DashboardPage() {
                           placeholder="Your Name or Team Name"
                           value={authorName}
                           onChange={(e) => setAuthorName(e.target.value)}
-                          className="h-10 rounded-xl border border-zinc-300 dark:border-zinc-800 dark:bg-black dark:text-zinc-100 px-3.5 text-xs focus:outline-none focus:ring-2 focus:ring-zinc-600 dark:focus:ring-zinc-400"
+                          className="h-11 rounded-xl border border-zinc-800 bg-black/80 text-zinc-100 px-4 text-xs focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition"
                         />
                       </div>
                     </div>
 
                     <div className="grid gap-4 sm:grid-cols-2">
                       <div className="flex flex-col gap-1.5">
-                        <label className="text-[0.7rem] uppercase tracking-wider text-zinc-500 font-medium">
-                          GitHub Repository URL <span className="text-red-500">*</span>
+                        <label className="text-[0.7rem] uppercase tracking-wider text-zinc-400 font-medium">
+                          GitHub Repository URL <span className="text-cyan-400">*</span>
                         </label>
                         <input
                           type="url"
@@ -496,48 +612,48 @@ export default function DashboardPage() {
                           placeholder="https://github.com/username/repo"
                           value={githubUrl}
                           onChange={(e) => setGithubUrl(e.target.value)}
-                          className="h-10 rounded-xl border border-zinc-300 dark:border-zinc-800 dark:bg-black dark:text-zinc-100 px-3.5 text-xs focus:outline-none focus:ring-2 focus:ring-zinc-600 dark:focus:ring-zinc-400"
+                          className="h-11 rounded-xl border border-zinc-800 bg-black/80 text-zinc-100 px-4 text-xs focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition"
                         />
                       </div>
 
                       <div className="flex flex-col gap-1.5">
-                        <label className="text-[0.7rem] uppercase tracking-wider text-zinc-500 font-medium">
-                          Live Demo / Video Link <span className="text-zinc-400">(Optional)</span>
+                        <label className="text-[0.7rem] uppercase tracking-wider text-zinc-400 font-medium">
+                          Demo / YouTube Link <span className="text-zinc-600">(Optional)</span>
                         </label>
                         <input
                           type="url"
-                          placeholder="https://youtu.be/... or demo site"
+                          placeholder="https://youtu.be/... or demo URL"
                           value={demoUrl}
                           onChange={(e) => setDemoUrl(e.target.value)}
-                          className="h-10 rounded-xl border border-zinc-300 dark:border-zinc-800 dark:bg-black dark:text-zinc-100 px-3.5 text-xs focus:outline-none focus:ring-2 focus:ring-zinc-600 dark:focus:ring-zinc-400"
+                          className="h-11 rounded-xl border border-zinc-800 bg-black/80 text-zinc-100 px-4 text-xs focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition"
                         />
                       </div>
                     </div>
 
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-[0.7rem] uppercase tracking-wider text-zinc-500 font-medium">
-                        Tech Stack & Tags <span className="text-zinc-400">(comma-separated)</span>
+                      <label className="text-[0.7rem] uppercase tracking-wider text-zinc-400 font-medium">
+                        Tech Stack &amp; Tags <span className="text-zinc-600">(comma-separated)</span>
                       </label>
                       <input
                         type="text"
-                        placeholder="e.g. Embedded C, STM32, PID Control, ROS2"
+                        placeholder="Embedded C, STM32, PID Control, ROS2"
                         value={tagsInput}
                         onChange={(e) => setTagsInput(e.target.value)}
-                        className="h-10 rounded-xl border border-zinc-300 dark:border-zinc-800 dark:bg-black dark:text-zinc-100 px-3.5 text-xs focus:outline-none focus:ring-2 focus:ring-zinc-600 dark:focus:ring-zinc-400"
+                        className="h-11 rounded-xl border border-zinc-800 bg-black/80 text-zinc-100 px-4 text-xs focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition"
                       />
                     </div>
 
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-[0.7rem] uppercase tracking-wider text-zinc-500 font-medium">
-                        Project Description & Remarks <span className="text-red-500">*</span>
+                      <label className="text-[0.7rem] uppercase tracking-wider text-zinc-400 font-medium">
+                        Project Overview &amp; Hardware Specs <span className="text-cyan-400">*</span>
                       </label>
                       <textarea
                         required
                         rows={4}
-                        placeholder="Explain the project features, hardware components used, algorithms, and results..."
+                        placeholder="Detail the hardware specs, microcontrollers, motor drivers, PID tuning, and results..."
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
-                        className="rounded-xl border border-zinc-300 dark:border-zinc-800 dark:bg-black dark:text-zinc-100 p-3 text-xs focus:outline-none focus:ring-2 focus:ring-zinc-600 dark:focus:ring-zinc-400 resize-none"
+                        className="rounded-xl border border-zinc-800 bg-black/80 text-zinc-100 p-3.5 text-xs focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition resize-none"
                       />
                     </div>
 
@@ -545,53 +661,68 @@ export default function DashboardPage() {
                       <button
                         type="submit"
                         disabled={isPublishing}
-                        className="inline-flex items-center justify-center rounded-full dark:bg-zinc-50 bg-black px-6 py-2.5 text-xs font-semibold uppercase tracking-[0.18em] dark:text-black text-white dark:hover:bg-zinc-200 hover:bg-zinc-900 transition"
+                        className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-black font-orbitron font-bold px-6 py-2.5 text-xs uppercase tracking-wider transition shadow-[0_0_15px_rgba(0,240,255,0.3)] disabled:opacity-50 cursor-pointer"
                       >
-                        {isPublishing ? "Publishing..." : "Submit Project"}
+                        {isPublishing ? "Syncing..." : "Submit to Hub"}
                       </button>
                     </div>
                   </form>
                 ) : null}
 
                 {/* MY PUBLISHED PROJECTS LIST */}
-                <div className="mt-8 pt-6 border-t border-zinc-200 dark:border-zinc-800">
-                  <h4 className="text-sm font-semibold mb-4">Your Published Projects ({userProjects.length})</h4>
+                <div className="mt-8 pt-6 border-t border-zinc-800">
+                  <div className="flex items-center justify-between mb-4">
+                    <h4 className="text-sm font-orbitron font-bold text-white">
+                      Your Projects ({userProjects.length})
+                    </h4>
+                    <span className="text-[10px] font-mono text-zinc-500 uppercase">
+                      HUB REPOSITORY
+                    </span>
+                  </div>
+
                   {userProjects.length === 0 ? (
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                      You haven't published any projects yet. Click "+ New Project" above to add your first build to Project Hub.
+                    <p className="text-xs font-sans text-zinc-500">
+                      You haven&apos;t published any projects yet. Click &ldquo;+ Deploy Project&rdquo; above to link your first repository.
                     </p>
                   ) : (
-                    <div className="space-y-4">
+                    <div className="space-y-3 font-mono">
                       {userProjects.map((p) => (
                         <div
                           key={p.id}
-                          className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 dark:bg-black/40 bg-zinc-50"
+                          className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl border border-zinc-800 bg-black/60 hover:border-cyan-500/40 transition"
                         >
                           <div>
-                            <h5 className="text-sm font-semibold">{p.title}</h5>
-                            <p className="text-xs text-zinc-600 dark:text-zinc-400 line-clamp-2 mt-1">
+                            <h5 className="text-sm font-orbitron font-semibold text-white">
+                              {p.title}
+                            </h5>
+                            <p className="text-xs font-sans text-zinc-400 line-clamp-2 mt-1">
                               {p.description}
                             </p>
                             <div className="flex items-center gap-2 mt-2 flex-wrap">
                               {p.tags.map((t) => (
-                                <span key={t} className="text-[0.65rem] font-mono px-2 py-0.5 rounded dark:bg-zinc-900 bg-zinc-200 text-zinc-600 dark:text-zinc-400">
+                                <span
+                                  key={t}
+                                  className="text-[10px] font-mono px-2 py-0.5 rounded border border-cyan-500/30 bg-cyan-950/30 text-cyan-300"
+                                >
                                   #{t}
                                 </span>
                               ))}
                             </div>
                           </div>
-                          <div className="flex items-center gap-3 shrink-0">
+
+                          <div className="flex items-center gap-3 shrink-0 text-xs">
                             <a
                               href={p.githubUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:underline"
+                              className="text-cyan-400 hover:text-cyan-300 font-bold"
                             >
                               GitHub ↗
                             </a>
+                            <span className="text-zinc-700">|</span>
                             <button
                               onClick={() => handleDeleteProject(p.id)}
-                              className="text-xs font-medium text-red-600 dark:text-red-400 hover:underline"
+                              className="text-red-400 hover:text-red-300 cursor-pointer"
                             >
                               Delete
                             </button>
@@ -606,90 +737,108 @@ export default function DashboardPage() {
               {/* DASHBOARD FEATURES GRID */}
               <div className="grid gap-4 sm:grid-cols-2">
                 {dashboardFeatures.map((feature) => (
-                  <article
+                  <TiltCard
                     key={feature.title}
-                    className="rounded-3xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950/50"
+                    className="rounded-3xl border border-zinc-800 bg-zinc-950/60 p-6 space-y-3 hover:border-cyan-500/40 transition shadow-[0_0_20px_rgba(0,240,255,0.05)]"
                   >
-                    <p className="text-[0.68rem] uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-500">
-                      Feature
+                    <p className="text-[0.68rem] uppercase font-mono tracking-[0.2em] text-cyan-400">
+                      {feature.tag}
                     </p>
-                    <h3 className="mt-3 text-lg font-semibold">{feature.title}</h3>
-                    <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+                    <h3 className="text-lg font-orbitron font-bold text-white">
+                      {feature.title}
+                    </h3>
+                    <p className="text-xs leading-relaxed text-zinc-400 font-sans">
                       {feature.description}
                     </p>
-                  </article>
+                  </TiltCard>
                 ))}
               </div>
             </section>
 
             <aside className="space-y-6">
-              <div className="rounded-3xl border border-zinc-200 bg-zinc-50 p-6 dark:border-zinc-800 dark:bg-zinc-950/40">
-                <p className="text-[0.7rem] uppercase tracking-[0.24em] text-zinc-500 dark:text-zinc-400">
-                  Quick Actions
-                </p>
-                <div className="mt-4 space-y-3 text-sm">
+              {/* QUICK ACTIONS */}
+              <div className="rounded-3xl border border-cyan-500/30 bg-zinc-950/80 p-6 space-y-4 shadow-[0_0_25px_rgba(0,240,255,0.08)]">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+                  <p className="text-[0.7rem] uppercase font-mono tracking-[0.24em] text-cyan-400">
+                    Quick Navigation
+                  </p>
+                </div>
+                <div className="space-y-2.5 font-mono text-xs">
                   <Link
                     href="/projects"
-                    className="block rounded-2xl border border-zinc-200 bg-white px-4 py-3 transition hover:border-zinc-800 dark:border-zinc-800 dark:bg-black/40 dark:hover:border-zinc-500"
+                    className="block rounded-xl border border-zinc-800 bg-black/60 px-4 py-3 text-zinc-300 hover:text-cyan-300 hover:border-cyan-500/40 transition"
                   >
-                    Explore Project Hub
+                    [01] Explore Project Hub ↗
                   </Link>
                   <Link
                     href="/events"
-                    className="block rounded-2xl border border-zinc-200 bg-white px-4 py-3 transition hover:border-zinc-800 dark:border-zinc-800 dark:bg-black/40 dark:hover:border-zinc-500"
+                    className="block rounded-xl border border-zinc-800 bg-black/60 px-4 py-3 text-zinc-300 hover:text-cyan-300 hover:border-cyan-500/40 transition"
                   >
-                    View Upcoming Events
+                    [02] Upcoming Workshops &amp; Events ↗
+                  </Link>
+                  <Link
+                    href="/execom"
+                    className="block rounded-xl border border-zinc-800 bg-black/60 px-4 py-3 text-zinc-300 hover:text-purple-300 hover:border-purple-500/40 transition"
+                  >
+                    [03] Executive Committee Directory ↗
+                  </Link>
+                  <Link
+                    href="/downloads"
+                    className="block rounded-xl border border-zinc-800 bg-black/60 px-4 py-3 text-zinc-300 hover:text-cyan-300 hover:border-cyan-500/40 transition"
+                  >
+                    [04] Download ROBOCEK Studio v0.2.1 ↗
                   </Link>
                   <button
                     onClick={() => setShowEditProfileModal(true)}
-                    className="w-full text-left block rounded-2xl border border-zinc-200 bg-white px-4 py-3 transition hover:border-zinc-800 dark:border-zinc-800 dark:bg-black/40 dark:hover:border-zinc-500 cursor-pointer"
+                    className="w-full text-left block rounded-xl border border-zinc-800 bg-black/60 px-4 py-3 text-zinc-300 hover:text-cyan-300 hover:border-cyan-500/40 transition cursor-pointer"
                   >
-                    Update registration
+                    [05] Update Registration Data
                   </button>
                   <a
                     href="mailto:robocek@gcek.ac.in"
-                    className="block rounded-2xl border border-zinc-200 bg-white px-4 py-3 transition hover:border-zinc-800 dark:border-zinc-800 dark:bg-black/40 dark:hover:border-zinc-500"
+                    className="block rounded-xl border border-zinc-800 bg-black/60 px-4 py-3 text-zinc-300 hover:text-cyan-300 hover:border-cyan-500/40 transition"
                   >
-                    Contact the team
+                    [06] Contact Executive Team
                   </a>
-                  <Link
-                    href="/"
-                    className="block rounded-2xl border border-zinc-200 bg-white px-4 py-3 transition hover:border-zinc-800 dark:border-zinc-800 dark:bg-black/40 dark:hover:border-zinc-500"
-                  >
-                    Back to home
-                  </Link>
                 </div>
               </div>
 
-              <div className="rounded-3xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950/50">
-                <p className="text-[0.7rem] uppercase tracking-[0.24em] text-zinc-500 dark:text-zinc-400">
-                  Member Snapshot
+              {/* MEMBER SNAPSHOT */}
+              <div className="rounded-3xl border border-zinc-800 bg-zinc-950/80 p-6 space-y-4">
+                <p className="text-[0.7rem] uppercase font-mono tracking-[0.24em] text-zinc-400">
+                  Telemetry Summary
                 </p>
-                <dl className="mt-4 space-y-4 text-sm">
+                <dl className="space-y-4 font-mono text-xs">
                   <div>
-                    <dt className="text-zinc-500 dark:text-zinc-400">Membership ID</dt>
-                    <dd className="mt-1 break-all font-medium text-black dark:text-zinc-100">
-                      {profile?.membershipId ? profile.membershipId : "Pending Admin Confirmation"}
+                    <dt className="text-zinc-500">Membership Pass ID</dt>
+                    <dd className="mt-1 font-bold text-cyan-400 break-all">
+                      {profile?.membershipId ? profile.membershipId : "Pending Confirmation"}
                     </dd>
                   </div>
                   <div>
-                    <dt className="text-zinc-500 dark:text-zinc-400">Phone</dt>
-                    <dd className="mt-1 font-medium text-black dark:text-zinc-100">
-                      {profile?.phoneNumber || profile?.phone || "Not saved yet"}
+                    <dt className="text-zinc-500">Verified Contact</dt>
+                    <dd className="mt-1 font-medium text-white">
+                      {profile?.phoneNumber || profile?.phone || "Not recorded"}
                     </dd>
                   </div>
                   <div>
-                    <dt className="text-zinc-500 dark:text-zinc-400">Current Status</dt>
+                    <dt className="text-zinc-500">Credential Status</dt>
                     <dd
-                      className={`mt-1 font-medium ${
-                        profile?.status?.trim().toLowerCase() === "approved"
-                          ? "text-emerald-600 dark:text-emerald-400"
-                          : "text-amber-600 dark:text-amber-400"
+                      className={`mt-1 font-bold flex items-center gap-1.5 ${
+                        profile?.status?.trim().toLowerCase() === "approved" || profile?.status?.trim().toLowerCase() === "verified"
+                          ? "text-cyan-400"
+                          : "text-amber-400"
                       }`}
                     >
-                      {profile?.status?.trim().toLowerCase() === "approved"
-                        ? "Approved Member"
-                        : profile?.status ?? "Pending Admin Confirmation"}
+                      <span className={`w-2 h-2 rounded-full ${
+                        profile?.status?.trim().toLowerCase() === "approved" || profile?.status?.trim().toLowerCase() === "verified"
+                          ? "bg-cyan-400 shadow-[0_0_8px_rgba(0,240,255,0.8)]"
+                          : "bg-amber-400"
+                      }`} />
+                      {profile?.status?.trim().toLowerCase() === "approved" || profile?.status?.trim().toLowerCase() === "verified"
+                        ? "ACTIVE / VERIFIED MEMBER"
+                        : profile?.status ?? "PENDING CONFIRMATION"}
                     </dd>
                   </div>
                 </dl>
@@ -698,6 +847,24 @@ export default function DashboardPage() {
           </div>
         ) : null}
       </div>
+
+      {/* FOOTER */}
+      <footer className="w-full border-t border-cyan-500/20 bg-[#030712]/90 backdrop-blur-xl mt-auto relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-zinc-500">
+          <p>© {new Date().getFullYear()} ROBOCEK · Robotics Club, Government College of Engineering Kannur.</p>
+          <div className="flex items-center gap-4">
+            <Link href="/" className="hover:text-cyan-400 transition uppercase tracking-wider">
+              Home
+            </Link>
+            <Link href="/execom" className="hover:text-purple-400 transition uppercase tracking-wider">
+              ExeCom
+            </Link>
+            <Link href="/downloads" className="hover:text-cyan-400 transition uppercase tracking-wider">
+              Downloads
+            </Link>
+          </div>
+        </div>
+      </footer>
     </main>
   );
 }

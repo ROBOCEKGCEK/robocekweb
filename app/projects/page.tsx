@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import ThemeToggle from "../ThemeToggle";
+import TiltCard from "../components/TiltCard";
+import CyberBackground from "../components/CyberBackground";
 import { collection, getDocs, orderBy, query } from "firebase/firestore";
 import { db } from "../firebase/client";
 
@@ -121,59 +123,66 @@ export default function ProjectsPage() {
   }, [projects, searchQuery, selectedTag]);
 
   return (
-    <div className="min-h-screen flex flex-col font-sans bg-white text-black dark:bg-black dark:text-zinc-50">
+    <div className="min-h-screen flex flex-col font-sans bg-slate-50 text-slate-900 dark:bg-[#030712] dark:text-zinc-50 relative overflow-x-hidden selection:bg-cyan-500/30 selection:text-cyan-200">
+      <CyberBackground />
       <ThemeToggle />
 
       {/* HEADER */}
-      <header className="w-full border-b dark:border-zinc-900 border-zinc-300 dark:bg-black/95 bg-white/95 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-3 sm:px-10 lg:px-16 py-2.5 sm:py-3 flex flex-wrap items-center justify-between gap-2">
-          <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition">
-            <Image
-              src="/logo_white.png"
-              alt="ROBOCEK logo"
-              width={30}
-              height={30}
-              className="hidden dark:block select-none"
-              style={{ width: "auto", height: "auto" }}
-            />
-            <Image
-              src="/logo_black.png"
-              alt="ROBOCEK logo"
-              width={30}
-              height={30}
-              className="block dark:hidden select-none"
-              style={{ width: "auto", height: "auto" }}
-            />
-            <span className="text-xs sm:text-sm font-semibold tracking-widest uppercase">
-              ROBOCEK
-            </span>
+      <header className="w-full border-b dark:border-cyan-500/20 border-slate-300 dark:bg-[#030712]/85 bg-white/90 backdrop-blur-md sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-3 flex flex-wrap items-center justify-between gap-3">
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="relative flex items-center justify-center p-1 rounded-lg border border-cyan-500/30 dark:bg-black/40 bg-slate-100 group-hover:border-cyan-400 transition-colors">
+              <Image
+                src="/logo_white.png"
+                alt="ROBOCEK logo"
+                width={32}
+                height={32}
+                className="hidden dark:block select-none"
+                style={{ width: "auto", height: "auto" }}
+                priority
+              />
+              <Image
+                src="/logo_black.png"
+                alt="ROBOCEK logo"
+                width={32}
+                height={32}
+                className="block dark:hidden select-none"
+                style={{ width: "auto", height: "auto" }}
+                priority
+              />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-sm sm:text-base font-bold tracking-[0.25em] uppercase font-[family-name:var(--font-cyber)] text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 via-purple-500 to-indigo-500 dark:from-cyan-400 dark:via-purple-300 dark:to-cyan-200">
+                ROBOCEK
+              </span>
+              <span className="text-[9px] font-mono tracking-widest text-zinc-500 uppercase">
+                PROJECT HUB // ACTIVE BUILDS
+              </span>
+            </div>
           </Link>
 
-          <nav className="flex items-center gap-2 sm:gap-4 text-[11px] sm:text-xs font-medium uppercase tracking-[0.12em]">
+          <nav className="flex items-center gap-2 sm:gap-3 text-xs font-mono uppercase tracking-[0.14em]">
             <Link
               href="/events"
-              className="dark:text-zinc-400 text-zinc-600 hover:dark:text-zinc-100 hover:text-black transition"
+              className="px-3 py-1.5 rounded-lg border dark:border-zinc-800 border-zinc-300 text-zinc-600 dark:text-zinc-400 hover:text-cyan-400 transition"
             >
               Events
             </Link>
             <Link
               href="/projects"
-              className="dark:text-zinc-100 text-black font-semibold underline underline-offset-4"
+              className="px-3 py-1.5 rounded-lg border border-cyan-500/50 bg-cyan-500/10 text-cyan-500 dark:text-cyan-300 font-semibold"
             >
               Projects
             </Link>
             <Link
               href="/downloads"
-              className="dark:text-zinc-400 text-zinc-600 hover:dark:text-zinc-100 hover:text-black transition"
+              className="px-3 py-1.5 rounded-lg border dark:border-zinc-800 border-zinc-300 text-zinc-600 dark:text-zinc-400 hover:text-cyan-400 transition"
             >
               Downloads
             </Link>
             <Link
               href="/dashboard"
-              className="inline-flex items-center justify-center rounded-full border
-                dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-100 dark:hover:text-zinc-50 dark:hover:bg-zinc-900/50
-                border-zinc-400 text-zinc-700 hover:border-zinc-800 hover:text-black hover:bg-gray-100
-                px-3 py-1 sm:px-4 sm:py-1.5 transition"
+              className="px-4 py-1.5 rounded-lg bg-gradient-to-r from-cyan-400 to-purple-500 text-black font-semibold hover:opacity-90 transition"
             >
               Dashboard
             </Link>
@@ -182,38 +191,39 @@ export default function ProjectsPage() {
       </header>
 
       {/* MAIN CONTENT */}
-      <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-10 lg:px-16 py-6 sm:py-16">
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-10 sm:py-16 z-10">
         {/* HERO SECTION */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6 mb-8 sm:mb-12 border-b dark:border-zinc-800 border-zinc-200 pb-6 sm:pb-8">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 pb-8 border-b dark:border-cyan-500/20 border-zinc-200">
           <div>
-            <span className="text-[0.65rem] sm:text-[0.7rem] uppercase tracking-[0.25em] text-zinc-500 dark:text-zinc-400">
-              Member projects
+            <span className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-[0.25em] text-cyan-600 dark:text-cyan-400 mb-2">
+              <span className="h-px w-6 bg-cyan-500" />
+              Open Engineering Repository
             </span>
-            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-semibold tracking-tight mt-1.5 sm:mt-2">
-              Project Hub
+            <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight font-[family-name:var(--font-cyber)]">
+              Club Project Hub
             </h1>
-            <p className="text-xs sm:text-base dark:text-zinc-400 text-zinc-600 max-w-2xl mt-2 sm:mt-3 leading-relaxed">
-              Projects shared by ROBOCEK members, from robot hardware and firmware to software tools.
+            <p className="text-xs sm:text-base dark:text-zinc-300 text-zinc-600 max-w-2xl mt-3 leading-relaxed">
+              Explore autonomous robotics prototypes, custom firmware codebases, embedded hardware designs, and AI perception pipelines built by ROBOCEK members.
             </p>
           </div>
           <Link
             href="/dashboard"
-            className="inline-flex items-center justify-center gap-2 rounded-full dark:bg-zinc-50 bg-black px-4 py-2.5 sm:px-6 sm:py-3 text-[11px] sm:text-xs font-semibold uppercase tracking-[0.15em] sm:tracking-[0.18em] dark:text-black text-white dark:hover:bg-zinc-200 hover:bg-zinc-900 transition shrink-0 w-full sm:w-auto"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 px-6 py-3 text-xs font-mono font-semibold uppercase tracking-[0.18em] text-black shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_30px_rgba(6,182,212,0.5)] transition shrink-0"
           >
-            Publish a project
+            <span>+ Publish Project</span>
           </Link>
         </div>
 
         {/* SEARCH AND TAG FILTERS */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-8">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-8 font-mono text-xs">
           {/* Search Bar */}
           <div className="relative flex-1 max-w-md">
             <input
               type="text"
-              placeholder="Search projects by title, author, or keyword..."
+              placeholder="SEARCH BY BOT, TAG, OR AUTHOR..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-11 rounded-full border dark:border-zinc-800 border-zinc-300 dark:bg-zinc-950 bg-white px-5 text-sm dark:text-zinc-100 text-black dark:placeholder:text-zinc-500 placeholder:text-zinc-400 focus:outline-none focus:ring-2 dark:focus:ring-zinc-400 focus:ring-zinc-600 transition"
+              className="w-full h-11 rounded-xl border dark:border-zinc-800 border-zinc-300 dark:bg-zinc-950/80 bg-white px-4 text-xs dark:text-zinc-100 text-black dark:placeholder:text-zinc-600 placeholder:text-zinc-400 focus:outline-none focus:border-cyan-400 transition"
             />
           </div>
 
@@ -223,13 +233,13 @@ export default function ProjectsPage() {
               <button
                 key={tag}
                 onClick={() => setSelectedTag(tag)}
-                className={`rounded-full px-4 py-1.5 text-xs font-medium transition shrink-0 ${
+                className={`rounded-lg px-3.5 py-1.5 text-xs font-mono transition shrink-0 border ${
                   selectedTag === tag
-                    ? "dark:bg-zinc-100 bg-black dark:text-black text-white"
-                    : "dark:bg-zinc-900 bg-zinc-100 dark:text-zinc-400 text-zinc-600 dark:hover:text-zinc-200 hover:text-black"
+                    ? "border-cyan-400 bg-cyan-500/20 text-cyan-300 shadow-[0_0_12px_rgba(6,182,212,0.3)]"
+                    : "border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:border-zinc-700 hover:text-zinc-200"
                 }`}
               >
-                {tag}
+                #{tag}
               </button>
             ))}
           </div>
@@ -237,26 +247,26 @@ export default function ProjectsPage() {
 
         {/* LOADING STATE */}
         {loading ? (
-          <div className="rounded-3xl border dark:border-zinc-800 border-zinc-200 p-8 text-center text-sm dark:text-zinc-400 text-zinc-600">
-            Loading projects...
+          <div className="rounded-2xl border dark:border-zinc-800 border-zinc-200 p-12 text-center text-sm font-mono text-cyan-400 animate-pulse">
+            [ INITIALIZING TELEMETRY STREAM // LOADING PROJECTS... ]
           </div>
         ) : null}
 
         {/* EMPTY STATE */}
         {!loading && filteredProjects.length === 0 ? (
-          <div className="rounded-3xl border dark:border-zinc-800 border-zinc-200 p-12 text-center">
-            <p className="text-lg font-medium mb-2">No projects found matching your search</p>
-            <p className="text-xs dark:text-zinc-400 text-zinc-600 mb-6">
-              Try adjusting your search terms or filter tags.
+          <div className="rounded-2xl border dark:border-zinc-800 border-zinc-200 p-12 text-center font-mono">
+            <p className="text-base font-semibold mb-2 text-zinc-300">No matching projects detected</p>
+            <p className="text-xs text-zinc-500 mb-6">
+              Refine your search parameters or reset tag filters.
             </p>
             <button
               onClick={() => {
                 setSearchQuery("");
                 setSelectedTag("All");
               }}
-              className="inline-flex items-center justify-center rounded-full border dark:border-zinc-700 border-zinc-300 px-5 py-2 text-xs font-medium uppercase tracking-[0.15em]"
+              className="inline-flex items-center justify-center rounded-lg border border-cyan-500/50 px-5 py-2 text-xs font-mono uppercase text-cyan-400 hover:bg-cyan-500/10"
             >
-              Clear Filters
+              Reset Filters
             </button>
           </div>
         ) : null}
@@ -264,29 +274,30 @@ export default function ProjectsPage() {
         {/* PROJECT GRID */}
         {!loading && filteredProjects.length > 0 ? (
           <div className="grid gap-6 md:grid-cols-2">
-            {filteredProjects.map((project) => (
-              <article
+            {filteredProjects.map((project, idx) => (
+              <TiltCard
                 key={project.id}
-                className="flex flex-col justify-between rounded-3xl border dark:border-zinc-800 border-zinc-200 dark:bg-zinc-950/50 bg-white p-6 sm:p-8 hover:border-zinc-400 dark:hover:border-zinc-700 transition group"
+                glowColor={idx % 2 === 0 ? "cyan" : "purple"}
+                className="flex flex-col justify-between dark:bg-zinc-950/70 bg-white p-6 sm:p-8 dark:border-zinc-800 border-zinc-200"
               >
                 <div>
                   {/* Top metadata */}
-                  <div className="flex items-center justify-between gap-3 mb-4">
-                    <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
-                      By <strong className="dark:text-zinc-200 text-zinc-800">{project.authorName}</strong>
+                  <div className="flex items-center justify-between gap-3 mb-4 font-mono text-[11px]">
+                    <span className="text-cyan-600 dark:text-cyan-400 font-semibold">
+                      BY // {project.authorName.toUpperCase()}
                     </span>
                     {project.createdAt ? (
-                      <span className="text-[0.7rem] uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                      <span className="text-zinc-500">
                         {project.createdAt}
                       </span>
                     ) : null}
                   </div>
 
                   {/* Title & Description */}
-                  <h2 className="text-xl font-semibold tracking-tight mb-3 group-hover:text-zinc-700 dark:group-hover:text-zinc-300 transition">
+                  <h2 className="text-lg sm:text-xl font-bold tracking-tight mb-3 font-[family-name:var(--font-cyber)] dark:text-white text-zinc-900 group-hover:text-cyan-300 transition-colors">
                     {project.title}
                   </h2>
-                  <p className="text-xs sm:text-sm dark:text-zinc-400 text-zinc-600 leading-relaxed mb-6">
+                  <p className="text-xs sm:text-sm dark:text-zinc-300 text-zinc-600 leading-relaxed mb-6 font-sans">
                     {project.description}
                   </p>
                 </div>
@@ -298,7 +309,7 @@ export default function ProjectsPage() {
                       {project.tags.map((t) => (
                         <span
                           key={t}
-                          className="rounded-md dark:bg-zinc-900 bg-zinc-100 dark:text-zinc-400 text-zinc-600 px-2.5 py-1 text-[0.7rem] font-mono"
+                          className="rounded border dark:border-zinc-800 border-zinc-200 dark:bg-zinc-900/60 bg-zinc-100 text-zinc-400 px-2.5 py-0.5 text-[10px] font-mono"
                         >
                           #{t}
                         </span>
@@ -307,18 +318,18 @@ export default function ProjectsPage() {
                   ) : null}
 
                   {/* Links / Actions */}
-                  <div className="flex items-center gap-3 pt-4 border-t dark:border-zinc-900 border-zinc-100">
+                  <div className="flex items-center gap-3 pt-4 border-t dark:border-zinc-900 border-zinc-100 font-mono text-xs">
                     {project.githubUrl && project.githubUrl !== "#" ? (
                       <a
                         href={project.githubUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 rounded-full dark:bg-zinc-100 bg-black px-4 py-2 text-xs font-medium text-white dark:text-black hover:opacity-80 transition"
+                        className="inline-flex items-center gap-2 rounded-lg bg-zinc-900 dark:bg-cyan-500/20 border border-zinc-700 dark:border-cyan-400/50 px-4 py-2 text-white dark:text-cyan-300 hover:bg-cyan-500 hover:text-black transition"
                       >
                         <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
                           <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
                         </svg>
-                        View Code
+                        <span>View Repository</span>
                       </a>
                     ) : null}
 
@@ -327,31 +338,32 @@ export default function ProjectsPage() {
                         href={project.demoUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 rounded-full border dark:border-zinc-700 border-zinc-300 px-4 py-2 text-xs font-medium hover:dark:border-zinc-500 hover:border-zinc-600 transition"
+                        className="inline-flex items-center gap-1.5 rounded-lg border dark:border-zinc-700 border-zinc-300 px-4 py-2 text-zinc-300 hover:text-white transition"
                       >
-                        Live Demo ↗
+                        <span>Live Demo</span>
+                        <span>↗</span>
                       </a>
                     ) : null}
                   </div>
                 </div>
-              </article>
+              </TiltCard>
             ))}
           </div>
         ) : null}
       </main>
 
       {/* FOOTER */}
-      <footer className="w-full border-t dark:border-zinc-900 border-zinc-300 dark:bg-black/95 bg-white mt-auto">
-        <div className="max-w-6xl mx-auto px-6 sm:px-10 lg:px-16 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-[0.7rem] dark:text-zinc-500 text-zinc-600">
+      <footer className="w-full border-t dark:border-cyan-500/20 border-zinc-300 dark:bg-[#02050c] bg-white py-6 mt-auto z-10 font-mono text-[11px]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 flex flex-col sm:flex-row items-center justify-between gap-4 text-zinc-500">
           <p>© {new Date().getFullYear()} ROBOCEK · Robotics Club GCE Kannur</p>
-          <div className="flex items-center gap-4">
-            <Link href="/" className="hover:dark:text-zinc-200 hover:text-zinc-800 transition uppercase tracking-[0.16em]">
+          <div className="flex items-center gap-4 uppercase tracking-widest text-[10px]">
+            <Link href="/" className="hover:text-cyan-400 transition">
               Home
             </Link>
-            <Link href="/events" className="hover:dark:text-zinc-200 hover:text-zinc-800 transition uppercase tracking-[0.16em]">
+            <Link href="/events" className="hover:text-cyan-400 transition">
               Events
             </Link>
-            <Link href="/dashboard" className="hover:dark:text-zinc-200 hover:text-zinc-800 transition uppercase tracking-[0.16em]">
+            <Link href="/dashboard" className="hover:text-cyan-400 transition">
               Dashboard
             </Link>
           </div>

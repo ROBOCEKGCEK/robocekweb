@@ -5,6 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import ThemeToggle from "../ThemeToggle";
 import UiIcon from "../components/UiIcon";
+import TiltCard from "../components/TiltCard";
+import CyberBackground from "../components/CyberBackground";
 import { collection, getDocs, doc, getDoc, addDoc } from "firebase/firestore";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { auth, db } from "../firebase/client";
@@ -380,21 +382,29 @@ export default function EventsPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col font-sans dark:bg-black dark:text-zinc-50 bg-zinc-50 text-zinc-900 transition-colors duration-200">
-      <header className="w-full border-b dark:border-zinc-900 border-zinc-200 dark:bg-black/90 bg-white/90 backdrop-blur-md sticky top-0 z-40">
-        <div className="max-w-6xl mx-auto px-6 sm:px-10 lg:px-16 py-4 flex items-center justify-between">
+    <div className="min-h-screen flex flex-col font-sans dark:bg-[#030712] dark:text-zinc-50 bg-slate-50 text-slate-900 relative overflow-x-hidden selection:bg-cyan-500/30 selection:text-cyan-200">
+      <CyberBackground />
+      <header className="w-full border-b dark:border-cyan-500/20 border-slate-300 dark:bg-[#030712]/85 bg-white/90 backdrop-blur-md sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-3 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3 group">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span className="text-sm sm:text-base font-bold tracking-widest uppercase font-mono dark:text-white text-zinc-900">
-              ROBOCEK <span className="text-zinc-500 font-normal">EVENTS</span>
-            </span>
+            <div className="p-1 rounded-lg border border-cyan-500/30 dark:bg-black/40 bg-slate-100 group-hover:border-cyan-400 transition-colors">
+              <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 block animate-pulse"></span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-sm sm:text-base font-bold tracking-[0.25em] uppercase font-[family-name:var(--font-cyber)] text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-300 to-cyan-200">
+                ROBOCEK
+              </span>
+              <span className="text-[9px] font-mono tracking-widest text-zinc-500 uppercase">
+                EVENTS &amp; HACKATHONS
+              </span>
+            </div>
           </Link>
 
           <div className="flex items-center gap-4">
             <ThemeToggle />
             <Link
               href="/"
-              className="text-xs px-4 py-1.5 rounded-full border dark:border-zinc-800 border-zinc-300 dark:hover:border-zinc-500 hover:border-zinc-400 dark:text-zinc-300 text-zinc-700 transition"
+              className="text-xs font-mono uppercase tracking-[0.14em] px-4 py-2 rounded-xl border dark:border-zinc-800 border-zinc-300 dark:hover:border-cyan-500/50 hover:border-zinc-400 dark:text-zinc-300 text-zinc-700 transition"
             >
               ← Back to Home
             </Link>
@@ -402,28 +412,29 @@ export default function EventsPage() {
         </div>
       </header>
 
-      <main className="flex-1 w-full max-w-6xl mx-auto px-6 sm:px-10 lg:px-16 py-10 sm:py-14">
-        <div className="space-y-4 mb-10">
-          <span className="px-3 py-1 rounded-full text-[0.65rem] font-semibold uppercase tracking-widest bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 font-mono">
-            Robotics Club GCE Kannur
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-10 sm:py-16 z-10">
+        <div className="space-y-4 mb-10 pb-8 border-b dark:border-cyan-500/20 border-zinc-200">
+          <span className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-[0.25em] text-cyan-600 dark:text-cyan-400">
+            <span className="h-px w-6 bg-cyan-500" />
+            Active Protocols &amp; Bootcamps
           </span>
-          <h1 className="text-3xl sm:text-5xl font-bold tracking-tight">
-            Events & Workshops
+          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight font-[family-name:var(--font-cyber)]">
+            Events &amp; Workshops
           </h1>
-          <p className="text-xs sm:text-sm dark:text-zinc-400 text-zinc-600 max-w-2xl leading-relaxed">
-            Hands-on technical boot camps, autonomous bot hackathons, masterclasses, and national hardware expos hosted by ROBOCEK.
+          <p className="text-xs sm:text-base dark:text-zinc-300 text-zinc-600 max-w-2xl leading-relaxed">
+            Hands-on technical boot camps, autonomous bot hackathons, masterclasses, and national hardware expos hosted by ROBOCEK GCE Kannur.
           </p>
         </div>
 
-        <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-8 no-scrollbar">
+        <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-8 no-scrollbar font-mono text-xs">
           {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => setFilterCategory(cat)}
-              className={`px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-wider transition whitespace-nowrap ${
+              className={`px-4 py-2 rounded-xl font-mono text-xs uppercase tracking-wider transition whitespace-nowrap border ${
                 filterCategory === cat
-                  ? "dark:bg-white bg-black dark:text-black text-white"
-                  : "dark:bg-zinc-900 bg-zinc-200/80 dark:text-zinc-400 text-zinc-600 dark:hover:text-white hover:text-black"
+                  ? "border-cyan-400 bg-cyan-500/20 text-cyan-300 shadow-[0_0_15px_rgba(6,182,212,0.3)]"
+                  : "border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:border-zinc-700 hover:text-zinc-200"
               }`}
             >
               {cat}
@@ -432,36 +443,37 @@ export default function EventsPage() {
         </div>
 
         {loading ? (
-          <div className="rounded-3xl border dark:border-zinc-800 border-zinc-200 p-8 text-center text-sm dark:text-zinc-400 text-zinc-600">
-            Loading events...
+          <div className="rounded-2xl border dark:border-zinc-800 border-zinc-200 p-12 text-center text-sm font-mono text-cyan-400 animate-pulse">
+            [ LOADING EVENT TELEMETRY... ]
           </div>
         ) : null}
 
         {!loading ? (
           <div className="space-y-6">
             {filteredEvents.map((ev) => (
-              <article
+              <TiltCard
                 key={ev.id}
-                className="rounded-3xl border dark:border-zinc-800 border-zinc-200 dark:bg-zinc-950/50 bg-white p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 hover:border-zinc-400 dark:hover:border-zinc-700 transition shadow-sm"
+                glowColor={ev.status === "Upcoming" ? "cyan" : "purple"}
+                className="dark:bg-zinc-950/70 bg-white p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 dark:border-zinc-800 border-zinc-200"
               >
                 <div className="flex-1 space-y-3">
                   <div className="flex items-center gap-3 flex-wrap">
                     <span
-                      className={`rounded-full px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-wider ${
+                      className={`rounded-lg px-3 py-1 text-[10px] font-mono font-bold uppercase tracking-wider border ${
                         ev.status === "Upcoming"
-                          ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800"
+                          ? "bg-cyan-500/10 text-cyan-400 border-cyan-500/30"
                           : ev.status === "Ongoing"
-                          ? "bg-blue-100 text-blue-800 dark:bg-blue-950/70 dark:text-blue-300 border border-blue-300 dark:border-blue-800"
-                          : "bg-zinc-100 text-zinc-600 dark:bg-zinc-900 dark:text-zinc-400 border border-zinc-300 dark:border-zinc-800"
+                          ? "bg-purple-500/10 text-purple-400 border-purple-500/30"
+                          : "bg-zinc-900 text-zinc-400 border-zinc-800"
                       }`}
                     >
                       {ev.status}
                     </span>
-                    <span className="text-xs font-mono dark:text-zinc-400 text-zinc-500">
-                      {ev.category}
+                    <span className="text-xs font-mono text-zinc-400">
+                      // {ev.category.toUpperCase()}
                     </span>
                     {ev.hasRegistrationForm && (
-                      <span className="rounded-full px-2.5 py-0.5 text-[0.65rem] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
+                      <span className="rounded-lg px-2.5 py-1 text-[10px] font-mono font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
                         {ev.isFreeForMembers
                           ? `Members: FREE | Non-Members: ${ev.nonMemberFee || ev.registrationFee || "₹50"}`
                           : ev.isPaid
@@ -471,20 +483,20 @@ export default function EventsPage() {
                     )}
                   </div>
 
-                  <h2 className="text-xl sm:text-2xl font-semibold tracking-tight">
+                  <h2 className="text-xl sm:text-2xl font-bold tracking-tight font-[family-name:var(--font-cyber)] dark:text-white text-zinc-900">
                     {ev.title}
                   </h2>
 
-                  <p className="text-xs sm:text-sm dark:text-zinc-400 text-zinc-600 leading-relaxed max-w-3xl">
+                  <p className="text-xs sm:text-sm dark:text-zinc-300 text-zinc-600 leading-relaxed max-w-3xl font-sans">
                     {ev.description}
                   </p>
 
-                  <div className="flex items-center gap-4 text-xs dark:text-zinc-400 text-zinc-500 flex-wrap pt-2">
-                    <span className="flex items-center gap-1.5">
-                      🗓️ <strong>{ev.date}</strong> {ev.time ? `· ${ev.time}` : ""}
+                  <div className="flex items-center gap-4 text-xs font-mono dark:text-zinc-400 text-zinc-500 flex-wrap pt-2">
+                    <span className="flex items-center gap-1.5 text-cyan-500 dark:text-cyan-400">
+                      CALENDAR: <strong>{ev.date}</strong> {ev.time ? `· ${ev.time}` : ""}
                     </span>
-                    <span className="flex items-center gap-1.5">
-                      📍 {ev.venue}
+                    <span className="flex items-center gap-1.5 text-purple-500 dark:text-purple-400">
+                      LOCATION: {ev.venue}
                     </span>
                   </div>
                 </div>
@@ -494,7 +506,7 @@ export default function EventsPage() {
                     {ev.hasRegistrationForm ? (
                       <button
                         onClick={() => handleOpenRegistration(ev)}
-                        className="inline-flex items-center justify-center rounded-full dark:bg-emerald-500 bg-emerald-600 px-6 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-white hover:bg-emerald-400 transition shadow-lg shadow-emerald-600/20 cursor-pointer"
+                        className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 px-6 py-3 text-xs font-mono font-semibold uppercase tracking-[0.18em] text-black shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_30px_rgba(6,182,212,0.5)] transition cursor-pointer"
                       >
                         Register Now {ev.isPaid ? `(${ev.registrationFee || "₹50"})` : "(Free)"} →
                       </button>
@@ -503,14 +515,14 @@ export default function EventsPage() {
                         href={ev.registrationUrl}
                         target={ev.registrationUrl.startsWith("http") ? "_blank" : "_self"}
                         rel="noreferrer"
-                        className="inline-flex items-center justify-center rounded-full dark:bg-zinc-50 bg-black px-6 py-3 text-xs font-semibold uppercase tracking-[0.18em] dark:text-black text-white dark:hover:bg-zinc-200 hover:bg-zinc-900 transition"
+                        className="inline-flex items-center justify-center rounded-xl border border-cyan-500/40 px-6 py-3 text-xs font-mono font-semibold uppercase tracking-[0.18em] text-cyan-400 hover:bg-cyan-500/10 transition"
                       >
                         Register External →
                       </a>
                     ) : null}
                   </div>
                 ) : null}
-              </article>
+              </TiltCard>
             ))}
           </div>
         ) : null}

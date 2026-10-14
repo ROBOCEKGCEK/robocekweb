@@ -102,7 +102,7 @@ export default function EditProfileModal({ profile, userUid, onClose, onUpdate }
         await updateProfile(auth.currentUser, { displayName: trimmedFullName });
       }
 
-      setStatusMessage("Registration details updated successfully!");
+      setStatusMessage("Telemetry record updated successfully!");
       onUpdate({
         ...profile,
         ...updatedPayload,
@@ -120,55 +120,56 @@ export default function EditProfileModal({ profile, userUid, onClose, onUpdate }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 sm:p-6 overflow-y-auto">
-      <div className="w-full max-w-xl rounded-2xl sm:rounded-3xl border border-zinc-300 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6 sm:p-8 shadow-2xl relative my-auto">
-        <div className="flex items-center justify-between mb-6 pb-4 border-b border-zinc-200 dark:border-zinc-800">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-xl p-4 sm:p-6 overflow-y-auto">
+      <div className="w-full max-w-xl rounded-3xl border border-cyan-500/40 bg-zinc-950/95 p-6 sm:p-8 shadow-[0_0_50px_rgba(0,240,255,0.2)] relative my-auto">
+        <div className="flex items-center justify-between mb-6 pb-4 border-b border-zinc-800">
           <div>
-            <span className="text-[0.65rem] sm:text-[0.7rem] uppercase tracking-[0.24em] text-zinc-500 dark:text-zinc-400">
-              Member Profile Settings
+            <span className="text-[0.65rem] sm:text-[0.7rem] uppercase tracking-[0.24em] font-mono text-cyan-400">
+              SYS.TELEMETRY // MEMBER SETTINGS
             </span>
-            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-black dark:text-white">
-              Update Registration Details
+            <h2 className="text-xl sm:text-2xl font-orbitron font-bold tracking-tight text-white mt-1">
+              Update Profile Record
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full border border-zinc-300 dark:border-zinc-800 flex items-center justify-center text-zinc-500 hover:text-black dark:hover:text-white transition"
+            className="w-9 h-9 rounded-full border border-zinc-800 bg-zinc-900/50 flex items-center justify-center text-zinc-400 hover:text-white hover:border-cyan-500/40 transition"
           >
             ✕
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 font-mono text-xs">
           {errorMessage ? (
-            <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-800 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-200">
+            <div className="rounded-xl border border-red-500/40 bg-red-950/40 p-3 text-red-300">
               {errorMessage}
             </div>
           ) : null}
 
           {statusMessage ? (
-            <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-xs text-emerald-800 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-200">
+            <div className="rounded-xl border border-cyan-500/40 bg-cyan-950/40 p-3 text-cyan-300">
+              <UiIcon name="check" className="mr-1 inline h-4 w-4 align-text-bottom" />
               {statusMessage}
             </div>
           ) : null}
 
           {/* Full Name */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-[0.7rem] uppercase tracking-wider text-zinc-500 font-medium">
-              Full Name <span className="text-red-500">*</span>
+            <label className="text-[0.7rem] uppercase tracking-wider text-zinc-400 font-medium">
+              Full Name <span className="text-cyan-400">*</span>
             </label>
             <input
               type="text"
               required
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              className="h-10 rounded-xl border border-zinc-300 dark:border-zinc-800 dark:bg-black dark:text-zinc-100 px-3.5 text-xs focus:outline-none focus:ring-2 focus:ring-zinc-600 dark:focus:ring-zinc-400"
+              className="h-11 rounded-xl border border-zinc-800 bg-black/80 text-zinc-100 px-4 text-xs focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition"
             />
           </div>
 
           {/* Phone Number */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-[0.7rem] uppercase tracking-wider text-zinc-500 font-medium">
+            <label className="text-[0.7rem] uppercase tracking-wider text-zinc-400 font-medium">
               Phone Number
             </label>
             <input
@@ -176,24 +177,24 @@ export default function EditProfileModal({ profile, userUid, onClose, onUpdate }
               placeholder="+91 9876543210"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
-              className="h-10 rounded-xl border border-zinc-300 dark:border-zinc-800 dark:bg-black dark:text-zinc-100 px-3.5 text-xs focus:outline-none focus:ring-2 focus:ring-zinc-600 dark:focus:ring-zinc-400"
+              className="h-11 rounded-xl border border-zinc-800 bg-black/80 text-zinc-100 px-4 text-xs focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition"
             />
           </div>
 
           {/* Branch & Batch Row */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
-              <label className="text-[0.7rem] uppercase tracking-wider text-zinc-500 font-medium">
-                Branch <span className="text-red-500">*</span>
+              <label className="text-[0.7rem] uppercase tracking-wider text-zinc-400 font-medium">
+                Branch <span className="text-cyan-400">*</span>
               </label>
               <select
                 required
                 value={branch}
                 onChange={(e) => setBranch(e.target.value)}
-                className="h-10 rounded-xl border border-zinc-300 dark:border-zinc-800 dark:bg-black dark:text-zinc-100 px-3.5 text-xs focus:outline-none focus:ring-2 focus:ring-zinc-600 dark:focus:ring-zinc-400"
+                className="h-11 rounded-xl border border-zinc-800 bg-black/80 text-zinc-100 px-3.5 text-xs focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition"
               >
                 {branchOptions.map((b) => (
-                  <option key={b} value={b}>
+                  <option key={b} value={b} className="bg-zinc-900 text-white">
                     {b}
                   </option>
                 ))}
@@ -201,17 +202,17 @@ export default function EditProfileModal({ profile, userUid, onClose, onUpdate }
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-[0.7rem] uppercase tracking-wider text-zinc-500 font-medium">
-                Batch / Year <span className="text-red-500">*</span>
+              <label className="text-[0.7rem] uppercase tracking-wider text-zinc-400 font-medium">
+                Batch / Year <span className="text-cyan-400">*</span>
               </label>
               <select
                 required
                 value={yearSemester}
                 onChange={(e) => setYearSemester(e.target.value)}
-                className="h-10 rounded-xl border border-zinc-300 dark:border-zinc-800 dark:bg-black dark:text-zinc-100 px-3.5 text-xs focus:outline-none focus:ring-2 focus:ring-zinc-600 dark:focus:ring-zinc-400"
+                className="h-11 rounded-xl border border-zinc-800 bg-black/80 text-zinc-100 px-3.5 text-xs focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition"
               >
                 {batchOptions.map((batch) => (
-                  <option key={batch} value={batch}>
+                  <option key={batch} value={batch} className="bg-zinc-900 text-white">
                     {batch}
                   </option>
                 ))}
@@ -221,8 +222,8 @@ export default function EditProfileModal({ profile, userUid, onClose, onUpdate }
 
           {/* Interests */}
           <div className="flex flex-col gap-2 pt-2">
-            <label className="text-[0.7rem] uppercase tracking-wider text-zinc-500 font-medium">
-              Areas of Interest
+            <label className="text-[0.7rem] uppercase tracking-wider text-zinc-400 font-medium">
+              Areas of Specialization
             </label>
             <div className="flex flex-wrap gap-2">
               {interestOptions.map((interest) => {
@@ -232,10 +233,10 @@ export default function EditProfileModal({ profile, userUid, onClose, onUpdate }
                     type="button"
                     key={interest}
                     onClick={() => toggleInterest(interest)}
-                    className={`rounded-full px-3 py-1.5 text-xs font-medium transition cursor-pointer ${
+                    className={`rounded-full px-3 py-1.5 text-xs font-mono transition cursor-pointer ${
                       isSelected
-                        ? "dark:bg-emerald-400 bg-black dark:text-black text-white"
-                        : "dark:bg-zinc-900 bg-zinc-100 dark:text-zinc-400 text-zinc-600 hover:dark:text-zinc-200 hover:text-black"
+                        ? "bg-gradient-to-r from-cyan-500 to-purple-600 text-black font-bold shadow-[0_0_12px_rgba(0,240,255,0.4)]"
+                        : "bg-zinc-900/60 text-zinc-400 border border-zinc-800 hover:border-zinc-700 hover:text-white"
                     }`}
                   >
                     <UiIcon name={isSelected ? "check" : "plus"} className="mr-1 inline h-3 w-3 align-text-bottom" />
@@ -246,20 +247,20 @@ export default function EditProfileModal({ profile, userUid, onClose, onUpdate }
             </div>
           </div>
 
-          <div className="pt-4 flex items-center justify-end gap-3 border-t border-zinc-200 dark:border-zinc-800">
+          <div className="pt-4 flex items-center justify-end gap-3 border-t border-zinc-800">
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2.5 rounded-full border border-zinc-300 dark:border-zinc-700 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:border-zinc-800 dark:hover:border-zinc-400 transition"
+              className="px-5 py-2.5 rounded-full border border-zinc-800 text-xs font-mono text-zinc-400 hover:text-white hover:border-zinc-700 transition"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSaving}
-              className="inline-flex items-center justify-center rounded-full dark:bg-zinc-50 bg-black px-6 py-2.5 text-xs font-semibold uppercase tracking-[0.15em] dark:text-black text-white dark:hover:bg-zinc-200 hover:bg-zinc-900 transition disabled:opacity-50"
+              className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 px-6 py-2.5 text-xs font-orbitron font-bold uppercase tracking-[0.15em] text-black transition shadow-[0_0_20px_rgba(0,240,255,0.4)] disabled:opacity-50"
             >
-              {isSaving ? "Saving..." : "Save Changes"}
+              {isSaving ? "Syncing..." : "Save Record"}
             </button>
           </div>
         </form>

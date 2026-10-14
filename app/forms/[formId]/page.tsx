@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import ThemeToggle from "../../ThemeToggle";
 import UiIcon from "../../components/UiIcon";
+import CyberBackground from "../../components/CyberBackground";
 import { doc, getDoc, getDocs, addDoc, collection } from "firebase/firestore";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { auth, db } from "../../firebase/client";
@@ -38,7 +39,7 @@ interface FormConfig {
   maxResponses?: number | string | null;
 }
 
-function formatFieldToString(val: any, fallback = ""): string {
+function formatFieldToString(val: unknown, fallback = ""): string {
   if (val === null || val === undefined) return fallback;
   if (typeof val === "string") return val;
   if (typeof val === "number") return String(val);
@@ -319,6 +320,28 @@ export default function StandaloneFormPage({
   const isFeeFree = activeFee.toLowerCase() === "free" || activeFee === "₹0" || activeFee === "0";
   const isPaymentRequired = Boolean(formConfig?.isPaid) && !isFeeFree;
 
+  const isClosed =
+    formConfig?.status === "Closed" ||
+    (formConfig?.isEventForm && formConfig?.status === "Registration Completed");
+
+  const openTimeMs = formConfig?.openAt ? new Date(formConfig.openAt).getTime() : null;
+  const closeTimeMs = formConfig?.closeAt ? new Date(formConfig.closeAt).getTime() : null;
+  const nowMs = Date.now();
+  const isBeforeOpen = openTimeMs !== null && !Number.isNaN(openTimeMs) && nowMs < openTimeMs;
+  const isAfterClose = closeTimeMs !== null && !Number.isNaN(closeTimeMs) && nowMs > closeTimeMs;
+  const maxResponsesNum = formConfig?.maxResponses ? Number(formConfig.maxResponses) : null;
+  const isLimitReached =
+    maxResponsesNum !== null && responseCount !== null && responseCount >= maxResponsesNum;
+  const isUnavailable = isBeforeOpen || isAfterClose || isLimitReached;
+
+  const unavailableReason = isLimitReached
+    ? "limit"
+    : isBeforeOpen
+      ? "not_open"
+      : isAfterClose
+        ? "ended"
+        : "closed";
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!db || !formConfig) return;
@@ -383,7 +406,7 @@ export default function StandaloneFormPage({
           "You are registered successfully! Go on and join the official WhatsApp group for updates.",
         whatsappLink: formConfig.whatsappGroupLink,
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error submitting form response:", err);
       setErrorMessage("Failed to submit form. Please try again.");
     } finally {
@@ -393,24 +416,26 @@ export default function StandaloneFormPage({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center font-sans text-sm">
-        Loading form details...
+      <div className="min-h-screen bg-[#030712] text-cyan-400 flex flex-col items-center justify-center font-mono text-xs gap-3">
+        <span className="w-8 h-8 rounded-full border-2 border-cyan-400 border-t-transparent animate-spin" />
+        <span>Loading secure registration payload...</span>
       </div>
     );
   }
 
   if (notFound || !formConfig) {
     return (
-      <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center px-6 py-12 font-sans text-center">
-        <div className="max-w-md w-full rounded-3xl border border-zinc-800 bg-zinc-950 p-8 space-y-4">
+      <div className="min-h-screen bg-[#030712] text-white flex flex-col items-center justify-center px-6 py-12 font-sans text-center relative overflow-hidden">
+        <CyberBackground />
+        <div className="max-w-md w-full rounded-3xl border border-red-500/40 bg-zinc-950/90 p-8 space-y-4 shadow-[0_0_50px_rgba(239,68,68,0.15)] relative z-10">
           <span className="text-4xl block">🔍</span>
-          <h1 className="text-xl font-bold text-red-400">Form Not Found</h1>
-          <p className="text-xs text-zinc-400">
-            The registration form <strong className="text-white">"/forms/{formId}"</strong> does not exist or has been removed.
+          <h1 className="text-xl font-orbitron font-bold text-red-400">Form Not Found</h1>
+          <p className="text-xs text-zinc-400 font-mono">
+            The registration form <strong className="text-white">&ldquo;/forms/{formId}&rdquo;</strong> does not exist or has concluded.
           </p>
           <Link
             href="/events"
-            className="inline-block px-5 py-2.5 rounded-full bg-zinc-800 hover:bg-zinc-700 text-white font-semibold text-xs uppercase tracking-wider transition"
+            className="inline-block px-6 py-2.5 rounded-full bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-black font-orbitron font-bold text-xs uppercase tracking-wider transition"
           >
             ← View All Events
           </Link>
@@ -419,45 +444,40 @@ export default function StandaloneFormPage({
     );
   }
 
-  const isClosed =
-    formConfig.status === "Closed" ||
-    (formConfig.isEventForm && formConfig.status === "Registration Completed");
-
-  const openTimeMs = formConfig.openAt ? new Date(formConfig.openAt).getTime() : null;
-  const closeTimeMs = formConfig.closeAt ? new Date(formConfig.closeAt).getTime() : null;
-  const nowMs = Date.now();
-  const isBeforeOpen = openTimeMs !== null && !Number.isNaN(openTimeMs) && nowMs < openTimeMs;
-  const isAfterClose = closeTimeMs !== null && !Number.isNaN(closeTimeMs) && nowMs > closeTimeMs;
-  const maxResponsesNum = formConfig.maxResponses ? Number(formConfig.maxResponses) : null;
-  const isLimitReached =
-    maxResponsesNum !== null && responseCount !== null && responseCount >= maxResponsesNum;
-  const isUnavailable = isBeforeOpen || isAfterClose || isLimitReached;
-
-  const unavailableReason = isLimitReached
-    ? "limit"
-    : isBeforeOpen
-      ? "not_open"
-      : isAfterClose
-        ? "ended"
-        : "closed";
-
   return (
-    <div className="min-h-screen flex flex-col font-sans dark:bg-black dark:text-zinc-50 bg-zinc-50 text-zinc-900 transition-colors duration-200">
-      {/* HEADER */}
-      <header className="w-full border-b dark:border-zinc-900 border-zinc-200 dark:bg-black/90 bg-white/90 backdrop-blur-md sticky top-0 z-40">
-        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span className="text-sm font-bold tracking-widest uppercase font-mono dark:text-white text-zinc-900">
-              ROBOCEK <span className="text-zinc-500 font-normal">REGISTRATION</span>
-            </span>
+    <div className="min-h-screen flex flex-col font-sans bg-[#030712] text-zinc-100 relative overflow-x-hidden selection:bg-cyan-500/30 selection:text-cyan-200">
+      <CyberBackground />
+      <ThemeToggle />
+
+      {/* FUTURISTIC HUD NAVIGATION HEADER */}
+      <header className="w-full border-b border-cyan-500/20 bg-[#030712]/80 backdrop-blur-xl sticky top-0 z-40">
+        <div className="max-w-5xl mx-auto px-4 sm:px-8 py-3.5 flex items-center justify-between gap-4">
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="relative w-8 h-8 rounded-xl bg-gradient-to-br from-cyan-500/20 to-purple-500/20 border border-cyan-500/40 flex items-center justify-center p-1.5 shadow-[0_0_15px_rgba(0,240,255,0.2)]">
+              <Image
+                src="/logo_white.png"
+                alt="ROBOCEK"
+                width={28}
+                height={28}
+                className="w-full h-full object-contain"
+              />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-orbitron font-bold text-sm tracking-[0.2em] bg-gradient-to-r from-white to-cyan-300 bg-clip-text text-transparent">
+                  ROBOCEK
+                </span>
+                <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded border border-cyan-500/40 text-cyan-400 bg-cyan-950/40">
+                  REGISTRATION
+                </span>
+              </div>
+            </div>
           </Link>
 
-          <div className="flex items-center gap-4">
-            <ThemeToggle />
+          <div className="flex items-center gap-3">
             <Link
               href="/events"
-              className="text-xs px-3.5 py-1.5 rounded-full border dark:border-zinc-800 border-zinc-300 dark:text-zinc-300 text-zinc-700 transition"
+              className="text-xs font-mono px-3.5 py-1.5 rounded-full border border-zinc-800 hover:border-cyan-500/40 text-zinc-400 hover:text-cyan-300 bg-zinc-950/60 transition"
             >
               ← Back to Events
             </Link>
@@ -466,35 +486,38 @@ export default function StandaloneFormPage({
       </header>
 
       {/* FORM CONTAINER */}
-      <main className="flex-1 w-full max-w-2xl mx-auto px-6 py-10">
-        <div className="rounded-3xl border dark:border-zinc-800 border-zinc-300 dark:bg-zinc-950 bg-white p-6 sm:p-10 shadow-2xl space-y-6">
+      <main className="flex-1 w-full max-w-2xl mx-auto px-4 sm:px-6 py-10 relative z-10">
+        <div className="rounded-3xl border border-cyan-500/30 bg-zinc-950/85 backdrop-blur-xl p-6 sm:p-10 shadow-[0_0_50px_rgba(0,240,255,0.1)] space-y-6">
           {/* Form Header */}
-          <div className="border-b dark:border-zinc-800 border-zinc-200 pb-6 space-y-3">
+          <div className="border-b border-zinc-800 pb-6 space-y-3">
             <div className="flex items-center gap-2 flex-wrap">
               {formConfig.isPaid ? (
                 <div className="flex items-center gap-2 flex-wrap font-mono text-[0.65rem]">
-                  <span className="px-3 py-1 rounded-full font-semibold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-                    <UiIcon name="bolt" className="inline h-3 w-3 align-text-bottom" /> ROBOCEK Members: {formConfig.isFreeForMembers ? "FREE" : (formConfig.memberFee || "FREE")}
+                  <span className="px-3 py-1 rounded-full font-bold uppercase tracking-wider bg-cyan-500/10 text-cyan-300 border border-cyan-500/40 shadow-[0_0_10px_rgba(0,240,255,0.2)]">
+                    <UiIcon name="bolt" className="inline h-3 w-3 align-text-bottom mr-1" />
+                    ROBOCEK Members: {formConfig.isFreeForMembers ? "FREE" : (formConfig.memberFee || "FREE")}
                   </span>
-                  <span className="px-3 py-1 rounded-full font-semibold uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/30">
+                  <span className="px-3 py-1 rounded-full font-bold uppercase tracking-wider bg-purple-500/10 text-purple-300 border border-purple-500/40">
                     Non-Members: {formConfig.nonMemberFee || formConfig.registrationFee || "₹50"}
                   </span>
                 </div>
               ) : (
-                <span className="px-3 py-1 rounded-full text-[0.65rem] font-semibold uppercase tracking-widest bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 font-mono">
-                  <UiIcon name="check" className="inline h-3 w-3 align-text-bottom" /> Free Registration for Everyone
+                <span className="px-3 py-1 rounded-full text-[0.65rem] font-bold uppercase tracking-widest bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 font-mono shadow-[0_0_10px_rgba(0,240,255,0.2)]">
+                  <UiIcon name="check" className="inline h-3 w-3 align-text-bottom mr-1" /> Free Registration for All Students
                 </span>
               )}
               {isClosed && (
-                <span className="px-3 py-1 rounded-full text-[0.65rem] font-semibold uppercase tracking-widest bg-red-500/10 text-red-400 border border-red-500/20 font-mono">
+                <span className="px-3 py-1 rounded-full text-[0.65rem] font-bold uppercase tracking-widest bg-red-500/10 text-red-400 border border-red-500/30 font-mono">
                   Closed
                 </span>
               )}
             </div>
 
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{formConfig.title}</h1>
+            <h1 className="text-2xl sm:text-3xl font-orbitron font-extrabold tracking-tight bg-gradient-to-r from-white via-cyan-100 to-cyan-400 bg-clip-text text-transparent">
+              {formConfig.title}
+            </h1>
             {formConfig.description ? (
-              <p className="text-xs sm:text-sm dark:text-zinc-400 text-zinc-600 leading-relaxed">
+              <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed font-sans">
                 {formConfig.description}
               </p>
             ) : null}
@@ -503,13 +526,15 @@ export default function StandaloneFormPage({
           {/* SUCCESS SCREEN */}
           {successInfo ? (
             <div className="space-y-6 text-center py-6">
-              <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center mx-auto text-3xl animate-bounce">
+              <div className="w-16 h-16 rounded-2xl bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 flex items-center justify-center mx-auto text-3xl shadow-[0_0_30px_rgba(0,240,255,0.3)] animate-pulse">
                 <UiIcon name="check" className="h-8 w-8" />
               </div>
 
               <div className="space-y-2">
-                <h2 className="text-2xl font-bold text-emerald-400">Registration Confirmed!</h2>
-                <p className="text-xs sm:text-sm dark:text-zinc-300 text-zinc-700 leading-relaxed max-w-md mx-auto">
+                <h2 className="text-2xl font-orbitron font-bold text-white">
+                  Registration Confirmed!
+                </h2>
+                <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed max-w-md mx-auto font-sans">
                   {successInfo.message}
                 </p>
               </div>
@@ -520,13 +545,13 @@ export default function StandaloneFormPage({
                     href={successInfo.whatsappLink}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center justify-center gap-2 w-full py-4 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs sm:text-sm uppercase tracking-wider transition shadow-xl shadow-emerald-600/30"
+                    className="inline-flex items-center justify-center gap-2.5 w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-black font-orbitron font-bold text-xs sm:text-sm uppercase tracking-wider transition shadow-[0_0_25px_rgba(16,185,129,0.4)]"
                   >
                     <UiIcon name="message" className="h-4 w-4" />
                     Join Official WhatsApp Group
                   </a>
-                  <p className="text-[0.65rem] text-zinc-500 mt-2">
-                    Click to join for instant updates, announcements, and coordinator Q&A.
+                  <p className="text-[0.65rem] font-mono text-zinc-500 mt-2">
+                    Click to join for instant announcements, schedules &amp; coordinator Q&amp;A.
                   </p>
                 </div>
               ) : null}
@@ -534,37 +559,37 @@ export default function StandaloneFormPage({
               <div className="pt-4">
                 <Link
                   href="/events"
-                  className="inline-block w-full py-3 rounded-xl border dark:border-zinc-800 border-zinc-300 dark:bg-zinc-900 bg-zinc-100 text-xs font-semibold uppercase tracking-wider hover:bg-zinc-200 dark:hover:bg-zinc-800 transition"
+                  className="inline-block w-full py-3.5 rounded-xl border border-zinc-800 bg-zinc-900/60 text-xs font-mono font-semibold uppercase tracking-wider text-zinc-300 hover:text-cyan-300 hover:border-cyan-500/40 transition"
                 >
                   ← Return to Events
                 </Link>
               </div>
             </div>
           ) : isClosed ? (
-            <div className="py-12 text-center space-y-3">
-              <span className="text-emerald-400 flex justify-center"><UiIcon name="lock" className="h-10 w-10" /></span>
-              <p className="text-sm font-semibold dark:text-zinc-200 text-zinc-700">
+            <div className="py-12 text-center space-y-3 font-mono">
+              <span className="text-red-400 flex justify-center"><UiIcon name="lock" className="h-10 w-10" /></span>
+              <p className="text-sm font-semibold text-white">
                 {formConfig.isEventForm && formConfig.status === "Registration Completed"
                   ? "Registrations for this event are now closed."
                   : "This registration form is currently closed."}
               </p>
-              <p className="text-xs dark:text-zinc-500 text-zinc-500">
+              <p className="text-xs text-zinc-500 font-sans">
                 {formConfig.isEventForm && formConfig.status === "Registration Completed"
                   ? "The registration window has ended. Please check back for future events."
                   : "The form is not accepting responses at this time."}
               </p>
             </div>
           ) : isUnavailable ? (
-            <div className="py-12 text-center space-y-3">
-              <span className="text-emerald-400 flex justify-center"><UiIcon name={unavailableReason === "limit" ? "ban" : unavailableReason === "not_open" ? "clock" : "lock"} className="h-10 w-10" /></span>
-              <p className="text-sm font-semibold dark:text-zinc-200 text-zinc-700">
+            <div className="py-12 text-center space-y-3 font-mono">
+              <span className="text-amber-400 flex justify-center"><UiIcon name={unavailableReason === "limit" ? "ban" : unavailableReason === "not_open" ? "clock" : "lock"} className="h-10 w-10" /></span>
+              <p className="text-sm font-semibold text-white">
                 {unavailableReason === "limit"
                   ? "Registration limit reached."
                   : unavailableReason === "not_open"
                     ? "Registrations haven't opened yet."
                     : "Registrations have ended."}
               </p>
-              <p className="text-xs dark:text-zinc-500 text-zinc-500">
+              <p className="text-xs text-zinc-500 font-sans">
                 {unavailableReason === "limit"
                   ? "The maximum number of responses has been reached. Thank you for your interest!"
                   : unavailableReason === "not_open"
@@ -574,84 +599,94 @@ export default function StandaloneFormPage({
             </div>
           ) : (
             /* FORM INPUTS */
-            <form onSubmit={handleSubmit} className="space-y-5 text-xs">
+            <form onSubmit={handleSubmit} className="space-y-5 text-xs font-mono">
               {errorMessage ? (
-                <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs">
-                  <UiIcon name="alert" className="mr-1 inline h-4 w-4 align-text-bottom" />
+                <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/40 text-red-400 text-xs">
+                  <UiIcon name="alert" className="mr-1.5 inline h-4 w-4 align-text-bottom" />
                   {errorMessage}
                 </div>
               ) : null}
 
               <div>
-                <label className="block uppercase font-medium dark:text-zinc-400 text-zinc-600 mb-1">Full Name *</label>
+                <label className="block uppercase text-zinc-400 mb-1.5">
+                  Full Name <span className="text-cyan-400">*</span>
+                </label>
                 <input
                   type="text"
                   required
                   placeholder="Enter your full name"
                   value={regForm.fullName}
                   onChange={(e) => setRegForm({ ...regForm, fullName: e.target.value })}
-                  className="w-full h-11 rounded-xl border dark:border-zinc-800 border-zinc-300 dark:bg-black bg-zinc-50 px-4 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full h-11 rounded-xl border border-zinc-800 bg-black/80 px-4 text-xs text-zinc-100 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block uppercase font-medium dark:text-zinc-400 text-zinc-600 mb-1">Email Address *</label>
+                  <label className="block uppercase text-zinc-400 mb-1.5">
+                    Email Address <span className="text-cyan-400">*</span>
+                  </label>
                   <input
                     type="email"
                     required
                     placeholder="student@gcek.ac.in"
                     value={regForm.email}
                     onChange={(e) => setRegForm({ ...regForm, email: e.target.value })}
-                    className="w-full h-11 rounded-xl border dark:border-zinc-800 border-zinc-300 dark:bg-black bg-zinc-50 px-4 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="w-full h-11 rounded-xl border border-zinc-800 bg-black/80 px-4 text-xs text-zinc-100 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition"
                   />
                 </div>
 
                 <div>
-                  <label className="block uppercase font-medium dark:text-zinc-400 text-zinc-600 mb-1">Mobile Phone *</label>
+                  <label className="block uppercase text-zinc-400 mb-1.5">
+                    Mobile Phone <span className="text-cyan-400">*</span>
+                  </label>
                   <input
                     type="tel"
                     required
-                    placeholder="10-digit mobile no."
+                    placeholder="10-digit mobile number"
                     value={regForm.phone}
                     onChange={(e) => setRegForm({ ...regForm, phone: e.target.value })}
-                    className="w-full h-11 rounded-xl border dark:border-zinc-800 border-zinc-300 dark:bg-black bg-zinc-50 px-4 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="w-full h-11 rounded-xl border border-zinc-800 bg-black/80 px-4 text-xs text-zinc-100 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block uppercase font-medium dark:text-zinc-400 text-zinc-600 mb-1">Branch / Department</label>
+                  <label className="block uppercase text-zinc-400 mb-1.5">
+                    Branch / Department
+                  </label>
                   <input
                     type="text"
                     placeholder="e.g. ECE / EEE / CSE / ME"
                     value={regForm.branch}
                     onChange={(e) => setRegForm({ ...regForm, branch: e.target.value })}
-                    className="w-full h-11 rounded-xl border dark:border-zinc-800 border-zinc-300 dark:bg-black bg-zinc-50 px-4 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="w-full h-11 rounded-xl border border-zinc-800 bg-black/80 px-4 text-xs text-zinc-100 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition"
                   />
                 </div>
 
                 <div>
-                  <label className="block uppercase font-medium dark:text-zinc-400 text-zinc-600 mb-1">Year / Semester</label>
+                  <label className="block uppercase text-zinc-400 mb-1.5">
+                    Year / Batch
+                  </label>
                   <input
                     type="text"
-                    placeholder="e.g. S4 / 2nd Year"
+                    placeholder="e.g. 2k26 / S4"
                     value={regForm.year}
                     onChange={(e) => setRegForm({ ...regForm, year: e.target.value })}
-                    className="w-full h-11 rounded-xl border dark:border-zinc-800 border-zinc-300 dark:bg-black bg-zinc-50 px-4 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="w-full h-11 rounded-xl border border-zinc-800 bg-black/80 px-4 text-xs text-zinc-100 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition"
                   />
                 </div>
               </div>
 
               {/* ROBOCEK MEMBERSHIP ID FIELD */}
-              <div className="p-4 rounded-2xl border border-indigo-500/30 bg-indigo-500/5 space-y-2">
+              <div className="p-5 rounded-2xl border border-cyan-500/30 bg-cyan-950/20 space-y-2.5">
                 <div className="flex items-center justify-between">
-                  <label className="block uppercase font-bold text-indigo-300 text-xs">
-                    ROBOCEK Membership ID (Auto-filled if logged in as Member)
+                  <label className="block uppercase font-bold text-cyan-300 text-xs">
+                    ROBOCEK Membership ID
                   </label>
                   {hasMembershipId && (
-                    <span className="text-[0.65rem] font-bold text-emerald-400 bg-emerald-500/20 px-2.5 py-0.5 rounded-full border border-emerald-500/40 flex items-center gap-1 font-mono">
+                    <span className="text-[0.65rem] font-bold text-cyan-300 bg-cyan-500/20 px-2.5 py-0.5 rounded-full border border-cyan-500/40 flex items-center gap-1 shadow-[0_0_10px_rgba(0,240,255,0.3)]">
                       <UiIcon name="check" className="inline h-3 w-3 align-text-bottom" /> Member Rate Active
                     </span>
                   )}
@@ -661,11 +696,11 @@ export default function StandaloneFormPage({
                   placeholder="e.g. RBC-2026-0042 (Auto-filled if logged in)"
                   value={regForm.membershipId}
                   onChange={(e) => setRegForm({ ...regForm, membershipId: e.target.value.toUpperCase() })}
-                  className="w-full h-11 rounded-xl border border-indigo-500/40 bg-black px-4 text-xs font-mono text-indigo-200 uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                  className="w-full h-11 rounded-xl border border-cyan-500/40 bg-black/80 px-4 text-xs text-cyan-200 uppercase tracking-wider focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition"
                 />
-                <p className="text-[0.65rem] text-zinc-400">
+                <p className="text-[0.65rem] text-zinc-400 font-sans">
                   {hasMembershipId
-                    ? `ROBOCEK Member Rate (${activeFee}) applied for ID: ${cleanMemId}. Your ID will be verified against the official member roster.`
+                    ? `ROBOCEK Member Rate (${activeFee}) applied for ID: ${cleanMemId}. Verified at registration check-in.`
                     : `Enter your ROBOCEK Membership ID to claim Member Rate (${formConfig.isFreeForMembers ? "FREE" : rawMemberFee}). Non-Member Rate: ${rawNonMemberFee}`}
                 </p>
               </div>
@@ -674,22 +709,22 @@ export default function StandaloneFormPage({
               {formConfig.isPaid && (
                 <div className={`p-4 rounded-2xl border text-xs flex items-center justify-between transition ${
                   hasMembershipId
-                    ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
-                    : "border-amber-500/40 bg-amber-500/10 text-amber-300"
+                    ? "border-cyan-500/40 bg-cyan-500/10 text-cyan-300"
+                    : "border-purple-500/40 bg-purple-500/10 text-purple-300"
                 }`}>
                   <div>
-                    <span className="font-bold text-sm block">
+                    <span className="font-orbitron font-bold text-sm block text-white">
                       {hasMembershipId
-                        ? `ROBOCEK Member Price: ${activeFee}`
-                        : `Standard Non-Member Price: ${activeFee}`}
+                        ? `ROBOCEK Member Rate: ${activeFee}`
+                        : `Non-Member Rate: ${activeFee}`}
                     </span>
-                    <span className="text-[0.65rem] opacity-80 block mt-0.5">
+                    <span className="text-[0.65rem] opacity-80 block mt-0.5 font-sans">
                       {hasMembershipId
-                        ? `Member discount active for ID: ${cleanMemId}`
-                        : `Non-Member fee applied. Have a ROBOCEK Membership ID? Enter it in the box above to claim Member Price!`}
+                        ? `Member discount applied for ID: ${cleanMemId}`
+                        : `Have a ROBOCEK Membership ID? Enter it above to claim Member Price!`}
                     </span>
                   </div>
-                  <span className="text-base font-bold font-mono px-3.5 py-1.5 rounded-xl bg-black/60 border border-current shadow-lg">
+                  <span className="text-base font-orbitron font-bold px-3.5 py-1.5 rounded-xl bg-black/80 border border-current shadow-lg">
                     {activeFee}
                   </span>
                 </div>
@@ -697,11 +732,11 @@ export default function StandaloneFormPage({
 
               {/* DYNAMIC CUSTOM FIELDS */}
               {formConfig.fields && formConfig.fields.length > 0 ? (
-                <div className="pt-3 border-t dark:border-zinc-800 border-zinc-200 space-y-4">
+                <div className="pt-3 border-t border-zinc-800 space-y-4">
                   {formConfig.fields.map((f) => (
                     <div key={f.id}>
-                      <label className="block uppercase font-medium dark:text-zinc-400 text-zinc-600 mb-1">
-                        {f.label} {f.required ? "*" : "(Optional)"}
+                      <label className="block uppercase text-zinc-400 mb-1.5">
+                        {f.label} {f.required ? <span className="text-cyan-400">*</span> : "(Optional)"}
                       </label>
 
                       {f.type === "select" ? (
@@ -714,11 +749,11 @@ export default function StandaloneFormPage({
                               customAnswers: { ...regForm.customAnswers, [f.id]: e.target.value },
                             })
                           }
-                          className="w-full h-11 rounded-xl border dark:border-zinc-800 border-zinc-300 dark:bg-black bg-zinc-50 px-4 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                          className="w-full h-11 rounded-xl border border-zinc-800 bg-black/80 px-4 text-xs text-zinc-100 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition"
                         >
                           <option value="">Select option...</option>
                           {(f.options || []).map((opt) => (
-                            <option key={opt} value={opt}>
+                            <option key={opt} value={opt} className="bg-zinc-900 text-white">
                               {opt}
                             </option>
                           ))}
@@ -735,7 +770,7 @@ export default function StandaloneFormPage({
                               customAnswers: { ...regForm.customAnswers, [f.id]: e.target.value },
                             })
                           }
-                          className="w-full rounded-xl border dark:border-zinc-800 border-zinc-300 dark:bg-black bg-zinc-50 p-3.5 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
+                          className="w-full rounded-xl border border-zinc-800 bg-black/80 p-3.5 text-xs text-zinc-100 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition resize-none"
                         />
                       ) : (
                         <input
@@ -749,7 +784,7 @@ export default function StandaloneFormPage({
                               customAnswers: { ...regForm.customAnswers, [f.id]: e.target.value },
                             })
                           }
-                          className="w-full h-11 rounded-xl border dark:border-zinc-800 border-zinc-300 dark:bg-black bg-zinc-50 px-4 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                          className="w-full h-11 rounded-xl border border-zinc-800 bg-black/80 px-4 text-xs text-zinc-100 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition"
                         />
                       )}
                     </div>
@@ -757,40 +792,40 @@ export default function StandaloneFormPage({
                 </div>
               ) : null}
 
-              {/* PAYMENT SECTION FOR PAID FORMS WHEN PAYMENT IS REQUIRED */}
+              {/* PAYMENT SECTION FOR PAID FORMS */}
               {isPaymentRequired && (
-                <div className="p-5 rounded-2xl border border-amber-500/30 bg-amber-500/5 space-y-4">
+                <div className="p-5 rounded-2xl border border-purple-500/30 bg-purple-950/20 space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-amber-400 uppercase tracking-wider">
-                      💳 UPI Payment Required ({activeFee})
+                    <span className="text-xs font-orbitron font-bold text-purple-300 uppercase tracking-wider">
+                      UPI Payment Gateway ({activeFee})
                     </span>
                   </div>
 
-                  <div className="flex flex-col items-center justify-center p-4 rounded-xl bg-black/40 border border-zinc-800 text-center">
+                  <div className="flex flex-col items-center justify-center p-4 rounded-xl bg-black/80 border border-zinc-800 text-center">
                     {!qrLoadError ? (
                       <Image
                         src={formConfig.paymentQr || "/qr.jpg"}
                         alt="ROBOCEK UPI Payment QR"
                         width={180}
                         height={180}
-                        className="rounded-lg mb-2 object-contain"
+                        className="rounded-xl mb-2 object-contain border border-purple-500/30"
                         onError={() => setQrLoadError(true)}
                       />
                     ) : (
-                      <div className="w-40 h-40 rounded-lg bg-zinc-900 border border-zinc-800 flex flex-col items-center justify-center text-center p-3 mb-2">
+                      <div className="w-40 h-40 rounded-xl bg-zinc-900 border border-zinc-800 flex flex-col items-center justify-center text-center p-3 mb-2">
                         <span className="text-3xl mb-1">📲</span>
-                        <span className="text-[0.7rem] text-amber-300 font-semibold uppercase">Scan UPI QR</span>
-                        <span className="text-[0.6rem] text-zinc-500">Scan & Pay fee</span>
+                        <span className="text-[0.7rem] text-purple-300 font-semibold uppercase">Scan UPI QR</span>
+                        <span className="text-[0.6rem] text-zinc-500">Scan &amp; Pay fee</span>
                       </div>
                     )}
-                    <p className="text-[0.7rem] text-zinc-400 leading-snug">
+                    <p className="text-[0.7rem] text-zinc-400 font-sans leading-snug">
                       Scan QR code using GPay / PhonePe / Paytm to pay <strong>{activeFee}</strong>.
                     </p>
                   </div>
 
                   <div>
-                    <label className="block uppercase font-semibold text-amber-300 mb-1">
-                      12-Digit UPI UTR / Transaction Reference ID *
+                    <label className="block uppercase font-bold text-purple-300 mb-1">
+                      12-Digit UPI UTR / Transaction Reference ID <span className="text-purple-400">*</span>
                     </label>
                     <input
                       type="text"
@@ -798,9 +833,9 @@ export default function StandaloneFormPage({
                       placeholder="e.g. 423819028312"
                       value={regForm.utrNumber}
                       onChange={(e) => setRegForm({ ...regForm, utrNumber: e.target.value })}
-                      className="w-full h-11 rounded-xl border border-amber-500/40 bg-black px-4 text-xs text-amber-200 font-mono focus:outline-none focus:ring-2 focus:ring-amber-500"
+                      className="w-full h-11 rounded-xl border border-purple-500/40 bg-black/80 px-4 text-xs text-purple-200 focus:outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-400 transition"
                     />
-                    <p className="text-[0.65rem] text-zinc-500 mt-1">
+                    <p className="text-[0.65rem] text-zinc-500 mt-1 font-sans">
                       Find the 12-digit UTR or Transaction Ref No on your payment confirmation screen.
                     </p>
                   </div>
@@ -811,7 +846,7 @@ export default function StandaloneFormPage({
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold uppercase tracking-wider text-xs transition disabled:opacity-50 shadow-xl shadow-emerald-600/30 cursor-pointer"
+                  className="w-full py-4 rounded-2xl bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-black font-orbitron font-bold uppercase tracking-wider text-xs transition disabled:opacity-50 shadow-[0_0_25px_rgba(0,240,255,0.4)] cursor-pointer"
                 >
                   {isSubmitting ? "Submitting Registration..." : "Submit Registration"}
                 </button>
@@ -822,11 +857,11 @@ export default function StandaloneFormPage({
       </main>
 
       {/* FOOTER */}
-      <footer className="w-full border-t dark:border-zinc-900 border-zinc-300 dark:bg-black/95 bg-white mt-auto">
-        <div className="max-w-4xl mx-auto px-6 py-5 flex items-center justify-between text-[0.7rem] dark:text-zinc-500 text-zinc-600">
+      <footer className="w-full border-t border-cyan-500/20 bg-[#030712]/90 backdrop-blur-xl mt-auto relative z-10">
+        <div className="max-w-5xl mx-auto px-4 sm:px-8 py-5 flex items-center justify-between text-xs font-mono text-zinc-500">
           <p>© {new Date().getFullYear()} ROBOCEK · Robotics Club GCE Kannur</p>
-          <Link href="/events" className="hover:dark:text-zinc-200 hover:text-zinc-800 transition uppercase tracking-wider">
-            All Events
+          <Link href="/events" className="hover:text-cyan-400 transition uppercase tracking-wider">
+            All Events ↗
           </Link>
         </div>
       </footer>

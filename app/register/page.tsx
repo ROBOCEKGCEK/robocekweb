@@ -6,6 +6,8 @@ import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import UiIcon from "../components/UiIcon";
+import TiltCard from "../components/TiltCard";
+import CyberBackground from "../components/CyberBackground";
 import {
   browserLocalPersistence,
   createUserWithEmailAndPassword,
@@ -250,71 +252,81 @@ export default function RegisterPage() {
   };
 
   return (
-    <div
-      className="min-h-screen flex flex-col font-sans bg-white text-black dark:bg-black dark:text-zinc-50"
-    >
+    <div className="min-h-screen flex flex-col font-sans bg-slate-50 text-slate-900 dark:bg-[#030712] dark:text-zinc-50 relative overflow-x-hidden selection:bg-cyan-500/30 selection:text-cyan-200">
+      <CyberBackground />
       <ThemeToggle />
 
-      {/* HEADER with Navigation */}
-      <header className="w-full border-b dark:border-zinc-900 border-zinc-300 dark:bg-black/95 bg-white/95 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-3 sm:px-10 lg:px-16 py-2.5 sm:py-3 flex items-center justify-between">
-          <Link
-            href="/"
-            className="flex items-center gap-2 hover:opacity-80 transition"
-          >
-            <Image
-              src="/logo_white.png"
-              alt="ROBOCEK logo"
-              width={30}
-              height={30}
-              className="hidden dark:block select-none"
-              style={{ width: "auto", height: "auto" }}
-            />
-            <Image
-              src="/logo_black.png"
-              alt="ROBOCEK logo"
-              width={30}
-              height={30}
-              className="block dark:hidden select-none"
-              style={{ width: "auto", height: "auto" }}
-            />
-            <span className="text-xs sm:text-sm font-semibold tracking-widest uppercase">
-              ROBOCEK
-            </span>
+      {/* HEADER */}
+      <header className="w-full border-b dark:border-cyan-500/20 border-slate-300 dark:bg-[#030712]/85 bg-white/90 backdrop-blur-md sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-3 flex flex-wrap items-center justify-between gap-3">
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="relative flex items-center justify-center p-1 rounded-lg border border-cyan-500/30 dark:bg-black/40 bg-slate-100 group-hover:border-cyan-400 transition-colors">
+              <Image
+                src="/logo_white.png"
+                alt="ROBOCEK logo"
+                width={32}
+                height={32}
+                className="hidden dark:block select-none"
+                style={{ width: "auto", height: "auto" }}
+                priority
+              />
+              <Image
+                src="/logo_black.png"
+                alt="ROBOCEK logo"
+                width={32}
+                height={32}
+                className="block dark:hidden select-none"
+                style={{ width: "auto", height: "auto" }}
+                priority
+              />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-sm sm:text-base font-bold tracking-[0.25em] uppercase font-[family-name:var(--font-cyber)] text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 via-purple-500 to-indigo-500 dark:from-cyan-400 dark:via-purple-300 dark:to-cyan-200">
+                ROBOCEK
+              </span>
+              <span className="text-[9px] font-mono tracking-widest text-zinc-500 uppercase">
+                CADET INDUCTION // 2026
+              </span>
+            </div>
           </Link>
-          <Link
-            href="/login"
-            className="inline-flex items-center justify-center rounded-full border
-              dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-100 dark:hover:text-zinc-50 dark:hover:bg-zinc-900/50
-              border-zinc-400 text-zinc-700 hover:border-zinc-800 hover:text-black hover:bg-gray-100
-              px-3 py-1.5 text-[11px] sm:px-5 sm:py-2 sm:text-xs font-medium uppercase tracking-[0.12em] transition"
-          >
-            Member Login
-          </Link>
+
+          <div className="flex items-center gap-2 sm:gap-3 text-xs font-mono uppercase tracking-[0.14em]">
+            <Link
+              href="/login"
+              className="inline-flex items-center justify-center rounded-lg border dark:border-zinc-800 border-zinc-300 text-zinc-600 dark:text-zinc-400 hover:text-cyan-400 px-4 py-2 transition"
+            >
+              Member Login
+            </Link>
+          </div>
         </div>
       </header>
 
       {/* MAIN CONTENT */}
-      <main className="flex-1 w-full flex flex-col items-center py-6 sm:py-16">
-        <div className="w-full max-w-2xl px-4 sm:px-10 lg:px-16">
+      <main className="flex-1 w-full flex flex-col items-center py-10 sm:py-16 z-10 px-4">
+        <div className="w-full max-w-2xl">
           {/* Header */}
-          <div className="mb-6 sm:mb-10 text-center">
-            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-semibold tracking-tight mb-2 sm:mb-4">
-              Join ROBOCEK
+          <div className="mb-8 text-center space-y-2">
+            <span className="inline-flex items-center gap-2 rounded-full border dark:border-cyan-500/40 dark:bg-cyan-950/30 border-cyan-700/30 bg-cyan-50 px-3.5 py-1 text-[10px] font-mono uppercase tracking-[0.2em] text-cyan-600 dark:text-cyan-300 shadow-[0_0_15px_rgba(6,182,212,0.15)]">
+              <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-pulse" />
+              MEMBERSHIP REGISTRATION
+            </span>
+            <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight font-[family-name:var(--font-cyber)] dark:text-white text-zinc-900">
+              Join ROBOCEK Cadre
             </h1>
-            <p className="text-xs sm:text-base dark:text-zinc-400 text-zinc-700 max-w-md mx-auto leading-relaxed">
-              Register your interest in the Robotics Club and fill out the
-              details below. We&apos;ll get back to you with information about
-              upcoming sessions and events.
+            <p className="text-xs sm:text-sm dark:text-zinc-300 text-zinc-600 max-w-md mx-auto leading-relaxed">
+              Register your interest to join Government College of Engineering Kannur&apos;s robotics and autonomous systems squads.
             </p>
           </div>
+
           {/* Registration Form */}
-          <div className="rounded-2xl sm:rounded-3xl border dark:border-zinc-800 border-zinc-300 dark:bg-zinc-950/40 bg-white p-4 sm:p-8">            {/* Email Requirement Notice */}
-            <div className="mb-6 p-3 rounded-lg dark:bg-blue-950/40 bg-blue-50 border dark:border-blue-900/50 border-blue-200">
-              <p className="text-xs dark:text-blue-200 text-blue-800">
-                <UiIcon name="info" className="mr-1 inline h-4 w-4 align-text-bottom" />
-                Any email address is accepted for registration.
-              </p>
+          <TiltCard
+            glowColor="purple"
+            className="dark:bg-zinc-950/80 bg-white p-6 sm:p-10 dark:border-zinc-800 border-zinc-200"
+          >
+            {/* Email Requirement Notice */}
+            <div className="mb-6 p-3 rounded-xl dark:bg-cyan-950/30 bg-cyan-50 border dark:border-cyan-500/30 border-cyan-200 flex items-center gap-2 text-xs font-mono dark:text-cyan-300 text-cyan-800">
+              <UiIcon name="info" className="h-4 w-4 shrink-0 text-cyan-500" />
+              <span>Any valid college or personal email address is accepted.</span>
             </div>
 
             <form className="space-y-6" onSubmit={handleSubmit}>
@@ -578,74 +590,63 @@ export default function RegisterPage() {
                 />
               </div>
               {/* Submit Button */}
-              <div className="pt-4">
+              <div className="pt-4 font-mono">
                 <button
                   type="submit"
                   disabled={isSubmitting || isPendingApproval}
-                  className="w-full inline-flex items-center justify-center rounded-full dark:bg-zinc-50 bg-black px-6 py-3 text-sm font-medium uppercase tracking-[0.18em] dark:text-black text-white dark:hover:bg-zinc-200 hover:bg-zinc-900 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="w-full inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-cyan-500 via-cyan-400 to-purple-600 px-6 py-3.5 text-xs font-mono font-semibold uppercase tracking-[0.2em] text-black shadow-[0_0_20px_rgba(6,182,212,0.35)] hover:shadow-[0_0_30px_rgba(6,182,212,0.6)] transition-all hover:scale-[1.01] cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  {isPendingApproval ? "Pending approval" : isSubmitting ? "Saving..." : "Complete Registration"}
+                  {isPendingApproval ? "Pending Approval..." : isSubmitting ? "Registering Cadre..." : "Complete Registration [ → ]"}
                 </button>
               </div>
             </form>
 
             {/* Important Notice */}
-            <div className="mt-8 pt-6 border-t dark:border-zinc-800 border-zinc-300">
-              <div className="rounded-xl dark:bg-zinc-900/50 bg-gray-100 p-4 border dark:border-zinc-800 border-zinc-300">
-                <p className="text-[0.75rem] uppercase tracking-[0.18em] dark:text-zinc-400 text-zinc-700 font-semibold mb-2">
-                  <UiIcon name="bolt" className="mr-1 inline h-4 w-4 align-text-bottom" />
-                  Important
+            <div className="mt-8 pt-6 border-t dark:border-zinc-800 border-zinc-200">
+              <div className="rounded-xl dark:bg-zinc-900/40 bg-slate-100 p-4 border dark:border-zinc-800 border-zinc-200 font-sans text-xs">
+                <p className="text-[10px] font-mono uppercase tracking-[0.18em] text-cyan-500 font-semibold mb-2">
+                  <UiIcon name="bolt" className="mr-1 inline h-4 w-4 align-text-bottom text-cyan-400" />
+                  Cadet Dispatch Instructions
                 </p>
-                <p className="text-xs dark:text-zinc-300 text-zinc-800 leading-relaxed">
-                  After filling out this form, please send an email to{" "}
+                <p className="dark:text-zinc-300 text-zinc-700 leading-relaxed">
+                  After submitting this form, dispatch a confirmation email to{" "}
                   <a
                     href="mailto:robocek@gcek.ac.in"
-                    className="font-semibold dark:text-zinc-50 text-black hover:underline"
+                    className="font-semibold text-cyan-500 dark:text-cyan-400 hover:underline"
                   >
                     robocek@gcek.ac.in
                   </a>{" "}
-                  with your details and the form information you just submitted.
-                  Please mention your name and branch in the email subject line
-                  for faster processing.
-                </p>
-                <p className="text-xs dark:text-zinc-400 text-zinc-600 mt-3">
-                  <UiIcon name="info" className="mr-1 inline h-4 w-4 align-text-bottom" />
-                  <span className="italic">Tip:</span> Also check the
-                  official GCEK notice board and announcements for official
-                  ROBOCEK recruitment sessions and workshops.
+                  mentioning your name and branch in the email subject line for rapid registration verification.
                 </p>
               </div>
             </div>
-          </div>
+          </TiltCard>
+
           {/* Back to Home Link */}
-          <div className="mt-8 text-center">
+          <div className="mt-8 text-center font-mono text-xs">
             <Link
               href="/"
-              className="text-xs dark:text-zinc-500 text-zinc-600 hover:dark:text-zinc-300 hover:text-zinc-800 transition uppercase tracking-[0.18em]"
+              className="text-zinc-500 hover:text-cyan-400 transition uppercase tracking-[0.18em]"
             >
-              ← Back to Home
+              ← Return to Main Terminal
             </Link>
           </div>
         </div>
       </main>
 
       {/* FOOTER */}
-      <footer className="w-full border-t dark:border-zinc-900 border-zinc-300 dark:bg-black/95 bg-white mt-auto">
-        <div className="max-w-6xl mx-auto px-6 sm:px-10 lg:px-16 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-[0.7rem] dark:text-zinc-500 text-zinc-600">
-          <p>
-            © {new Date().getFullYear()} ROBOCEK · Robotics Club, Government
-            College of Engineering Kannur.
-          </p>
-          <div className="flex items-center gap-4">
-            <span className="uppercase tracking-[0.18em] dark:text-zinc-600 text-zinc-500">
-              Designed in B/W
-            </span>
-            <span className="h-px w-10 dark:bg-zinc-700 bg-zinc-300" />
-            <Link
-              href="/"
-              className="dark:hover:text-zinc-200 hover:text-zinc-800 transition uppercase tracking-[0.16em]"
-            >
+      <footer className="w-full border-t dark:border-cyan-500/20 border-zinc-300 dark:bg-[#02050c] bg-white py-6 mt-auto z-10 font-mono text-[11px]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 flex flex-col sm:flex-row items-center justify-between gap-4 text-zinc-500">
+          <p>© {new Date().getFullYear()} ROBOCEK GCEK // AUTONOMOUS ROBOTICS CLUB</p>
+          <div className="flex items-center gap-4 uppercase tracking-widest text-[10px]">
+            <Link href="/" className="hover:text-cyan-400 transition">
               Home
+            </Link>
+            <Link href="/execom" className="hover:text-cyan-400 transition">
+              ExeCom
+            </Link>
+            <Link href="/events" className="hover:text-cyan-400 transition">
+              Events
             </Link>
           </div>
         </div>
