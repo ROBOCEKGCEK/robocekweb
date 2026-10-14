@@ -9,7 +9,6 @@ import UiIcon from "../components/UiIcon";
 import {
   browserLocalPersistence,
   browserSessionPersistence,
-  createUserWithEmailAndPassword,
   sendPasswordResetEmail,
   setPersistence,
   signInWithEmailAndPassword,
@@ -17,14 +16,8 @@ import {
 } from "firebase/auth";
 import { auth, db } from "../firebase/client";
 import {
-  collection,
-  deleteDoc,
   doc,
   getDoc,
-  getDocs,
-  query,
-  setDoc,
-  where,
 } from "firebase/firestore";
 
 export default function LoginPage() {
@@ -42,41 +35,27 @@ export default function LoginPage() {
     setErrorMessage("");
     setStatusMessage("");
 
-    if (!auth || !db) {
+    if (!auth) {
       setErrorMessage("Firebase authentication is not configured.");
       return;
     }
 
     const trimmedIdentifier = identifier.trim();
     if (!trimmedIdentifier) {
-      setErrorMessage("Please enter your Email or Membership ID in the input box above, then click 'Forgot password?'.");
+      setErrorMessage("Please enter your registered email address in the input box above, then click 'Forgot password?'.");
+      return;
+    }
+
+    if (!trimmedIdentifier.includes("@")) {
+      setErrorMessage("Please enter your full registered email address (e.g. name@gcek.ac.in).");
       return;
     }
 
     setIsSendingReset(true);
     try {
-      let emailToUse = trimmedIdentifier;
-
-      // Resolve Membership ID to Email if needed
-      if (!trimmedIdentifier.includes("@")) {
-        const userQuery = query(
-          collection(db, "users"),
-          where("membershipId", "==", trimmedIdentifier)
-        );
-        const snapshot = await getDocs(userQuery);
-
-        if (snapshot.empty) {
-          setErrorMessage("No registered member account was found with that Membership ID.");
-          setIsSendingReset(false);
-          return;
-        }
-
-        emailToUse = snapshot.docs[0].data().email as string;
-      }
-
-      await sendPasswordResetEmail(auth, emailToUse);
+      await sendPasswordResetEmail(auth, trimmedIdentifier);
       setStatusMessage(
-        `Password reset link sent to ${emailToUse}! Please check your email inbox (and spam folder).`
+        `Password reset link sent to ${trimmedIdentifier}! Please check your email inbox (and spam folder).`
       );
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : "Failed to send password reset email.";
@@ -102,11 +81,16 @@ export default function LoginPage() {
       return;
     }
 
-    const trimmedIdentifier = identifier.trim();
+    const trimmedEmail = identifier.trim();
     const trimmedPassword = password.trim();
 
-    if (!trimmedIdentifier || !trimmedPassword) {
-      setErrorMessage("Enter your email or membership ID and password.");
+    if (!trimmedEmail || !trimmedPassword) {
+      setErrorMessage("Enter your registered email address and password.");
+      return;
+    }
+
+    if (!trimmedEmail.includes("@")) {
+      setErrorMessage("Please sign in using your registered email address (e.g. name@gcek.ac.in).");
       return;
     }
 
@@ -118,132 +102,44 @@ export default function LoginPage() {
         rememberMe ? browserLocalPersistence : browserSessionPersistence,
       );
 
-      let emailToUse = trimmedIdentifier;
-      let userDocSnap = null;
+      // Direct Firebase Auth Sign-in with Email & Password
+      // (Bypasses unauthenticated Firestore queries, complying with security rules)
+      const cred = await signInWithEmailAndPassword(auth, trimmedEmail, trimmedPassword);
 
-      // 1. Resolve identifier to email and find Firestore document
-      if (!trimmedIdentifier.includes("@")) {
-        const userQuery = query(
-          collection(db, "users"),
-          where("membershipId", "==", trimmedIdentifier),
-        );
-        const snapshot = await getDocs(userQuery);
+      if (cred.user) {
+        // Authenticated session established: safe to read user's own profile
+        const profileSnap = await getDoc(doc(db, "users", cred.user.uid));
 
-        if (snapshot.empty) {
-          setErrorMessage("No account matched that Membership ID.");
-          setIsSubmitting(false);
-          return;
-        }
-
-        userDocSnap = snapshot.docs[0];
-        emailToUse = userDocSnap.data().email as string;
-      } else {
-        const userQuery = query(
-          collection(db, "users"),
-          where("email", "==", trimmedIdentifier),
-        );
-        const snapshot = await getDocs(userQuery);
-        if (!snapshot.empty) {
-          userDocSnap = snapshot.docs[0];
-        } else {
-          // Fallback: Case-insensitive email search across Firestore users
-          const allSnap = await getDocs(collection(db, "users"));
-          const match = allSnap.docs.find(
-            (d) => (d.data().email || "").toString().trim().toLowerCase() === trimmedIdentifier.toLowerCase()
-          );
-          if (match) {
-            userDocSnap = match;
-            emailToUse = (match.data().email as string) || trimmedIdentifier;
-          }
-        }
-      }
-
-      // 2. Try standard Firebase Auth Sign-in
-      try {
-        const cred = await signInWithEmailAndPassword(auth, emailToUse, trimmedPassword);
-
-        // Check if member profile document was deleted by admin
-        if (cred.user) {
-          const profileSnap = await getDoc(doc(db, "users", cred.user.uid));
-          if (!profileSnap.exists() && !userDocSnap) {
+        if (profileSnap.exists()) {
+          const st = (profileSnap.data().status || "").toString().toLowerCase();
+          if (st && st !== "approved" && st !== "verified") {
             await signOut(auth);
-            setErrorMessage("Your member account has been deleted by an administrator. Please contact robocek@gcek.ac.in for assistance.");
+            setErrorMessage("Your account is pending admin approval. Please wait for confirmation or contact robocek@gcek.ac.in.");
             setIsSubmitting(false);
             return;
           }
-          // Block access until admin approves the user
-          if (profileSnap.exists()) {
-            const st = (profileSnap.data().status || "").toString().toLowerCase();
-            if (st !== "approved") {
-              await signOut(auth);
-              setErrorMessage("Your account is pending admin approval. Please wait for confirmation or contact robocek@gcek.ac.in.");
-              setIsSubmitting(false);
-              return;
-            }
-          }
-        }
-      } catch (authErr: unknown) {
-        const errCode = (authErr as { code?: string })?.code || "";
-        const errStr = authErr instanceof Error ? authErr.message : "";
-        const isUserNotFound =
-          errCode === "auth/user-not-found" ||
-          errCode === "auth/invalid-credential" ||
-          errStr.includes("auth/user-not-found") ||
-          errStr.includes("auth/invalid-credential");
-
-        // 3. If member document exists in Firestore (e.g. uploaded via Excel or approved by Admin)
-        if (userDocSnap && isUserNotFound) {
-          const expectedDefaultPass = userDocSnap.data().defaultPassword || "Robocek@2026";
-          
-          // Verify provided password matches the default password
-          if (trimmedPassword === expectedDefaultPass || trimmedPassword === "Robocek@2026") {
-            try {
-              // Auto-provision their Firebase Auth user account on the fly!
-              const newCred = await createUserWithEmailAndPassword(auth, emailToUse, trimmedPassword);
-              
-              if (newCred.user) {
-                const oldDocRef = doc(db, "users", userDocSnap.id);
-                const newDocRef = doc(db, "users", newCred.user.uid);
-                
-                // Move document to new Auth UID
-                await setDoc(newDocRef, {
-                  ...userDocSnap.data(),
-                  uid: newCred.user.uid,
-                  mustChangePassword: true,
-                });
-
-                if (userDocSnap.id !== newCred.user.uid) {
-                  await deleteDoc(oldDocRef);
-                }
-              }
-            } catch (createErr: unknown) {
-              const createCode = (createErr as { code?: string })?.code || "";
-              if (createCode === "auth/email-already-in-use") {
-                setErrorMessage("Incorrect password. If you forgot your password, please click 'Forgot password?' below to reset it.");
-                return;
-              }
-              throw createErr;
-            }
-          } else {
-            setErrorMessage("Incorrect password. For first-time login, use default password: Robocek@2026");
-            return;
-          }
-        } else {
-          setErrorMessage(
-            errCode === "auth/invalid-credential" || errStr.includes("invalid-credential")
-              ? "Invalid email or password. If logging in for the first time, use default password: Robocek@2026"
-              : errStr || "Sign in failed."
-          );
-          return;
         }
       }
 
       setStatusMessage("Signed in successfully. Redirecting...");
       router.replace("/dashboard");
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error ? error.message : "Sign in failed.",
-      );
+    } catch (authErr: unknown) {
+      const errCode = (authErr as { code?: string })?.code || "";
+      const errStr = authErr instanceof Error ? authErr.message : "";
+      
+      if (
+        errCode === "auth/invalid-credential" ||
+        errCode === "auth/user-not-found" ||
+        errCode === "auth/wrong-password" ||
+        errStr.includes("invalid-credential") ||
+        errStr.includes("user-not-found")
+      ) {
+        setErrorMessage("Invalid email or password. Please verify your credentials or register if you are new.");
+      } else if (errCode === "auth/too-many-requests") {
+        setErrorMessage("Access temporarily blocked due to multiple failed login attempts. Please try again later or reset your password.");
+      } else {
+        setErrorMessage(errStr || "Sign in failed.");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -311,7 +207,7 @@ export default function LoginPage() {
             <div className="mb-6 p-3 rounded-lg dark:bg-blue-950/40 bg-blue-50 border dark:border-blue-900/50 border-blue-200">
               <p className="text-xs dark:text-blue-200 text-blue-800">
                 <UiIcon name="info" className="mr-1 inline h-4 w-4 align-text-bottom" />
-                Enter either your email or membership ID to login.
+                Sign in using your registered email address and password.
               </p>
             </div>
             <form className="space-y-6" onSubmit={handleSubmit}>
@@ -325,14 +221,14 @@ export default function LoginPage() {
                   {statusMessage}
                 </div>
               ) : null}
-              {/* Email or Membership ID */}
+              {/* Email Address */}
               <div className="flex flex-col gap-2">
                 <label className="text-[0.75rem] uppercase tracking-[0.18em] dark:text-zinc-400 text-zinc-700 font-medium">
-                  Email or Membership ID <span className="text-red-500">*</span>
+                  Email Address <span className="text-red-500">*</span>
                 </label>
                 <input
-                  type="text"
-                  placeholder="you@email.com or ROBOCEK-2024-001"
+                  type="email"
+                  placeholder="you@email.com"
                   required
                   value={identifier}
                   onChange={(event) => setIdentifier(event.target.value)}
@@ -345,7 +241,7 @@ export default function LoginPage() {
                     transition"
                 />
                 <p className="text-[0.65rem] dark:text-zinc-500 text-zinc-600">
-                  Use any email address or your ROBOCEK membership ID
+                  Use your registered college or personal email address
                 </p>
               </div>
 
