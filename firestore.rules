@@ -3,24 +3,146 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    match /users/{document=**} {
-      allow read: if true;
-      allow write: if request.auth != null;
-    }
-    
-    match /events/{document=**} {
-      allow read: if true;
-      allow write: if true;
+    function isAuthenticated() {
+      return request.auth != null;
     }
 
-    match /custom_forms/{document=**} {
-      allow read: if true;
-      allow write: if true;
+    function isAdmin() {
+      return isAuthenticated()
+        && request.auth.token.email == "robocek@gcek.ac.in";
     }
 
-    match /projects/{document=**} {
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    match /users/{userId} {
+      allow create: if isAdmin()
+        || (
+          isOwner(userId)
+          && request.resource.data.uid == request.auth.uid
+          && request.resource.data.email == request.auth.token.email
+          && request.resource.data.status == "Pending Approval"
+          && request.resource.data.membershipId == null
+          && request.resource.data.keys().hasOnly([
+            "uid",
+            "fullName",
+            "email",
+            "phoneNumber",
+            "phone",
+            "branch",
+            "yearSemester",
+            "year",
+            "interests",
+            "comments",
+            "status",
+            "membershipId",
+            "createdAt"
+          ])
+        );
+
+      allow read: if isAdmin()
+        || (
+          isOwner(userId)
+          && resource.data.uid == request.auth.uid
+        );
+
+      allow update: if isAdmin()
+        || (
+          isOwner(userId)
+          && resource.data.uid == request.auth.uid
+          && request.resource.data.uid == resource.data.uid
+          && request.resource.data.email == resource.data.email
+          && request.resource.data.status == resource.data.status
+          && request.resource.data.membershipId == resource.data.membershipId
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            "fullName",
+            "phoneNumber",
+            "phone",
+            "branch",
+            "yearSemester",
+            "year",
+            "interests",
+            "comments",
+            "mustChangePassword",
+            "updatedAt"
+          ])
+        );
+
+      allow delete: if isAdmin();
+    }
+
+    match /events/{eventId} {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
+    match /events/{eventId}/registrations/{registrationId} {
+      allow read: if isAdmin();
+      allow create: if isAuthenticated()
+        && request.resource.data.eventId == eventId
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.keys().hasOnly([
+          "eventId",
+          "eventTitle",
+          "userId",
+          "fullName",
+          "email",
+          "phone",
+          "branch",
+          "year",
+          "membershipId",
+          "isMemberDiscountApplied",
+          "feePaid",
+          "utrNumber",
+          "paymentStatus",
+          "registeredAt"
+        ]);
+      allow update, delete: if isAdmin();
+    }
+
+    match /custom_forms/{formId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /custom_forms/{formId}/responses/{responseId} {
+      allow read: if isAdmin();
+      allow create: if isAuthenticated()
+        && request.resource.data.formId == formId
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.keys().hasOnly([
+          "formId",
+          "formTitle",
+          "userId",
+          "fullName",
+          "email",
+          "phone",
+          "branch",
+          "year",
+          "membershipId",
+          "isMemberDiscountApplied",
+          "feePaid",
+          "utrNumber",
+          "paymentStatus",
+          "customAnswers",
+          "submittedAt",
+          "registeredAt"
+        ]);
+      allow update, delete: if isAdmin();
+    }
+
+    match /projects/{projectId} {
+      allow read: if true;
+      allow create: if isAuthenticated()
+        && request.resource.data.authorUid == request.auth.uid;
+      allow update: if isAuthenticated()
+        && resource.data.authorUid == request.auth.uid
+        && request.resource.data.authorUid == resource.data.authorUid;
+      allow delete: if isAuthenticated()
+        && resource.data.authorUid == request.auth.uid;
     }
   }
 }

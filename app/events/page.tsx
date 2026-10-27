@@ -150,14 +150,6 @@ export default function EventsPage() {
           const userDoc = await getDoc(doc(db, "users", u.uid));
           if (userDoc.exists()) {
             userData = userDoc.data();
-          } else if (u.email) {
-            const allUsersSnap = await getDocs(collection(db, "users"));
-            const matchedUser = allUsersSnap.docs.find(
-              (d) => formatFieldToString(d.data().email).toLowerCase() === u.email?.toLowerCase()
-            );
-            if (matchedUser) {
-              userData = matchedUser.data();
-            }
           }
 
           if (userData) {
@@ -316,6 +308,10 @@ export default function EventsPage() {
   const handleRegistrationSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!db || !registeringEvent) return;
+    if (!currentUser) {
+      setRegError("Please sign in before submitting a registration.");
+      return;
+    }
     setRegError("");
 
     if (evIsUnavailable) {

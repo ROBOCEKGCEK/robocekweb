@@ -140,22 +140,9 @@ export default function DashboardPage() {
           setProfile(profileData);
           setAuthorName(profileData.fullName || currentUser.displayName || currentUser.email || "");
         } else {
-          // Fallback query by uid
-          const userQuery = query(
-            collection(db, "users"),
-            where("uid", "==", currentUser.uid),
-          );
-          const snapshot = await getDocs(userQuery);
-
-          if (!snapshot.empty) {
-            const profileData = snapshot.docs[0].data() as UserProfile;
-            setProfile(profileData);
-            setAuthorName(profileData.fullName || currentUser.displayName || currentUser.email || "");
-          } else {
-            setProfile(null);
-            setAuthorName(currentUser.displayName || currentUser.email || "");
-            setErrorMessage("No user profile record was found for this account.");
-          }
+          setProfile(null);
+          setAuthorName(currentUser.displayName || currentUser.email || "");
+          setErrorMessage("No user profile record was found for this account.");
         }
 
         await fetchUserProjects(currentUser.uid, currentUser.email);

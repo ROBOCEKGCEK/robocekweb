@@ -86,14 +86,6 @@ export default function StandaloneFormPage({
           const userDoc = await getDoc(doc(db, "users", u.uid));
           if (userDoc.exists()) {
             userData = userDoc.data();
-          } else if (u.email) {
-            const allUsersSnap = await getDocs(collection(db, "users"));
-            const matchedUser = allUsersSnap.docs.find(
-              (d) => formatFieldToString(d.data().email).toLowerCase() === u.email?.toLowerCase()
-            );
-            if (matchedUser) {
-              userData = matchedUser.data();
-            }
           }
 
           if (userData) {
@@ -322,6 +314,10 @@ export default function StandaloneFormPage({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!db || !formConfig) return;
+    if (!currentUser) {
+      setErrorMessage("Please sign in before submitting a registration.");
+      return;
+    }
     if (isUnavailable) {
       setErrorMessage(
         unavailableReason === "limit"
